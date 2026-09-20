@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceRequestController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceBrowseController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +38,10 @@ Route::middleware('auth')->group(function (): void {
 
     Route::resource('addresses', AddressController::class)->except(['show']);
     Route::patch('addresses/{address}/default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
+
+    Route::resource('requests', MaintenanceRequestController::class)
+        ->only(['index', 'create', 'store', 'show'])
+        ->parameters(['requests' => 'maintenanceRequest']);
 });
 
 Route::middleware(['auth', 'role:admin,manager'])
@@ -50,4 +56,12 @@ Route::middleware(['auth', 'role:admin,manager'])
 
         Route::patch('customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
         Route::resource('customers', CustomerController::class)->only(['index', 'show', 'edit', 'update']);
+
+        Route::patch('requests/{maintenanceRequest}/approve', [AdminMaintenanceRequestController::class, 'approve'])->name('requests.approve');
+        Route::patch('requests/{maintenanceRequest}/reject', [AdminMaintenanceRequestController::class, 'reject'])->name('requests.reject');
+        Route::patch('requests/{maintenanceRequest}/request-info', [AdminMaintenanceRequestController::class, 'requestInfo'])->name('requests.request-info');
+        Route::patch('requests/{maintenanceRequest}/appointment', [AdminMaintenanceRequestController::class, 'updateAppointment'])->name('requests.appointment');
+        Route::resource('requests', AdminMaintenanceRequestController::class)
+            ->only(['index', 'show'])
+            ->parameters(['requests' => 'maintenanceRequest']);
     });

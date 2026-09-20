@@ -132,7 +132,7 @@
 
                         <div class="mt-8">
                             @auth
-                                <a href="{{ route('dashboard') }}" class="primary-button w-full py-3.5 text-center text-sm font-bold">
+                                <a href="{{ route('requests.create', ['service_id' => $service->id]) }}" class="primary-button w-full py-3.5 text-center text-sm font-bold">
                                     Request This Service Now
                                 </a>
                             @else

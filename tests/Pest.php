@@ -1,8 +1,11 @@
 <?php
 
+use App\Models\MaintenanceRequest;
 use App\Models\Service;
 use App\Models\Technician;
+use App\Services\TechnicianAssignmentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /*
@@ -60,4 +63,31 @@ function skilledTechnician(Service $service): Technician
     $technician->categories()->sync([$service->service_category_id]);
 
     return $technician->refresh();
+}
+
+/**
+ * Create a real 1x1 PNG upload without requiring the GD extension.
+ */
+function fakePngPhoto(string $name = 'ac.png'): UploadedFile
+{
+    $path = tempnam(sys_get_temp_dir(), 'photo').'.png';
+    file_put_contents($path, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
+
+    return new UploadedFile($path, $name, 'image/png', null, true);
+}
+
+/**
+ * Create an approved request, assign a skilled technician, and book the slot.
+ *
+ * The booked visit is 09:00–11:00 on the preferred date.
+ */
+function scheduledRequest(): MaintenanceRequest
+{
+    $request = MaintenanceRequest::factory()->approved()->create([
+        'preferred_time' => '09:00',
+    ]);
+    $request->service->update(['estimated_duration_minutes' => 120]);
+    $technician = skilledTechnician($request->service);
+
+    return app(TechnicianAssignmentService::class)->assign($request->refresh(), $technician);
 }

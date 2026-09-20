@@ -6,11 +6,13 @@ use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceR
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TechnicianController;
+use App\Http\Controllers\Admin\WorkOrderController as AdminWorkOrderController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceBrowseController;
+use App\Http\Controllers\Technician\WorkOrderController as TechnicianWorkOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -45,6 +47,20 @@ Route::middleware('auth')->group(function (): void {
         ->parameters(['requests' => 'maintenanceRequest']);
 });
 
+Route::middleware(['auth', 'role:technician'])
+    ->prefix('technician')
+    ->name('technician.')
+    ->group(function (): void {
+        Route::get('jobs', [TechnicianWorkOrderController::class, 'index'])->name('jobs.index');
+        Route::get('jobs/{workOrder}', [TechnicianWorkOrderController::class, 'show'])->name('jobs.show');
+        Route::post('jobs/requests/{maintenanceRequest}/start', [TechnicianWorkOrderController::class, 'start'])->name('jobs.start');
+        Route::patch('jobs/{workOrder}/diagnosis', [TechnicianWorkOrderController::class, 'recordDiagnosis'])->name('jobs.diagnosis');
+        Route::patch('jobs/{workOrder}/notes', [TechnicianWorkOrderController::class, 'recordNotes'])->name('jobs.notes');
+        Route::post('jobs/{workOrder}/labor', [TechnicianWorkOrderController::class, 'addLabor'])->name('jobs.labor');
+        Route::post('jobs/{workOrder}/photos', [TechnicianWorkOrderController::class, 'uploadPhotos'])->name('jobs.photos');
+        Route::patch('jobs/{workOrder}/complete', [TechnicianWorkOrderController::class, 'complete'])->name('jobs.complete');
+    });
+
 Route::middleware(['auth', 'role:admin,manager'])
     ->prefix('admin')
     ->name('admin.')
@@ -73,4 +89,7 @@ Route::middleware(['auth', 'role:admin,manager'])
 
         Route::patch('technicians/{technician}/toggle-status', [TechnicianController::class, 'toggleStatus'])->name('technicians.toggle-status');
         Route::resource('technicians', TechnicianController::class);
+
+        Route::get('work-orders/{workOrder}', [AdminWorkOrderController::class, 'show'])->name('work-orders.show');
+        Route::patch('work-orders/{workOrder}/correct', [AdminWorkOrderController::class, 'correct'])->name('work-orders.correct');
     });

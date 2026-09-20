@@ -106,6 +106,16 @@ class MaintenanceRequest extends Model
     }
 
     /**
+     * Get the work order for the request.
+     *
+     * @return HasOne<WorkOrder, $this>
+     */
+    public function workOrder(): HasOne
+    {
+        return $this->hasOne(WorkOrder::class);
+    }
+
+    /**
      * Get the staff member who reviewed the request.
      *
      * @return BelongsTo<User, $this>

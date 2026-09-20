@@ -11,7 +11,10 @@ use App\Services\TechnicianAssignmentService;
 
 it('assigns an eligible technician to an approved request and books the slot', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
-    $request = MaintenanceRequest::factory()->approved()->create();
+    $request = MaintenanceRequest::factory()->approved()->create([
+        'preferred_time' => '10:00',
+    ]);
+    $request->service->update(['estimated_duration_minutes' => 60]);
     $technician = skilledTechnician($request->service);
 
     $this->actingAs($admin)->patch(route('admin.requests.assign', $request), [
@@ -74,7 +77,10 @@ it('rejects assignment of inactive technicians', function () {
 it('reassigns and unassigns technicians', function () {
     $service = app(TechnicianAssignmentService::class);
     $admin = User::factory()->create(['role' => UserRole::Admin]);
-    $request = MaintenanceRequest::factory()->approved()->create();
+    $request = MaintenanceRequest::factory()->approved()->create([
+        'preferred_time' => '10:00',
+    ]);
+    $request->service->update(['estimated_duration_minutes' => 60]);
     $first = skilledTechnician($request->service);
     $second = skilledTechnician($request->service);
 

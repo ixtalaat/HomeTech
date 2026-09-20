@@ -13,17 +13,6 @@ use App\Services\RequestStatusService;
 use App\Services\SchedulingService;
 use App\Services\TechnicianAssignmentService;
 
-function scheduledRequest(): MaintenanceRequest
-{
-    $request = MaintenanceRequest::factory()->approved()->create([
-        'preferred_time' => '09:00',
-    ]);
-    $request->service->update(['estimated_duration_minutes' => 120]);
-    $technician = skilledTechnician($request->service);
-
-    return app(TechnicianAssignmentService::class)->assign($request->refresh(), $technician);
-}
-
 it('rejects overlapping appointments for the same technician (BR-002)', function () {
     $scheduling = app(SchedulingService::class);
     $request = scheduledRequest();

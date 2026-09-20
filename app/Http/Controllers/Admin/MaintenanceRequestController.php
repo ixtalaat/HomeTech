@@ -54,7 +54,7 @@ class MaintenanceRequestController extends Controller
     {
         $this->authorize('view', $maintenanceRequest);
 
-        $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'technician.user', 'appointment', 'statusHistories']);
+        $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'technician.user', 'appointment', 'workOrder', 'statusHistories']);
 
         $eligibleTechnicians = $this->assignments->eligibleFor($maintenanceRequest);
 

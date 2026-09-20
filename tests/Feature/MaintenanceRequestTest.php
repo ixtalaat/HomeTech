@@ -6,17 +6,7 @@ use App\Models\Address;
 use App\Models\MaintenanceRequest;
 use App\Models\Service;
 use App\Models\User;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
-function fakePngPhoto(string $name = 'ac.png'): UploadedFile
-{
-    // 1x1 PNG without requiring the GD extension.
-    $path = tempnam(sys_get_temp_dir(), 'photo').'.png';
-    file_put_contents($path, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
-
-    return new UploadedFile($path, $name, 'image/png', null, true);
-}
 
 function validRequestPayload(Service $service, Address $address): array
 {

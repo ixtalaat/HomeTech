@@ -13,6 +13,11 @@
             </span>
         </div>
         <p class="mt-1 text-sm text-slate-500">{{ $maintenanceRequest->user->name ?? '—' }} · Submitted {{ $maintenanceRequest->created_at->format('d M Y, h:i A') }}</p>
+        @if($maintenanceRequest->workOrder)
+            <a href="{{ route('admin.work-orders.show', $maintenanceRequest->workOrder) }}" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-teal-700 hover:underline">
+                View work order #{{ $maintenanceRequest->workOrder->id }} ({{ $maintenanceRequest->workOrder->status->label() }}) →
+            </a>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">

@@ -4,6 +4,7 @@ use App\Http\Controllers\AdditionalWorkController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\InventoryItemController;
+use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceRequestController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\TechnicianController;
 use App\Http\Controllers\Admin\WorkOrderController as AdminWorkOrderController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceBrowseController;
@@ -50,6 +52,11 @@ Route::middleware('auth')->group(function (): void {
 
     Route::patch('additional-work/{additionalWork}/approve', [AdditionalWorkController::class, 'approve'])->name('additional-work.approve');
     Route::patch('additional-work/{additionalWork}/reject', [AdditionalWorkController::class, 'reject'])->name('additional-work.reject');
+
+    Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
+    Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
+
+    Route::post('requests/{maintenanceRequest}/cancel', [MaintenanceRequestController::class, 'cancel'])->name('requests.cancel');
 });
 
 Route::middleware(['auth', 'role:technician'])
@@ -91,6 +98,7 @@ Route::middleware(['auth', 'role:admin,manager'])
         Route::patch('requests/{maintenanceRequest}/book-appointment', [AdminMaintenanceRequestController::class, 'bookAppointment'])->name('requests.book-appointment');
         Route::patch('requests/{maintenanceRequest}/reschedule-appointment', [AdminMaintenanceRequestController::class, 'rescheduleAppointment'])->name('requests.reschedule-appointment');
         Route::patch('requests/{maintenanceRequest}/cancel-appointment', [AdminMaintenanceRequestController::class, 'cancelAppointment'])->name('requests.cancel-appointment');
+        Route::patch('requests/{maintenanceRequest}/cancel', [AdminMaintenanceRequestController::class, 'cancelRequest'])->name('requests.cancel');
         Route::resource('requests', AdminMaintenanceRequestController::class)
             ->only(['index', 'show'])
             ->parameters(['requests' => 'maintenanceRequest']);
@@ -103,4 +111,12 @@ Route::middleware(['auth', 'role:admin,manager'])
 
         Route::patch('inventory/{inventoryItem}/adjust', [InventoryItemController::class, 'adjust'])->name('inventory.adjust');
         Route::resource('inventory', InventoryItemController::class)->parameters(['inventory' => 'inventoryItem']);
+
+        Route::post('invoices/work-orders/{workOrder}/generate', [AdminInvoiceController::class, 'generate'])->name('invoices.generate');
+        Route::patch('invoices/{invoice}/issue', [AdminInvoiceController::class, 'issue'])->name('invoices.issue');
+        Route::patch('invoices/{invoice}/discount', [AdminInvoiceController::class, 'discount'])->name('invoices.discount');
+        Route::post('invoices/{invoice}/payments', [AdminInvoiceController::class, 'recordPayment'])->name('invoices.payments');
+        Route::patch('invoices/{invoice}/cancel', [AdminInvoiceController::class, 'cancel'])->name('invoices.cancel');
+        Route::patch('invoices/{invoice}/close', [AdminInvoiceController::class, 'close'])->name('invoices.close');
+        Route::resource('invoices', AdminInvoiceController::class)->only(['index', 'show']);
     });

@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\InventoryItem;
 use App\Models\MaintenanceRequest;
 use App\Models\Service;
 use App\Models\Technician;
 use App\Models\WorkOrder;
+use App\Services\AdditionalWorkService;
 use App\Services\TechnicianAssignmentService;
 use App\Services\WorkOrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -102,4 +104,27 @@ function inProgressWorkOrder(): WorkOrder
     $request = scheduledRequest();
 
     return app(WorkOrderService::class)->startVisit($request->refresh(), $request->technician->user);
+}
+
+/**
+ * Create a completed work order with labor, materials, and one approved extra.
+ */
+function completedWorkOrderWithCharges(): WorkOrder
+{
+    $workOrder = inProgressWorkOrder();
+    $services = app(WorkOrderService::class);
+    $techUser = $workOrder->technician->user;
+
+    $services->recordDiagnosis($workOrder, $techUser, 'Faulty capacitor.');
+    $services->recordNotes($workOrder, $techUser, 'Replaced and tested.');
+    $services->addLaborItem($workOrder, $techUser, 'AC Diagnosis', 100.00);
+
+    $item = InventoryItem::factory()->create(['current_stock' => 10, 'unit_cost' => 150.00]);
+    $services->recordMaterialUsage($workOrder->refresh(), $techUser, $item, 1);
+
+    $extras = app(AdditionalWorkService::class);
+    $extra = $extras->request($workOrder->refresh(), $techUser, 'Replace connector.', 100.00);
+    $extras->decide($extra, $workOrder->request->user, true);
+
+    return $services->complete($workOrder->refresh(), $techUser);
 }

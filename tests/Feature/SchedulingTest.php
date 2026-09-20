@@ -44,7 +44,7 @@ it('allows non-overlapping and boundary-touching slots', function () {
     expect($scheduling->hasConflict($otherTech->id, $date, '10:00', '12:00'))->toBeFalse();
 
     // Different date, same slot.
-    $otherDate = now()->addDays(10)->format('Y-m-d');
+    $otherDate = $request->appointment->date->copy()->addDays(30)->format('Y-m-d');
     expect($scheduling->hasConflict($technician->id, $otherDate, '10:00', '12:00'))->toBeFalse();
 });
 

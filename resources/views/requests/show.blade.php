@@ -12,6 +12,19 @@
                 {{ $maintenanceRequest->status->label() }}
             </span>
         </div>
+        @if($maintenanceRequest->invoice)
+            <a href="{{ route('invoices.show', $maintenanceRequest->invoice) }}" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-teal-700 hover:underline">
+                View invoice {{ $maintenanceRequest->invoice->number }} ({{ $maintenanceRequest->invoice->status->label() }}) →
+            </a>
+        @endif
+        @if($maintenanceRequest->cancellation)
+            <p class="mt-2 rounded-xl bg-slate-100 p-3 text-xs font-semibold text-slate-600">
+                Cancelled: {{ $maintenanceRequest->cancellation->reason }}
+                @if($maintenanceRequest->cancellation->fee > 0)
+                    · Fee: {{ number_format($maintenanceRequest->cancellation->fee, 2) }} EGP
+                @endif
+            </p>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -118,6 +131,17 @@
                     <p class="text-sm text-slate-500">No history yet.</p>
                 @endforelse
             </ol>
+
+            @if(!$maintenanceRequest->cancellation && in_array($maintenanceRequest->status, [\App\Enums\RequestStatus::PendingReview, \App\Enums\RequestStatus::InfoRequested, \App\Enums\RequestStatus::Approved, \App\Enums\RequestStatus::TechnicianAssigned, \App\Enums\RequestStatus::Scheduled], true))
+                <form method="POST" action="{{ route('requests.cancel', $maintenanceRequest) }}" class="mt-4 space-y-3 border-t border-slate-100 pt-4" onsubmit="return confirm('Cancel this request? A fee may apply per the cancellation policy.');">
+                    @csrf
+                    <div>
+                        <label for="reason" class="form-label text-xs">Cancellation Reason <span class="text-rose-500">*</span></label>
+                        <textarea id="reason" name="reason" rows="2" required class="form-input text-xs"></textarea>
+                    </div>
+                    <button type="submit" class="w-full rounded-xl border border-rose-200 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">Cancel Request</button>
+                </form>
+            @endif
         </div>
     </div>
 </div>

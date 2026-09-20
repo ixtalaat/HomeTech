@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Models\InventoryItem;
+use App\Models\Invoice;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
 use App\Models\User;
 use App\Models\WorkOrder;
 use App\Policies\CustomerPolicy;
 use App\Policies\InventoryPolicy;
+use App\Policies\InvoicePolicy;
 use App\Policies\MaintenanceRequestPolicy;
 use App\Policies\TechnicianPolicy;
 use App\Policies\WorkOrderPolicy;
@@ -35,5 +37,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Technician::class, TechnicianPolicy::class);
         Gate::policy(WorkOrder::class, WorkOrderPolicy::class);
         Gate::policy(InventoryItem::class, InventoryPolicy::class);
+        Gate::policy(Invoice::class, InvoicePolicy::class);
     }
 }

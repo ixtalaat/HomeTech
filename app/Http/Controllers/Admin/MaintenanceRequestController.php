@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\RequestStatus;
+use App\Exceptions\BillingException;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\SchedulingConflictException;
 use App\Exceptions\TechnicianAssignmentException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AssignTechnicianRequest;
 use App\Http\Requests\Admin\BookAppointmentRequest;
+use App\Http\Requests\Admin\CancelRequestRequest;
 use App\Http\Requests\Admin\RescheduleAppointmentRequest;
 use App\Http\Requests\Admin\ReviewMaintenanceRequestRequest;
 use App\Http\Requests\Admin\UpdateRequestAppointmentRequest;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
+use App\Services\CancellationService;
 use App\Services\MaintenanceRequestService;
 use App\Services\RequestReviewService;
 use App\Services\SchedulingService;
@@ -31,7 +34,8 @@ class MaintenanceRequestController extends Controller
         private MaintenanceRequestService $requests,
         private RequestReviewService $reviews,
         private TechnicianAssignmentService $assignments,
-        private SchedulingService $scheduling
+        private SchedulingService $scheduling,
+        private CancellationService $cancellations
     ) {}
 
     /**
@@ -54,7 +58,7 @@ class MaintenanceRequestController extends Controller
     {
         $this->authorize('view', $maintenanceRequest);
 
-        $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'technician.user', 'appointment', 'workOrder', 'statusHistories']);
+        $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'technician.user', 'appointment', 'workOrder', 'invoice', 'cancellation', 'statusHistories']);
 
         $eligibleTechnicians = $this->assignments->eligibleFor($maintenanceRequest);
 
@@ -169,6 +173,26 @@ class MaintenanceRequestController extends Controller
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
             ->with('success', 'Technician unassigned. The request is approved again.');
+    }
+
+    /**
+     * Cancel the maintenance request per the cancellation policy.
+     */
+    public function cancelRequest(CancelRequestRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        try {
+            $this->cancellations->cancel(
+                $maintenanceRequest,
+                $request->user(),
+                $request->validated('reason')
+            );
+        } catch (BillingException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()
+            ->route('admin.requests.show', $maintenanceRequest)
+            ->with('success', 'Request cancelled per the cancellation policy.');
     }
 
     /**

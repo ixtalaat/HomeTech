@@ -23,9 +23,12 @@ class RequestStatusService
         'info_requested' => [RequestStatus::PendingReview, RequestStatus::Rejected, RequestStatus::Cancelled],
         'approved' => [RequestStatus::TechnicianAssigned, RequestStatus::Cancelled],
         'technician_assigned' => [RequestStatus::Approved, RequestStatus::Scheduled, RequestStatus::Cancelled],
-        'scheduled' => [RequestStatus::TechnicianAssigned, RequestStatus::Approved, RequestStatus::InProgress],
+        'scheduled' => [RequestStatus::TechnicianAssigned, RequestStatus::Approved, RequestStatus::InProgress, RequestStatus::Cancelled],
         'in_progress' => [RequestStatus::WaitingCustomerApproval, RequestStatus::Completed],
         'waiting_customer_approval' => [RequestStatus::InProgress],
+        'completed' => [RequestStatus::Invoiced],
+        'invoiced' => [RequestStatus::Paid],
+        'paid' => [RequestStatus::Closed],
     ];
 
     /**

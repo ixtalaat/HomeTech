@@ -116,6 +116,26 @@ class MaintenanceRequest extends Model
     }
 
     /**
+     * Get the invoice for the request.
+     *
+     * @return HasOne<Invoice, $this>
+     */
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
+    /**
+     * Get the cancellation for the request.
+     *
+     * @return HasOne<Cancellation, $this>
+     */
+    public function cancellation(): HasOne
+    {
+        return $this->hasOne(Cancellation::class);
+    }
+
+    /**
      * Get the staff member who reviewed the request.
      *
      * @return BelongsTo<User, $this>

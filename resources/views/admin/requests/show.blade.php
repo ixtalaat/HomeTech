@@ -233,6 +233,34 @@
             @endif
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-sm font-extrabold text-slate-900">Billing</h3>
+                @if($maintenanceRequest->invoice)
+                    <a href="{{ route('admin.invoices.show', $maintenanceRequest->invoice) }}" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-teal-700 hover:underline">
+                        View invoice {{ $maintenanceRequest->invoice->number }} ({{ $maintenanceRequest->invoice->status->label() }}) →
+                    </a>
+                @elseif($maintenanceRequest->workOrder && $maintenanceRequest->status === \App\Enums\RequestStatus::Completed)
+                    <form method="POST" action="{{ route('admin.invoices.generate', $maintenanceRequest->workOrder) }}" class="mt-3">
+                        @csrf
+                        <button type="submit" class="primary-button w-full text-xs">Generate Invoice</button>
+                    </form>
+                @else
+                    <p class="mt-2 text-xs text-slate-500">No invoice yet — invoicing unlocks after the job is completed.</p>
+                @endif
+            </div>
+
+            @if(!$maintenanceRequest->cancellation && in_array($maintenanceRequest->status, [\App\Enums\RequestStatus::PendingReview, \App\Enums\RequestStatus::InfoRequested, \App\Enums\RequestStatus::Approved, \App\Enums\RequestStatus::TechnicianAssigned, \App\Enums\RequestStatus::Scheduled], true))
+                <div class="rounded-2xl border border-rose-200 bg-rose-50/50 p-6 shadow-sm">
+                    <h3 class="text-sm font-extrabold text-slate-900">Cancel Request</h3>
+                    <form method="POST" action="{{ route('admin.requests.cancel', $maintenanceRequest) }}" class="mt-3 space-y-3" onsubmit="return confirm('Cancel this request per the policy?');">
+                        @csrf
+                        @method('PATCH')
+                        <textarea name="reason" rows="2" required placeholder="Cancellation reason…" class="form-input text-xs"></textarea>
+                        <button type="submit" class="w-full rounded-xl border border-rose-200 bg-white px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">Cancel Request</button>
+                    </form>
+                </div>
+            @endif
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 class="text-sm font-extrabold text-slate-900">Status History</h3>
                 <ol class="mt-4 space-y-4">
                     @forelse ($maintenanceRequest->statusHistories as $history)

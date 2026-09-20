@@ -74,6 +74,12 @@
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 7H4a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1ZM7 10h2v2H7v-2Zm0 4h2v2H7v-2Zm4-4h6v2h-6v-2Zm0 4h6v2h-6v-2Z"/></svg>
                         <span>Inventory</span>
                     </a>
+
+                    <a href="{{ route('admin.invoices.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.invoices.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l4 4v14H6V3Zm8 0v5h5"/></svg>
+                        <span>Invoices</span>
+                    </a>
                 @endif
 
                 <div class="pt-4 pb-1">
@@ -90,6 +96,12 @@
                     class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('requests.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
                     <span>My requests</span>
+                </a>
+
+                <a href="{{ route('invoices.index') }}"
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('invoices.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l4 4v14H6V3Zm8 0v5h5"/></svg>
+                    <span>My invoices</span>
                 </a>
 
                 @if(auth()->user() && auth()->user()->role === \App\Enums\UserRole::Technician)

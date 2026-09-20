@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\RequestStatus;
+use App\Exceptions\BillingException;
+use App\Http\Requests\CancelMaintenanceRequestRequest;
 use App\Http\Requests\StoreMaintenanceRequestRequest;
 use App\Models\MaintenanceRequest;
+use App\Services\CancellationService;
 use App\Services\MaintenanceRequestService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +18,10 @@ class MaintenanceRequestController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(private MaintenanceRequestService $requests) {}
+    public function __construct(
+        private MaintenanceRequestService $requests,
+        private CancellationService $cancellations
+    ) {}
 
     /**
      * Display a listing of the user's maintenance requests.
@@ -69,8 +75,34 @@ class MaintenanceRequestController extends Controller
         abort_unless($maintenanceRequest->isOwnedBy($request->user()), 404);
         $this->authorize('view', $maintenanceRequest);
 
-        $maintenanceRequest->load(['service.category', 'address', 'appointment', 'workOrder.additionalWorkItems', 'statusHistories']);
+        $maintenanceRequest->load(['service.category', 'address', 'appointment', 'workOrder.additionalWorkItems', 'invoice', 'cancellation', 'statusHistories']);
 
         return view('requests.show', compact('maintenanceRequest'));
+    }
+
+    /**
+     * Cancel the maintenance request per the cancellation policy.
+     */
+    public function cancel(CancelMaintenanceRequestRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        abort_unless($maintenanceRequest->isOwnedBy($request->user()), 404);
+
+        try {
+            $cancellation = $this->cancellations->cancel(
+                $maintenanceRequest,
+                $request->user(),
+                $request->validated('reason')
+            );
+        } catch (BillingException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        $message = $cancellation->fee > 0
+            ? "Request cancelled with a fee of {$cancellation->fee} EGP per the cancellation policy."
+            : 'Request cancelled without a fee.';
+
+        return redirect()
+            ->route('requests.show', $maintenanceRequest)
+            ->with('success', $message);
     }
 }

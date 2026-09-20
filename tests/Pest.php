@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Service;
+use App\Models\Technician;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,4 +49,15 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * Create a technician skilled for the given service's category.
+ */
+function skilledTechnician(Service $service): Technician
+{
+    $technician = Technician::factory()->create();
+    $technician->categories()->sync([$service->service_category_id]);
+
+    return $technician->refresh();
 }

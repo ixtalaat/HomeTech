@@ -116,24 +116,15 @@
                 </div>
             @endif
 
-            @if(in_array($maintenanceRequest->status, [\App\Enums\RequestStatus::Approved, \App\Enums\RequestStatus::TechnicianAssigned], true))
+            @if($maintenanceRequest->status === \App\Enums\RequestStatus::Approved)
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <h3 class="text-sm font-extrabold text-slate-900">Technician Assignment</h3>
-                    @if($maintenanceRequest->technician)
-                        <p class="mt-2 text-sm text-slate-600">
-                            Assigned to <span class="font-bold text-slate-900">{{ $maintenanceRequest->technician->user->name ?? '—' }}</span>
-                        </p>
-                        <form method="POST" action="{{ route('admin.requests.unassign', $maintenanceRequest) }}" class="mt-2">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="secondary-button text-xs">Unassign</button>
-                        </form>
-                    @endif
+                    <p class="mt-1 text-xs text-slate-500">Assigning books the preferred slot automatically (end derived from the service duration).</p>
                     <form method="POST" action="{{ route('admin.requests.assign', $maintenanceRequest) }}" class="mt-4 space-y-3">
                         @csrf
                         @method('PATCH')
                         <div>
-                            <label for="technician_id" class="form-label text-xs">{{ $maintenanceRequest->technician ? 'Reassign to' : 'Assign technician' }}</label>
+                            <label for="technician_id" class="form-label text-xs">Assign technician</label>
                             <select id="technician_id" name="technician_id" required class="form-input text-xs">
                                 <option value="">Select eligible technician</option>
                                 @foreach ($eligibleTechnicians as $technician)
@@ -146,7 +137,92 @@
                                 <p class="mt-1.5 text-xs font-semibold text-amber-600">No eligible technicians: none are active with skills for this service category.</p>
                             @endif
                         </div>
-                        <button type="submit" class="primary-button w-full text-xs">{{ $maintenanceRequest->technician ? 'Reassign' : 'Assign' }}</button>
+                        <button type="submit" class="primary-button w-full text-xs">Assign & Book</button>
+                    </form>
+                </div>
+            @endif
+
+            @if($maintenanceRequest->status === \App\Enums\RequestStatus::TechnicianAssigned)
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-sm font-extrabold text-slate-900">Book Appointment</h3>
+                    <p class="mt-2 text-sm text-slate-600">
+                        Assigned to <span class="font-bold text-slate-900">{{ $maintenanceRequest->technician->user->name ?? '—' }}</span> — awaiting a slot.
+                    </p>
+                    <form method="POST" action="{{ route('admin.requests.book-appointment', $maintenanceRequest) }}" class="mt-4 space-y-3">
+                        @csrf
+                        @method('PATCH')
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label for="book_date" class="form-label text-xs">Date</label>
+                                <input type="date" id="book_date" name="date" required min="{{ now()->addDay()->format('Y-m-d') }}" class="form-input text-xs py-2">
+                            </div>
+                            <div>
+                                <label for="book_start" class="form-label text-xs">Start</label>
+                                <input type="time" id="book_start" name="start_time" required class="form-input text-xs py-2">
+                            </div>
+                            <div>
+                                <label for="book_end" class="form-label text-xs">End</label>
+                                <input type="time" id="book_end" name="end_time" required class="form-input text-xs py-2">
+                            </div>
+                        </div>
+                        <button type="submit" class="primary-button w-full text-xs">Book Slot</button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.requests.unassign', $maintenanceRequest) }}" class="mt-2">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="secondary-button w-full text-xs">Unassign</button>
+                    </form>
+                </div>
+            @endif
+
+            @if($maintenanceRequest->status === \App\Enums\RequestStatus::Scheduled && $maintenanceRequest->appointment)
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-sm font-extrabold text-slate-900">Appointment</h3>
+                    <p class="mt-2 text-sm font-semibold text-slate-900">
+                        {{ $maintenanceRequest->appointment->date->format('d M Y') }}
+                        {{ \Carbon\Carbon::parse($maintenanceRequest->appointment->start_time)->format('h:i A') }} –
+                        {{ \Carbon\Carbon::parse($maintenanceRequest->appointment->end_time)->format('h:i A') }}
+                    </p>
+                    <p class="mt-1 text-xs text-slate-500">
+                        {{ $maintenanceRequest->technician->user->name ?? '—' }} ·
+                        <span class="font-bold">{{ $maintenanceRequest->appointment->status->label() }}</span>
+                    </p>
+                    <form method="POST" action="{{ route('admin.requests.reschedule-appointment', $maintenanceRequest) }}" class="mt-4 space-y-3 border-t border-slate-100 pt-4">
+                        @csrf
+                        @method('PATCH')
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label for="re_date" class="form-label text-xs">Date</label>
+                                <input type="date" id="re_date" name="date" required min="{{ now()->addDay()->format('Y-m-d') }}" value="{{ $maintenanceRequest->appointment->date->format('Y-m-d') }}" class="form-input text-xs py-2">
+                            </div>
+                            <div>
+                                <label for="re_start" class="form-label text-xs">Start</label>
+                                <input type="time" id="re_start" name="start_time" required value="{{ \Carbon\Carbon::parse($maintenanceRequest->appointment->start_time)->format('H:i') }}" class="form-input text-xs py-2">
+                            </div>
+                            <div>
+                                <label for="re_end" class="form-label text-xs">End</label>
+                                <input type="time" id="re_end" name="end_time" required value="{{ \Carbon\Carbon::parse($maintenanceRequest->appointment->end_time)->format('H:i') }}" class="form-input text-xs py-2">
+                            </div>
+                        </div>
+                        <button type="submit" class="secondary-button w-full text-xs">Reschedule</button>
+                    </form>
+                    <div class="mt-2 flex gap-2">
+                        <form method="POST" action="{{ route('admin.requests.cancel-appointment', $maintenanceRequest) }}" onsubmit="return confirm('Cancel this appointment?');" class="flex-1">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="w-full rounded-xl border border-rose-200 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">Cancel Appointment</button>
+                        </form>
+                    </div>
+                    <form method="POST" action="{{ route('admin.requests.assign', $maintenanceRequest) }}" class="mt-2 space-y-2">
+                        @csrf
+                        @method('PATCH')
+                        <select name="technician_id" required class="form-input text-xs" aria-label="Reassign technician">
+                            <option value="">Reassign to…</option>
+                            @foreach ($eligibleTechnicians as $technician)
+                                <option value="{{ $technician->id }}">{{ $technician->user->name }}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="secondary-button w-full text-xs">Reassign</button>
                     </form>
                 </div>
             @endif

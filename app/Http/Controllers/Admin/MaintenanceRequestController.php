@@ -4,15 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\RequestStatus;
 use App\Exceptions\InvalidStatusTransitionException;
+use App\Exceptions\SchedulingConflictException;
 use App\Exceptions\TechnicianAssignmentException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AssignTechnicianRequest;
+use App\Http\Requests\Admin\BookAppointmentRequest;
+use App\Http\Requests\Admin\RescheduleAppointmentRequest;
 use App\Http\Requests\Admin\ReviewMaintenanceRequestRequest;
 use App\Http\Requests\Admin\UpdateRequestAppointmentRequest;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
 use App\Services\MaintenanceRequestService;
 use App\Services\RequestReviewService;
+use App\Services\SchedulingService;
 use App\Services\TechnicianAssignmentService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -26,7 +30,8 @@ class MaintenanceRequestController extends Controller
     public function __construct(
         private MaintenanceRequestService $requests,
         private RequestReviewService $reviews,
-        private TechnicianAssignmentService $assignments
+        private TechnicianAssignmentService $assignments,
+        private SchedulingService $scheduling
     ) {}
 
     /**
@@ -49,7 +54,7 @@ class MaintenanceRequestController extends Controller
     {
         $this->authorize('view', $maintenanceRequest);
 
-        $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'technician.user', 'statusHistories']);
+        $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'technician.user', 'appointment', 'statusHistories']);
 
         $eligibleTechnicians = $this->assignments->eligibleFor($maintenanceRequest);
 
@@ -130,14 +135,16 @@ class MaintenanceRequestController extends Controller
         try {
             $technician = Technician::with('user')->findOrFail($request->validated('technician_id'));
 
-            if ($maintenanceRequest->status === RequestStatus::TechnicianAssigned) {
+            if ($maintenanceRequest->status === RequestStatus::Scheduled) {
                 $this->assignments->reassign($maintenanceRequest, $technician, $request->user());
                 $message = "Request reassigned to '{$technician->user->name}' successfully.";
             } else {
                 $this->assignments->assign($maintenanceRequest, $technician, $request->user());
-                $message = "Technician '{$technician->user->name}' assigned successfully.";
+                $message = "Technician '{$technician->user->name}' assigned and appointment booked successfully.";
             }
         } catch (TechnicianAssignmentException $exception) {
+            return back()->with('error', $exception->getMessage());
+        } catch (SchedulingConflictException $exception) {
             return back()->with('error', $exception->getMessage());
         }
 
@@ -151,7 +158,7 @@ class MaintenanceRequestController extends Controller
      */
     public function unassign(Request $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
     {
-        abort_unless($request->user()->can('updateAppointment', $maintenanceRequest), 403);
+        abort_unless($request->user()->can('manageAppointment', $maintenanceRequest), 403);
 
         try {
             $this->assignments->unassign($maintenanceRequest, $request->user());
@@ -162,5 +169,69 @@ class MaintenanceRequestController extends Controller
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
             ->with('success', 'Technician unassigned. The request is approved again.');
+    }
+
+    /**
+     * Book an appointment for an assigned request awaiting a slot.
+     */
+    public function bookAppointment(BookAppointmentRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        try {
+            $validated = $request->validated();
+
+            $this->scheduling->book(
+                $maintenanceRequest,
+                $maintenanceRequest->technician,
+                $validated['date'],
+                $validated['start_time'],
+                $validated['end_time'],
+                $request->user()
+            );
+        } catch (SchedulingConflictException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()
+            ->route('admin.requests.show', $maintenanceRequest)
+            ->with('success', 'Appointment booked successfully.');
+    }
+
+    /**
+     * Reschedule the appointment, re-running the conflict check.
+     */
+    public function rescheduleAppointment(RescheduleAppointmentRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        try {
+            $validated = $request->validated();
+
+            $this->scheduling->reschedule(
+                $maintenanceRequest->appointment,
+                $validated['date'],
+                $validated['start_time'],
+                $validated['end_time'],
+                $request->user()
+            );
+        } catch (SchedulingConflictException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()
+            ->route('admin.requests.show', $maintenanceRequest)
+            ->with('success', 'Appointment rescheduled successfully.');
+    }
+
+    /**
+     * Cancel the appointment, returning the request for rebooking.
+     */
+    public function cancelAppointment(Request $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        abort_unless($request->user()->can('manageAppointment', $maintenanceRequest), 403);
+        abort_unless($maintenanceRequest->status === RequestStatus::Scheduled && $maintenanceRequest->appointment !== null, 404);
+
+        $this->scheduling->cancel($maintenanceRequest->appointment, $request->user());
+
+        return redirect()
+            ->route('admin.requests.show', $maintenanceRequest)
+            ->with('success', 'Appointment cancelled. The request is awaiting a new slot.');
     }
 }

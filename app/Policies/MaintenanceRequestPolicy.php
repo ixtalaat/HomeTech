@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\RequestStatus;
 use App\Enums\UserRole;
 use App\Models\MaintenanceRequest;
 use App\Models\User;
@@ -46,6 +47,16 @@ class MaintenanceRequestPolicy
     public function updateAppointment(User $user, MaintenanceRequest $request): bool
     {
         return $this->isStaff($user) && $request->isReviewable();
+    }
+
+    /**
+     * Determine whether the user can manage the booked appointment
+     * (assign/unassign/book/reschedule/cancel after review).
+     */
+    public function manageAppointment(User $user, MaintenanceRequest $request): bool
+    {
+        return $this->isStaff($user)
+            && in_array($request->status, [RequestStatus::Approved, RequestStatus::TechnicianAssigned, RequestStatus::Scheduled], true);
     }
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class MaintenanceRequest extends Model
 {
@@ -92,6 +93,16 @@ class MaintenanceRequest extends Model
     public function technician(): BelongsTo
     {
         return $this->belongsTo(Technician::class);
+    }
+
+    /**
+     * Get the appointment booked for the request.
+     *
+     * @return HasOne<Appointment, $this>
+     */
+    public function appointment(): HasOne
+    {
+        return $this->hasOne(Appointment::class);
     }
 
     /**

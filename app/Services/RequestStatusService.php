@@ -22,7 +22,8 @@ class RequestStatusService
         'pending_review' => [RequestStatus::Approved, RequestStatus::Rejected, RequestStatus::InfoRequested, RequestStatus::Cancelled],
         'info_requested' => [RequestStatus::PendingReview, RequestStatus::Rejected, RequestStatus::Cancelled],
         'approved' => [RequestStatus::TechnicianAssigned, RequestStatus::Cancelled],
-        'technician_assigned' => [RequestStatus::Approved, RequestStatus::Cancelled],
+        'technician_assigned' => [RequestStatus::Approved, RequestStatus::Scheduled, RequestStatus::Cancelled],
+        'scheduled' => [RequestStatus::TechnicianAssigned, RequestStatus::Approved],
     ];
 
     /**

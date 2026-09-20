@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateCustomerRequest;
 use App\Models\User;
+use App\Services\CustomerService;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,8 @@ class CustomerController extends Controller
 {
     use AuthorizesRequests;
 
+    public function __construct(private CustomerService $customers) {}
+
     /**
      * Display a listing of customers.
      */
@@ -23,27 +26,7 @@ class CustomerController extends Controller
     {
         $this->authorize('viewAny', User::class);
 
-        $query = User::customers()->withCount('addresses')->latest();
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($inner) use ($search): void {
-                $inner->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('status')) {
-            $status = $request->input('status');
-            if ($status === 'active') {
-                $query->where('is_active', true);
-            } elseif ($status === 'inactive') {
-                $query->where('is_active', false);
-            }
-        }
-
-        $customers = $query->paginate(15)->withQueryString();
+        $customers = $this->customers->paginate($request->only(['search', 'status']));
 
         return view('admin.customers.index', compact('customers'));
     }
@@ -79,10 +62,7 @@ class CustomerController extends Controller
     {
         abort_unless($customer->role === UserRole::Customer, 404);
 
-        $validated = $request->validated();
-        $validated['is_active'] = $request->boolean('is_active', true);
-
-        $customer->update($validated);
+        $this->customers->update($customer, $request->validated());
 
         return redirect()
             ->route('admin.customers.show', $customer)
@@ -97,8 +77,7 @@ class CustomerController extends Controller
         $this->authorize('toggleStatus', $customer);
         abort_unless($customer->role === UserRole::Customer, 404);
 
-        $customer->update(['is_active' => ! $customer->is_active]);
-
+        $customer = $this->customers->toggleStatus($customer);
         $statusLabel = $customer->is_active ? 'activated' : 'deactivated';
 
         return back()->with('success', "Customer '{$customer->name}' was {$statusLabel} successfully.");

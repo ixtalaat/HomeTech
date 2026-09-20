@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\AddressInUseException;
 use App\Models\Address;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -70,9 +71,15 @@ class AddressService
 
     /**
      * Delete an address, promoting another one to default when needed.
+     *
+     * @throws AddressInUseException
      */
     public function delete(Address $address): void
     {
+        if ($address->maintenanceRequests()->exists()) {
+            throw new AddressInUseException('This address cannot be deleted because it is used by maintenance requests.');
+        }
+
         DB::transaction(function () use ($address): void {
             $wasDefault = $address->is_default;
             $userId = $address->user_id;

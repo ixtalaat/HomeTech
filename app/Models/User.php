@@ -20,6 +20,9 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
+     * Note: `role` is assigned explicitly by controllers/services only,
+     * never from user input.
+     *
      * @var list<string>
      */
     protected $fillable = [
@@ -27,6 +30,7 @@ class User extends Authenticatable
         'phone',
         'email',
         'password',
+        'role',
         'is_active',
     ];
 
@@ -83,6 +87,16 @@ class User extends Authenticatable
     public function maintenanceRequests(): HasMany
     {
         return $this->hasMany(MaintenanceRequest::class);
+    }
+
+    /**
+     * Get the technician profile for the user.
+     *
+     * @return HasOne<Technician, $this>
+     */
+    public function technician(): HasOne
+    {
+        return $this->hasOne(Technician::class);
     }
 
     /**

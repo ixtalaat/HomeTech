@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\RequestStatus;
 use App\Exceptions\InvalidStatusTransitionException;
+use App\Exceptions\TechnicianAssignmentException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AssignTechnicianRequest;
 use App\Http\Requests\Admin\ReviewMaintenanceRequestRequest;
 use App\Http\Requests\Admin\UpdateRequestAppointmentRequest;
 use App\Models\MaintenanceRequest;
+use App\Models\Technician;
 use App\Services\RequestStatusService;
+use App\Services\TechnicianAssignmentService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -19,7 +23,10 @@ class MaintenanceRequestController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(private RequestStatusService $transitions) {}
+    public function __construct(
+        private RequestStatusService $transitions,
+        private TechnicianAssignmentService $assignments
+    ) {}
 
     /**
      * Display a listing of maintenance requests for review.
@@ -59,9 +66,11 @@ class MaintenanceRequestController extends Controller
     {
         $this->authorize('view', $maintenanceRequest);
 
-        $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'statusHistories']);
+        $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'technician.user', 'statusHistories']);
 
-        return view('admin.requests.show', compact('maintenanceRequest'));
+        $eligibleTechnicians = $this->assignments->eligibleFor($maintenanceRequest);
+
+        return view('admin.requests.show', compact('maintenanceRequest', 'eligibleTechnicians'));
     }
 
     /**
@@ -166,5 +175,47 @@ class MaintenanceRequestController extends Controller
         $maintenanceRequest->update($request->validated());
 
         return back()->with('success', 'Appointment updated successfully.');
+    }
+
+    /**
+     * Assign (or reassign) a technician to the request.
+     */
+    public function assign(AssignTechnicianRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        try {
+            $technician = Technician::with('user')->findOrFail($request->validated('technician_id'));
+
+            if ($maintenanceRequest->status === RequestStatus::TechnicianAssigned) {
+                $this->assignments->reassign($maintenanceRequest, $technician, $request->user());
+                $message = "Request reassigned to '{$technician->user->name}' successfully.";
+            } else {
+                $this->assignments->assign($maintenanceRequest, $technician, $request->user());
+                $message = "Technician '{$technician->user->name}' assigned successfully.";
+            }
+        } catch (TechnicianAssignmentException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()
+            ->route('admin.requests.show', $maintenanceRequest)
+            ->with('success', $message);
+    }
+
+    /**
+     * Unassign the technician, returning the request to approved.
+     */
+    public function unassign(Request $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        abort_unless($request->user()->can('updateAppointment', $maintenanceRequest), 403);
+
+        try {
+            $this->assignments->unassign($maintenanceRequest, $request->user());
+        } catch (TechnicianAssignmentException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()
+            ->route('admin.requests.show', $maintenanceRequest)
+            ->with('success', 'Technician unassigned. The request is approved again.');
     }
 }

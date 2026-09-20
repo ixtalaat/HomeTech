@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceRequestController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\TechnicianController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\MaintenanceRequestController;
@@ -61,7 +62,12 @@ Route::middleware(['auth', 'role:admin,manager'])
         Route::patch('requests/{maintenanceRequest}/reject', [AdminMaintenanceRequestController::class, 'reject'])->name('requests.reject');
         Route::patch('requests/{maintenanceRequest}/request-info', [AdminMaintenanceRequestController::class, 'requestInfo'])->name('requests.request-info');
         Route::patch('requests/{maintenanceRequest}/appointment', [AdminMaintenanceRequestController::class, 'updateAppointment'])->name('requests.appointment');
+        Route::patch('requests/{maintenanceRequest}/assign', [AdminMaintenanceRequestController::class, 'assign'])->name('requests.assign');
+        Route::patch('requests/{maintenanceRequest}/unassign', [AdminMaintenanceRequestController::class, 'unassign'])->name('requests.unassign');
         Route::resource('requests', AdminMaintenanceRequestController::class)
             ->only(['index', 'show'])
             ->parameters(['requests' => 'maintenanceRequest']);
+
+        Route::patch('technicians/{technician}/toggle-status', [TechnicianController::class, 'toggleStatus'])->name('technicians.toggle-status');
+        Route::resource('technicians', TechnicianController::class);
     });

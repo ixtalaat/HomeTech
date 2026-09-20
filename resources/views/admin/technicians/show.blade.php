@@ -1,0 +1,69 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="mx-auto max-w-4xl">
+    <div class="mb-8">
+        <a href="{{ route('admin.technicians.index') }}" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-teal-700 transition">
+            <span>← Back to technicians</span>
+        </a>
+        <div class="mt-2 flex flex-wrap items-center gap-3">
+            <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $technician->user->name ?? '—' }}</h2>
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold {{ $technician->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                {{ $technician->is_active ? 'Active' : 'Inactive' }}
+            </span>
+        </div>
+        <p class="mt-1 text-sm text-slate-500">{{ $technician->user->email ?? '' }}</p>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="text-sm font-extrabold text-slate-900">Profile</h3>
+        <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-sm">
+            <div>
+                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Work Phone</dt>
+                <dd class="mt-1 font-semibold text-slate-900">{{ $technician->phone ?? '—' }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Emergency Contact</dt>
+                <dd class="mt-1 font-semibold text-slate-900">{{ $technician->emergency_contact ?? '—' }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Hired At</dt>
+                <dd class="mt-1 font-semibold text-slate-900">{{ $technician->hired_at?->format('d M Y') ?? '—' }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Assigned Requests</dt>
+                <dd class="mt-1 font-semibold text-slate-900">{{ $technician->assignedRequests->count() }}</dd>
+            </div>
+        </dl>
+        @if($technician->notes)
+            <p class="mt-4 text-sm text-slate-600">{{ $technician->notes }}</p>
+        @endif
+        <div class="mt-6 flex flex-wrap items-center gap-2">
+            <a href="{{ route('admin.technicians.edit', $technician) }}" class="secondary-button text-xs">Edit Technician</a>
+            <form method="POST" action="{{ route('admin.technicians.toggle-status', $technician) }}" class="inline">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="secondary-button text-xs">{{ $technician->is_active ? 'Deactivate' : 'Activate' }}</button>
+            </form>
+            <form method="POST" action="{{ route('admin.technicians.destroy', $technician) }}" onsubmit="return confirm('Remove this technician?');" class="inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="rounded-xl border border-rose-200 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">Remove</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="text-sm font-extrabold text-slate-900">Skills</h3>
+        <div class="mt-3 flex flex-wrap gap-2">
+            @forelse ($technician->categories as $category)
+                <span class="inline-flex items-center rounded-lg bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">
+                    {{ $category->name }}
+                </span>
+            @empty
+                <p class="text-sm text-slate-500">No skills assigned yet.</p>
+            @endforelse
+        </div>
+    </div>
+</div>
+@endsection

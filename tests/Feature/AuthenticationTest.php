@@ -13,7 +13,7 @@ it('registers a customer and authenticates them', function () {
 
     $response->assertRedirect(route('dashboard'));
     $this->assertAuthenticatedAs(User::where('email', 'jane@example.com')->first());
-    expect(User::where('email', 'jane@example.com')->value('role'))->toBe(UserRole::Customer->value);
+    expect(User::where('email', 'jane@example.com')->first()->role)->toBe(UserRole::Customer);
 });
 
 it('rejects invalid registration data', function () {

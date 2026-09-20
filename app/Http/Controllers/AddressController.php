@@ -87,6 +87,10 @@ class AddressController extends Controller
         abort_unless($address->isOwnedBy($request->user()), 404);
         $this->authorize('delete', $address);
 
+        if ($address->maintenanceRequests()->exists()) {
+            return back()->with('error', 'This address cannot be deleted because it is used by maintenance requests.');
+        }
+
         $this->addresses->delete($address);
 
         return redirect()

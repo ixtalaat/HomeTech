@@ -76,6 +76,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the maintenance requests owned by the user.
+     *
+     * @return HasMany<MaintenanceRequest, $this>
+     */
+    public function maintenanceRequests(): HasMany
+    {
+        return $this->hasMany(MaintenanceRequest::class);
+    }
+
+    /**
      * Scope a query to only include customers.
      *
      * @param  Builder<$this>  $query

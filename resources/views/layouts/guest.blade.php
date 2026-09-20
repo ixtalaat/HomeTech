@@ -18,10 +18,9 @@
         <section class="relative hidden overflow-hidden bg-teal-700 p-12 lg:flex lg:flex-col lg:justify-between">
             <div class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-teal-500/40 blur-3xl"></div>
             <div class="relative">
-                <a href="{{ url('/') }}" class="flex items-center gap-3 text-xl font-extrabold tracking-tight">
-                    <span
-                        class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-lg text-teal-700">H</span>
-                    Home<span class="text-teal-200">Tech</span></a>
+                <a href="{{ url('/') }}" aria-label="HomeTech home">
+                    <x-brand-logo variant="light" />
+                </a>
                 <div class="mt-28 max-w-lg">
                     <p class="text-sm font-bold uppercase tracking-[0.2em] text-teal-200">Care for your home</p>
                     <h1 class="mt-5 font-display text-5xl font-extrabold leading-tight tracking-tight">Reliable help for

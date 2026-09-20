@@ -15,9 +15,7 @@
 
 <body class="bg-slate-950 text-white antialiased">
     <header class="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12">
-        <a href="{{ url('/') }}" class="flex items-center gap-3 text-xl font-extrabold tracking-tight"><span
-                class="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-500 text-lg">H</span> Home<span
-                class="text-teal-400">Tech</span></a>
+        <a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo variant="light" /></a>
         <nav class="flex items-center gap-3 text-sm font-bold"><a href="{{ route('login') }}"
                 class="rounded-xl px-4 py-2.5 text-slate-300 transition hover:text-white">Sign in</a><a
                 href="{{ route('register') }}" class="primary-button">Get started <span aria-hidden="true">→</span></a>

@@ -17,19 +17,18 @@
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
     <div class="min-h-screen lg:flex">
         <aside class="hidden w-72 shrink-0 flex-col border-r border-slate-200 bg-white px-6 py-7 lg:flex">
-            <a href="{{ route('dashboard') }}"
-                class="flex items-center gap-3 text-xl font-extrabold tracking-tight text-slate-900">
-                <span
-                    class="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-600 text-lg text-white shadow-lg shadow-teal-600/20">H</span>
-                Home<span class="text-teal-600">Tech</span>
+            <a href="{{ route('dashboard') }}" aria-label="HomeTech dashboard">
+                <x-brand-logo />
             </a>
             <p class="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Service hub</p>
             <nav class="mt-10 flex-col gap-2" aria-label="Main navigation">
                 <a href="{{ route('dashboard') }}"
-                    class="flex items-center gap-3 rounded-xl bg-teal-50 px-4 py-3 text-sm font-bold text-teal-700">⌂
+                    class="flex items-center gap-3 rounded-xl bg-teal-50 px-4 py-3 text-sm font-bold text-teal-700">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9Z"/><path d="M9 21v-6h6v6"/></svg>
                     <span>Overview</span></a>
                 <a href="{{ route('profile.edit') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-900">◎
+                    class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-900">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
                     <span>My profile</span></a>
             </nav>
             <div class="mt-auto rounded-2xl bg-slate-900 p-5 text-white">

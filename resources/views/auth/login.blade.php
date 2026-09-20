@@ -1,9 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="mb-8 lg:hidden">
-        <a href="{{ url('/') }}" class="flex items-center gap-3 text-xl font-extrabold tracking-tight"><span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-500 text-lg text-white">H</span> Home<span class="text-teal-400">Tech</span></a>
-    </div>
+    <div class="mb-8 lg:hidden"><a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo variant="light" /></a></div>
     <div class="mb-9">
         <p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-400">Welcome back</p>
         <h1 class="mt-3 font-display text-3xl font-extrabold tracking-tight">Sign in to HomeTech</h1>

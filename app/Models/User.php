@@ -5,7 +5,10 @@ namespace App\Models;
 use App\Enums\UserRole;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -24,6 +27,7 @@ class User extends Authenticatable
         'phone',
         'email',
         'password',
+        'is_active',
     ];
 
     /**
@@ -47,6 +51,55 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
+            'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Get the addresses owned by the user.
+     *
+     * @return HasMany<Address, $this>
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    /**
+     * Get the default address of the user.
+     *
+     * @return HasOne<Address, $this>
+     */
+    public function defaultAddress(): HasOne
+    {
+        return $this->hasOne(Address::class)->where('is_default', true);
+    }
+
+    /**
+     * Scope a query to only include customers.
+     *
+     * @param  Builder<$this>  $query
+     */
+    public function scopeCustomers(Builder $query): Builder
+    {
+        return $query->where('role', UserRole::Customer);
+    }
+
+    /**
+     * Scope a query to only include active users.
+     *
+     * @param  Builder<$this>  $query
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Determine whether the address belongs to this user.
+     */
+    public function ownsAddress(Address $address): bool
+    {
+        return $address->user_id === $this->id;
     }
 }

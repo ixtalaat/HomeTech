@@ -18,7 +18,7 @@
     <header class="relative z-10 border-b border-slate-200/80 bg-white/90 px-5 py-4 backdrop-blur sm:px-8 lg:px-12">
         <div class="mx-auto flex max-w-7xl items-center justify-between">
             <a href="{{ url('/') }}" aria-label="HomeTech home">
-                <x-brand-logo variant="light" />
+                <x-brand-logo />
             </a>
             <nav class="flex items-center gap-4 text-sm font-bold">
                 <a href="{{ route('services.index') }}" class="text-teal-700 transition">Services</a>

@@ -19,7 +19,7 @@
             <div class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-teal-200/60 blur-3xl"></div>
             <div class="relative">
                 <a href="{{ url('/') }}" aria-label="HomeTech home">
-                    <x-brand-logo variant="light" />
+                    <x-brand-logo />
                 </a>
                 <div class="mt-28 max-w-lg">
                     <p class="text-sm font-bold uppercase tracking-[0.2em] text-teal-700">Care for your home</p>

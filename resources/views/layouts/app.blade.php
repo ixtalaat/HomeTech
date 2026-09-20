@@ -21,15 +21,46 @@
                 <x-brand-logo />
             </a>
             <p class="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Service hub</p>
-            <nav class="mt-10 flex-col gap-2" aria-label="Main navigation">
+            <nav class="mt-8 flex flex-col gap-1.5" aria-label="Main navigation">
                 <a href="{{ route('dashboard') }}"
-                    class="flex items-center gap-3 rounded-xl bg-teal-50 px-4 py-3 text-sm font-bold text-teal-700">
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-bold transition {{ request()->routeIs('dashboard') ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9Z"/><path d="M9 21v-6h6v6"/></svg>
-                    <span>Overview</span></a>
+                    <span>Overview</span>
+                </a>
+
+                <a href="{{ route('services.index') }}"
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('services.*') && !request()->routeIs('admin.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                    <span>Browse Services</span>
+                </a>
+
+                @if(auth()->user() && in_array(auth()->user()->role, [\App\Enums\UserRole::Admin, \App\Enums\UserRole::Manager], true))
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Admin Management</p>
+                    </div>
+
+                    <a href="{{ route('admin.services.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.services.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        <span>Manage Services</span>
+                    </a>
+
+                    <a href="{{ route('admin.categories.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.categories.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                        <span>Categories</span>
+                    </a>
+                @endif
+
+                <div class="pt-4 pb-1">
+                    <p class="px-4 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Account</p>
+                </div>
+
                 <a href="{{ route('profile.edit') }}"
-                    class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-900">
+                    class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('profile.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
-                    <span>My profile</span></a>
+                    <span>My profile</span>
+                </a>
             </nav>
             <div class="mt-auto rounded-2xl bg-slate-900 p-5 text-white">
                 <p class="text-sm font-bold">Need a hand?</p>
@@ -54,12 +85,29 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button
-                            class="rounded-xl border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
+                            class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
                             type="submit">Log out</button>
                     </form>
                 </div>
             </header>
-            <div class="px-5 py-8 sm:px-8 lg:px-12 lg:py-10">@yield('content')</div>
+
+            <div class="px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
+                @if (session('success'))
+                    <div class="mb-6 flex items-center gap-3 rounded-2xl border border-teal-200 bg-teal-50 p-4 text-sm font-medium text-teal-900">
+                        <svg class="h-5 w-5 text-teal-600 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" /></svg>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="mb-6 flex items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-900">
+                        <svg class="h-5 w-5 text-rose-600 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" /></svg>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                @endif
+
+                @yield('content')
+            </div>
         </main>
     </div>
 </body>

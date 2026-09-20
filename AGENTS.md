@@ -33,6 +33,24 @@ Full domain detail lives in `docs/PRD.md`. This file is the *operating contract*
  
 Do not assume a package's API — confirm the installed version first with `composer show --direct` (PHP) or `package.json` (JS). Do not introduce a different framework, ORM, or database, and do not change dependencies without approval.
 
+---
+
+## 3. Implemented Modules & Domain Guidelines
+
+### Epic 1 — Authentication & Authorization
+- User model with `UserRole` enum (`Customer`, `Admin`, `Technician`, `Manager`).
+- Role authorization middleware `role:admin,manager` protecting admin areas.
+- Profile management and password updates.
+
+### Epic 2 — Services & Categories (`docs/EPIC_2_SERVICES.md`)
+- **Service Categories** (`service_categories`): Name, slug, description, icon, is_active.
+  - Initial seed categories: Plumbing, Electrical, Air Conditioning, Painting, Appliance Repair.
+  - Safe deletion: Deleting a category with associated services is forbidden.
+- **Services** (`services`): Category relation, name, slug, description, base_price (EGP decimal), estimated_duration_minutes, is_active.
+  - Admin CRUD: `/admin/categories`, `/admin/services` (Admin/Manager only).
+  - Quick toggle status: `PATCH /admin/services/{service}/toggle-status`.
+  - Public catalog: `/services` and `/services/{slug}` strictly showing active services in active categories. Filterable by category and keyword search.
+
 --- 
 
 ## Foundational Context

@@ -182,7 +182,9 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Console commands in `app/Console/Commands/` are automatically available and do not require manual registration.
 
 ## Database
-
+- MySQL is the required application database. Use the MySQL connection for local development, testing, and deployment configuration.
+- Configure MySQL through environment variables: `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`.
+- Do not introduce SQLite as an application or test database unless explicitly approved.
 - When modifying a column, the migration must include all of the attributes that were previously defined on the column. Otherwise, they will be dropped and lost.
 
 - Laravel 12 allows limiting eagerly loaded records natively, without external packages: `$query->latest()->limit(10);`.

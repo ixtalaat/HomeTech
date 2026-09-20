@@ -1173,8 +1173,9 @@ The project is intended as a Laravel MVC portfolio project.
 - Eloquent ORM
 
 ### Database
-
-- MySQL
+- MySQL is the required database engine for development, testing, and production.
+- Configure the connection with `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`.
+- SQLite is not supported for application or test environments unless explicitly approved.
 
 ### Authentication & Authorization
 

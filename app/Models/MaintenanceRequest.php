@@ -27,6 +27,7 @@ class MaintenanceRequest extends Model
         'user_id',
         'service_id',
         'address_id',
+        'technician_id',
         'description',
         'preferred_date',
         'preferred_time',
@@ -81,6 +82,16 @@ class MaintenanceRequest extends Model
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
+    }
+
+    /**
+     * Get the technician assigned to the request.
+     *
+     * @return BelongsTo<Technician, $this>
+     */
+    public function technician(): BelongsTo
+    {
+        return $this->belongsTo(Technician::class);
     }
 
     /**

@@ -116,6 +116,41 @@
                 </div>
             @endif
 
+            @if(in_array($maintenanceRequest->status, [\App\Enums\RequestStatus::Approved, \App\Enums\RequestStatus::TechnicianAssigned], true))
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h3 class="text-sm font-extrabold text-slate-900">Technician Assignment</h3>
+                    @if($maintenanceRequest->technician)
+                        <p class="mt-2 text-sm text-slate-600">
+                            Assigned to <span class="font-bold text-slate-900">{{ $maintenanceRequest->technician->user->name ?? '—' }}</span>
+                        </p>
+                        <form method="POST" action="{{ route('admin.requests.unassign', $maintenanceRequest) }}" class="mt-2">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="secondary-button text-xs">Unassign</button>
+                        </form>
+                    @endif
+                    <form method="POST" action="{{ route('admin.requests.assign', $maintenanceRequest) }}" class="mt-4 space-y-3">
+                        @csrf
+                        @method('PATCH')
+                        <div>
+                            <label for="technician_id" class="form-label text-xs">{{ $maintenanceRequest->technician ? 'Reassign to' : 'Assign technician' }}</label>
+                            <select id="technician_id" name="technician_id" required class="form-input text-xs">
+                                <option value="">Select eligible technician</option>
+                                @foreach ($eligibleTechnicians as $technician)
+                                    <option value="{{ $technician->id }}">
+                                        {{ $technician->user->name }} ({{ $technician->assigned_requests_count ?? 0 }} assigned)
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if($eligibleTechnicians->isEmpty())
+                                <p class="mt-1.5 text-xs font-semibold text-amber-600">No eligible technicians: none are active with skills for this service category.</p>
+                            @endif
+                        </div>
+                        <button type="submit" class="primary-button w-full text-xs">{{ $maintenanceRequest->technician ? 'Reassign' : 'Assign' }}</button>
+                    </form>
+                </div>
+            @endif
+
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 class="text-sm font-extrabold text-slate-900">Status History</h3>
                 <ol class="mt-4 space-y-4">

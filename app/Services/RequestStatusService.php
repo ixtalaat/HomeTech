@@ -13,7 +13,7 @@ class RequestStatusService
     /**
      * Allowed status transitions.
      *
-     * Later epics (assignment, scheduling, work orders, billing) unlock
+     * Later epics (scheduling, work orders, billing) unlock
      * their edges here as those features are implemented.
      *
      * @var array<string, array<int, RequestStatus>>
@@ -21,6 +21,8 @@ class RequestStatusService
     private const TRANSITIONS = [
         'pending_review' => [RequestStatus::Approved, RequestStatus::Rejected, RequestStatus::InfoRequested, RequestStatus::Cancelled],
         'info_requested' => [RequestStatus::PendingReview, RequestStatus::Rejected, RequestStatus::Cancelled],
+        'approved' => [RequestStatus::TechnicianAssigned, RequestStatus::Cancelled],
+        'technician_assigned' => [RequestStatus::Approved, RequestStatus::Cancelled],
     ];
 
     /**

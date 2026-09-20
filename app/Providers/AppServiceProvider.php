@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\MaintenanceRequest;
+use App\Models\Technician;
 use App\Models\User;
 use App\Policies\CustomerPolicy;
 use App\Policies\MaintenanceRequestPolicy;
+use App\Policies\TechnicianPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,5 +28,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(User::class, CustomerPolicy::class);
         Gate::policy(MaintenanceRequest::class, MaintenanceRequestPolicy::class);
+        Gate::policy(Technician::class, TechnicianPolicy::class);
     }
 }

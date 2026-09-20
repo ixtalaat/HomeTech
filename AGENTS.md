@@ -37,7 +37,7 @@ Do not assume a package's API — confirm the installed version first with `comp
 
 ## 3. Implemented Modules & Domain Guidelines
 
-### Epic 1 — Authentication & Authorization
+### Epic 1 — Authentication & Authorization (`docs/EPIC_1_AUTH_USERS.md`)
 - User model with `UserRole` enum (`Customer`, `Admin`, `Technician`, `Manager`).
 - Role authorization middleware `role:admin,manager` protecting admin areas.
 - Profile management and password updates.

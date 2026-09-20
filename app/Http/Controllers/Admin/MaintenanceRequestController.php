@@ -11,9 +11,9 @@ use App\Http\Requests\Admin\ReviewMaintenanceRequestRequest;
 use App\Http\Requests\Admin\UpdateRequestAppointmentRequest;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
-use App\Services\RequestStatusService;
+use App\Services\MaintenanceRequestService;
+use App\Services\RequestReviewService;
 use App\Services\TechnicianAssignmentService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +24,8 @@ class MaintenanceRequestController extends Controller
     use AuthorizesRequests;
 
     public function __construct(
-        private RequestStatusService $transitions,
+        private MaintenanceRequestService $requests,
+        private RequestReviewService $reviews,
         private TechnicianAssignmentService $assignments
     ) {}
 
@@ -35,25 +36,7 @@ class MaintenanceRequestController extends Controller
     {
         $this->authorize('viewAny', MaintenanceRequest::class);
 
-        $query = MaintenanceRequest::with(['user', 'service', 'address'])->latest();
-
-        if ($request->filled('status')) {
-            $status = RequestStatus::tryFrom($request->input('status'));
-
-            if ($status !== null) {
-                $query->where('status', $status);
-            }
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($inner) use ($search): void {
-                $inner->where('description', 'like', "%{$search}%")
-                    ->orWhereHas('user', fn ($userQuery): Builder => $userQuery->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
-            });
-        }
-
-        $requests = $query->paginate(15)->withQueryString();
+        $requests = $this->requests->paginateForAdmin($request->only(['search', 'status']));
         $statuses = RequestStatus::cases();
 
         return view('admin.requests.index', compact('requests', 'statuses'));
@@ -79,27 +62,7 @@ class MaintenanceRequestController extends Controller
     public function approve(ReviewMaintenanceRequestRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
     {
         try {
-            $validated = $request->validated();
-
-            if (! empty($validated['preferred_date']) || ! empty($validated['preferred_time'])) {
-                $maintenanceRequest->update([
-                    'preferred_date' => $validated['preferred_date'] ?? $maintenanceRequest->preferred_date,
-                    'preferred_time' => $validated['preferred_time'] ?? $maintenanceRequest->preferred_time,
-                ]);
-            }
-
-            if (! empty($validated['admin_note'])) {
-                $maintenanceRequest->update(['admin_note' => $validated['admin_note']]);
-            }
-
-            $this->transitions->transition(
-                $maintenanceRequest->refresh(),
-                RequestStatus::Approved,
-                $request->user(),
-                $validated['admin_note'] ?? null
-            );
-
-            $maintenanceRequest->update(['reviewed_by' => $request->user()->id, 'reviewed_at' => now()]);
+            $this->reviews->approve($maintenanceRequest, $request->user(), $request->validated());
         } catch (InvalidStatusTransitionException $exception) {
             return back()->with('error', $exception->getMessage());
         }
@@ -115,19 +78,10 @@ class MaintenanceRequestController extends Controller
     public function reject(ReviewMaintenanceRequestRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
     {
         try {
-            $validated = $request->validated();
-
-            $maintenanceRequest->update([
-                'rejection_reason' => $validated['rejection_reason'],
-                'reviewed_by' => $request->user()->id,
-                'reviewed_at' => now(),
-            ]);
-
-            $this->transitions->transition(
-                $maintenanceRequest->refresh(),
-                RequestStatus::Rejected,
+            $this->reviews->reject(
+                $maintenanceRequest,
                 $request->user(),
-                $validated['rejection_reason']
+                $request->validated('rejection_reason')
             );
         } catch (InvalidStatusTransitionException $exception) {
             return back()->with('error', $exception->getMessage());
@@ -144,19 +98,10 @@ class MaintenanceRequestController extends Controller
     public function requestInfo(ReviewMaintenanceRequestRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
     {
         try {
-            $validated = $request->validated();
-
-            $maintenanceRequest->update([
-                'admin_note' => $validated['admin_note'],
-                'reviewed_by' => $request->user()->id,
-                'reviewed_at' => now(),
-            ]);
-
-            $this->transitions->transition(
-                $maintenanceRequest->refresh(),
-                RequestStatus::InfoRequested,
+            $this->reviews->requestInfo(
+                $maintenanceRequest,
                 $request->user(),
-                $validated['admin_note']
+                $request->validated('admin_note')
             );
         } catch (InvalidStatusTransitionException $exception) {
             return back()->with('error', $exception->getMessage());
@@ -172,7 +117,7 @@ class MaintenanceRequestController extends Controller
      */
     public function updateAppointment(UpdateRequestAppointmentRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
     {
-        $maintenanceRequest->update($request->validated());
+        $this->reviews->updateAppointment($maintenanceRequest, $request->validated());
 
         return back()->with('success', 'Appointment updated successfully.');
     }

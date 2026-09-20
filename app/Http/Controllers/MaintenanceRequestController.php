@@ -5,17 +5,17 @@ namespace App\Http\Controllers;
 use App\Enums\RequestStatus;
 use App\Http\Requests\StoreMaintenanceRequestRequest;
 use App\Models\MaintenanceRequest;
-use App\Models\Service;
-use Illuminate\Database\Eloquent\Builder;
+use App\Services\MaintenanceRequestService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class MaintenanceRequestController extends Controller
 {
     use AuthorizesRequests;
+
+    public function __construct(private MaintenanceRequestService $requests) {}
 
     /**
      * Display a listing of the user's maintenance requests.
@@ -24,17 +24,7 @@ class MaintenanceRequestController extends Controller
     {
         $this->authorize('viewAny', MaintenanceRequest::class);
 
-        $query = $request->user()->maintenanceRequests()->with(['service', 'address'])->latest();
-
-        if ($request->filled('status')) {
-            $status = RequestStatus::tryFrom($request->input('status'));
-
-            if ($status !== null) {
-                $query->where('status', $status);
-            }
-        }
-
-        $requests = $query->paginate(15)->withQueryString();
+        $requests = $this->requests->paginateForUser($request->user(), $request->input('status'));
         $statuses = RequestStatus::cases();
 
         return view('requests.index', compact('requests', 'statuses'));
@@ -47,8 +37,7 @@ class MaintenanceRequestController extends Controller
     {
         $this->authorize('create', MaintenanceRequest::class);
 
-        $services = Service::active()->whereHas('category', fn ($query): Builder => $query->where('is_active', true))->orderBy('name')->get();
-        $addresses = $request->user()->addresses()->orderByDesc('is_default')->latest()->get();
+        ['services' => $services, 'addresses' => $addresses] = $this->requests->createFormData($request->user());
         $selectedService = $request->integer('service_id') ?: null;
 
         return view('requests.create', compact('services', 'addresses', 'selectedService'));
@@ -61,33 +50,11 @@ class MaintenanceRequestController extends Controller
     {
         $this->authorize('create', MaintenanceRequest::class);
 
-        $validated = $request->validated();
-
-        $maintenanceRequest = DB::transaction(function () use ($request, $validated): MaintenanceRequest {
-            $maintenanceRequest = $request->user()->maintenanceRequests()->create([
-                ...$validated,
-                'status' => RequestStatus::PendingReview,
-                'photos' => null,
-            ]);
-
-            $photoPaths = [];
-            foreach ($request->file('photos', []) as $photo) {
-                $photoPaths[] = $photo->store("request-photos/{$maintenanceRequest->id}", 'public');
-            }
-
-            if ($photoPaths !== []) {
-                $maintenanceRequest->update(['photos' => $photoPaths]);
-            }
-
-            $maintenanceRequest->statusHistories()->create([
-                'from_status' => null,
-                'status' => RequestStatus::PendingReview->value,
-                'changed_by' => $request->user()->id,
-                'reason' => null,
-            ]);
-
-            return $maintenanceRequest;
-        });
+        $maintenanceRequest = $this->requests->create(
+            $request->user(),
+            $request->validated(),
+            $request->file('photos', [])
+        );
 
         return redirect()
             ->route('requests.show', $maintenanceRequest)

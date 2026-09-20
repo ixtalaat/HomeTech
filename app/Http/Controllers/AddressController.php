@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\AddressInUseException;
 use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\UpdateAddressRequest;
 use App\Models\Address;
@@ -87,11 +88,11 @@ class AddressController extends Controller
         abort_unless($address->isOwnedBy($request->user()), 404);
         $this->authorize('delete', $address);
 
-        if ($address->maintenanceRequests()->exists()) {
-            return back()->with('error', 'This address cannot be deleted because it is used by maintenance requests.');
+        try {
+            $this->addresses->delete($address);
+        } catch (AddressInUseException $exception) {
+            return back()->with('error', $exception->getMessage());
         }
-
-        $this->addresses->delete($address);
 
         return redirect()
             ->route('addresses.index')

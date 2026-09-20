@@ -6,41 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreServiceRequest;
 use App\Http\Requests\Admin\UpdateServiceRequest;
 use App\Models\Service;
-use App\Models\ServiceCategory;
+use App\Services\CatalogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ServiceController extends Controller
 {
+    public function __construct(private CatalogService $catalog) {}
+
     /**
      * Display a listing of services for administration.
      */
     public function index(Request $request): View
     {
-        $query = Service::with('category')->latest();
-
-        if ($request->filled('category_id')) {
-            $query->where('service_category_id', $request->integer('category_id'));
-        }
-
-        if ($request->filled('status')) {
-            $status = $request->input('status');
-            if ($status === 'active') {
-                $query->where('is_active', true);
-            } elseif ($status === 'inactive') {
-                $query->where('is_active', false);
-            }
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        $services = $query->paginate(15)->withQueryString();
-        $categories = ServiceCategory::orderBy('name')->get();
+        $services = $this->catalog->paginateServices($request->only(['search', 'category_id', 'status']));
+        $categories = $this->catalog->orderedCategories();
 
         return view('admin.services.index', compact('services', 'categories'));
     }
@@ -50,7 +31,7 @@ class ServiceController extends Controller
      */
     public function create(): View
     {
-        $categories = ServiceCategory::orderBy('name')->get();
+        $categories = $this->catalog->orderedCategories();
 
         return view('admin.services.create', compact('categories'));
     }
@@ -60,11 +41,7 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-        $validated['slug'] = ! empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['name']);
-        $validated['is_active'] = $request->boolean('is_active', true);
-
-        Service::create($validated);
+        $this->catalog->createService($request->validated());
 
         return redirect()
             ->route('admin.services.index')
@@ -76,7 +53,7 @@ class ServiceController extends Controller
      */
     public function edit(Service $service): View
     {
-        $categories = ServiceCategory::orderBy('name')->get();
+        $categories = $this->catalog->orderedCategories();
 
         return view('admin.services.edit', compact('service', 'categories'));
     }
@@ -86,11 +63,7 @@ class ServiceController extends Controller
      */
     public function update(UpdateServiceRequest $request, Service $service): RedirectResponse
     {
-        $validated = $request->validated();
-        $validated['slug'] = ! empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['name']);
-        $validated['is_active'] = $request->boolean('is_active', true);
-
-        $service->update($validated);
+        $this->catalog->updateService($service, $request->validated());
 
         return redirect()
             ->route('admin.services.index')
@@ -102,10 +75,7 @@ class ServiceController extends Controller
      */
     public function toggleStatus(Service $service): RedirectResponse
     {
-        $service->update([
-            'is_active' => ! $service->is_active,
-        ]);
-
+        $service = $this->catalog->toggleServiceStatus($service);
         $statusLabel = $service->is_active ? 'activated' : 'deactivated';
 
         return back()->with('success', "Service '{$service->name}' was {$statusLabel} successfully.");

@@ -6,20 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreServiceCategoryRequest;
 use App\Http\Requests\Admin\UpdateServiceCategoryRequest;
 use App\Models\ServiceCategory;
+use App\Services\CatalogService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ServiceCategoryController extends Controller
 {
+    public function __construct(private CatalogService $catalog) {}
+
     /**
      * Display a listing of service categories.
      */
     public function index(): View
     {
-        $categories = ServiceCategory::withCount('services')
-            ->latest()
-            ->paginate(15);
+        $categories = $this->catalog->paginateCategories();
 
         return view('admin.categories.index', compact('categories'));
     }
@@ -37,11 +37,7 @@ class ServiceCategoryController extends Controller
      */
     public function store(StoreServiceCategoryRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-        $validated['slug'] = ! empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['name']);
-        $validated['is_active'] = $request->boolean('is_active', true);
-
-        ServiceCategory::create($validated);
+        $this->catalog->createCategory($request->validated());
 
         return redirect()
             ->route('admin.categories.index')
@@ -61,11 +57,7 @@ class ServiceCategoryController extends Controller
      */
     public function update(UpdateServiceCategoryRequest $request, ServiceCategory $category): RedirectResponse
     {
-        $validated = $request->validated();
-        $validated['slug'] = ! empty($validated['slug']) ? Str::slug($validated['slug']) : Str::slug($validated['name']);
-        $validated['is_active'] = $request->boolean('is_active', true);
-
-        $category->update($validated);
+        $this->catalog->updateCategory($category, $request->validated());
 
         return redirect()
             ->route('admin.categories.index')
@@ -77,13 +69,11 @@ class ServiceCategoryController extends Controller
      */
     public function destroy(ServiceCategory $category): RedirectResponse
     {
-        if ($category->services()->count() > 0) {
+        if (! $this->catalog->deleteCategory($category)) {
             return redirect()
                 ->route('admin.categories.index')
                 ->with('error', 'Cannot delete a category with existing services. Please reassign or delete its services first.');
         }
-
-        $category->delete();
 
         return redirect()
             ->route('admin.categories.index')

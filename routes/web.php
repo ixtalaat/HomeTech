@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -31,6 +33,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+
+    Route::resource('addresses', AddressController::class)->except(['show']);
+    Route::patch('addresses/{address}/default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
 });
 
 Route::middleware(['auth', 'role:admin,manager'])
@@ -42,4 +47,7 @@ Route::middleware(['auth', 'role:admin,manager'])
         Route::resource('categories', ServiceCategoryController::class);
         Route::patch('services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');
         Route::resource('services', ServiceController::class);
+
+        Route::patch('customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
+        Route::resource('customers', CustomerController::class)->only(['index', 'show', 'edit', 'update']);
     });

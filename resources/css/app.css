@@ -6,6 +6,28 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --color-brand: #0f766e;
+}
+
+@layer base {
+    body { font-family: var(--font-sans); }
+    button, a, input { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid rgb(45 212 191 / 0.45); outline-offset: 3px; }
+}
+
+@layer components {
+    .form-label { display: block; margin-bottom: .5rem; font-size: .875rem; font-weight: 600; color: rgb(51 65 85); }
+    .form-input { width: 100%; border-radius: .875rem; border: 1px solid rgb(203 213 225); background: white; padding: .75rem 1rem; font-size: .875rem; color: rgb(15 23 42); box-shadow: 0 1px 2px rgb(15 23 42 / 0.03); }
+    .form-input::placeholder { color: rgb(148 163 184); }
+    .form-input:hover { border-color: rgb(148 163 184); }
+    .form-input:focus { border-color: rgb(13 148 136); box-shadow: 0 0 0 4px rgb(20 184 166 / 0.12); outline: none; }
+    .primary-button, .secondary-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: .875rem; padding: .8rem 1.15rem; font-size: .875rem; font-weight: 700; }
+    .primary-button { background: rgb(13 148 136); color: white; box-shadow: 0 8px 18px rgb(13 148 136 / 0.18); }
+    .primary-button:hover { background: rgb(15 118 110); transform: translateY(-1px); }
+    .secondary-button { border: 1px solid rgb(203 213 225); background: white; color: rgb(15 23 42); }
+    .secondary-button:hover { border-color: rgb(94 234 212); background: rgb(240 253 250); color: rgb(15 118 110); }
+    .stat-card { display: flex; align-items: center; gap: 1rem; border: 1px solid rgb(226 232 240); border-radius: 1.5rem; background: white; padding: 1.25rem; box-shadow: 0 1px 2px rgb(15 23 42 / 0.03); }
+    .stat-icon { display: flex; height: 2.75rem; width: 2.75rem; align-items: center; justify-content: center; border-radius: 1rem; font-weight: 800; }
 }

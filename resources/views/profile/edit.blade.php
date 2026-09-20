@@ -1,39 +1,10 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@extends('layouts.app')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Profile</title>
-</head>
+@php($heading = 'Your profile')
 
-<body>
-    <h1>Profile</h1>
-    @if (session('status'))
-        <p>{{ session('status') }}</p>
-    @endif
-    @if ($errors->any())
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    @endif
-    <form method="POST" action="{{ route('profile.update') }}">
-        @csrf @method('PUT')
-        <label>Name <input type="text" name="name" value="{{ old('name', $user->name) }}" required></label>
-        <label>Phone <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"></label>
-        <label>Email <input type="email" name="email" value="{{ old('email', $user->email) }}" required></label>
-        <button type="submit">Save profile</button>
-    </form>
-    <h2>Change password</h2>
-    <form method="POST" action="{{ route('password.update') }}">
-        @csrf @method('PUT')
-        <label>Current password <input type="password" name="current_password" required></label>
-        <label>New password <input type="password" name="password" required></label>
-        <label>Confirm password <input type="password" name="password_confirmation" required></label>
-        <button type="submit">Change password</button>
-    </form>
-</body>
-
-</html>
+@section('content')
+    <div class="mx-auto max-w-4xl"><div class="mb-8"><p class="text-sm font-semibold text-slate-500">Keep your contact details current for smoother service.</p><h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight">Profile settings</h2></div>
+    @if (session('status'))<div class="mb-6 rounded-2xl border-teal-200 bg-teal-50 p-4 text-sm font-semibold text-teal-800" role="status">Your {{ session('status') === 'profile-updated' ? 'profile' : 'password' }} has been updated successfully.</div>@endif
+    @if ($errors->any())<div class="mb-6 rounded-2xl border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert"><p class="font-bold">Please check the highlighted details.</p><ul class="mt-2 list-inside list-disc">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+    <div class="grid gap-6 lg:grid-cols-2"><section class="rounded-3xl border-slate-200 bg-white p-6 shadow-sm sm:p-8"><div class="mb-7"><p class="text-sm font-bold uppercase tracking-[0.14em] text-teal-600">Personal details</p><h3 class="mt-2 font-display text-xl font-extrabold">Your contact information</h3></div><form method="POST" action="{{ route('profile.update') }}" class="space-y-5">@csrf @method('PUT')<div><label for="name" class="form-label">Full name</label><input id="name" type="text" name="name" value="{{ old('name', $user->name) }}" required class="form-input"></div><div><label for="phone" class="form-label">Phone number</label><input id="phone" type="tel" name="phone" value="{{ old('phone', $user->phone) }}" class="form-input"></div><div><label for="email" class="form-label">Email address</label><input id="email" type="email" name="email" value="{{ old('email', $user->email) }}" required class="form-input"></div><button type="submit" class="primary-button">Save changes</button></form></section><section class="rounded-3xl border-slate-200 bg-white p-6 shadow-sm sm:p-8"><div class="mb-7"><p class="text-sm font-bold uppercase tracking-[0.14em] text-teal-600">Security</p><h3 class="mt-2 font-display text-xl font-extrabold">Change password</h3></div><form method="POST" action="{{ route('password.update') }}" class="space-y-5">@csrf @method('PUT')<div><label for="current_password" class="form-label">Current password</label><input id="current_password" type="password" name="current_password" required class="form-input"></div><div><label for="password" class="form-label">New password</label><input id="password" type="password" name="password" required class="form-input"></div><div><label for="password_confirmation" class="form-label">Confirm new password</label><input id="password_confirmation" type="password" name="password_confirmation" required class="form-input"></div><button type="submit" class="secondary-button">Update password</button></form></section></div></div>
+@endsection

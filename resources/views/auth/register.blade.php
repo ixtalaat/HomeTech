@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="mb-8 lg:hidden"><a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo variant="light" /></a></div>
+    <div class="mb-8 lg:hidden"><a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo /></a></div>
     <div class="mb-8"><p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-400">Get started</p><h1 class="mt-3 font-display text-3xl font-extrabold tracking-tight">Create your account</h1><p class="mt-3 text-sm leading-6 text-slate-400">Join HomeTech and take the stress out of home maintenance.</p></div>
     @if ($errors->any())
         <div class="mb-6 rounded-2xl border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200" role="alert"><p class="font-bold">Please check your details.</p><ul class="mt-2 list-inside list-disc space-y-1">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>

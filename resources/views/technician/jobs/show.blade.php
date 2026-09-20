@@ -118,6 +118,38 @@
             </div>
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-extrabold text-slate-900">Materials</h3>
+                    <span class="text-sm font-extrabold text-slate-900">Total: {{ number_format($workOrder->materialsTotal(), 2) }} EGP</span>
+                </div>
+                <ul class="mt-3 space-y-2 text-sm">
+                    @forelse ($workOrder->materialUsages as $usage)
+                        <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+                            <span class="font-medium text-slate-700">{{ $usage->item->name ?? '—' }} × {{ $usage->quantity }}</span>
+                            <span class="font-bold text-slate-900">{{ number_format($usage->extendedCost(), 2) }} EGP</span>
+                        </li>
+                    @empty
+                        <p class="text-sm text-slate-400">No materials used yet.</p>
+                    @endforelse
+                </ul>
+                @unless($workOrder->isCompleted())
+                    <form method="POST" action="{{ route('technician.jobs.materials', $workOrder) }}" class="mt-3 space-y-3">
+                        @csrf
+                        <div class="grid grid-cols-2 gap-2">
+                            <select name="inventory_item_id" required class="form-input text-xs" aria-label="Material">
+                                <option value="">Select material</option>
+                                @foreach ($stockedItems as $stockedItem)
+                                    <option value="{{ $stockedItem->id }}">{{ $stockedItem->name }} ({{ $stockedItem->current_stock }} left)</option>
+                                @endforeach
+                            </select>
+                            <input type="number" name="quantity" min="1" required placeholder="Qty" class="form-input text-xs">
+                        </div>
+                        <button type="submit" class="secondary-button w-full text-xs">Use Material</button>
+                    </form>
+                @endunless
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 class="text-sm font-extrabold text-slate-900">Completion</h3>
                 @if($workOrder->isCompleted())
                     <p class="mt-2 text-sm text-slate-500">Completed {{ $workOrder->completed_at?->format('d M Y, h:i A') }}.</p>

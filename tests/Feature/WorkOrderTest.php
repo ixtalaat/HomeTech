@@ -13,14 +13,6 @@ use App\Models\User;
 use App\Models\WorkOrder;
 use App\Services\WorkOrderService;
 
-function inProgressWorkOrder(): WorkOrder
-{
-    $request = scheduledRequest();
-    $service = app(WorkOrderService::class);
-
-    return $service->startVisit($request->refresh(), $request->technician->user);
-}
-
 it('starts the visit for the assigned technician', function () {
     $request = scheduledRequest();
     $technicianUser = $request->technician->user;

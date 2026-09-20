@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\InventoryItemController;
 use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceRequestController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
@@ -57,6 +58,7 @@ Route::middleware(['auth', 'role:technician'])
         Route::patch('jobs/{workOrder}/diagnosis', [TechnicianWorkOrderController::class, 'recordDiagnosis'])->name('jobs.diagnosis');
         Route::patch('jobs/{workOrder}/notes', [TechnicianWorkOrderController::class, 'recordNotes'])->name('jobs.notes');
         Route::post('jobs/{workOrder}/labor', [TechnicianWorkOrderController::class, 'addLabor'])->name('jobs.labor');
+        Route::post('jobs/{workOrder}/materials', [TechnicianWorkOrderController::class, 'recordMaterial'])->name('jobs.materials');
         Route::post('jobs/{workOrder}/photos', [TechnicianWorkOrderController::class, 'uploadPhotos'])->name('jobs.photos');
         Route::patch('jobs/{workOrder}/complete', [TechnicianWorkOrderController::class, 'complete'])->name('jobs.complete');
     });
@@ -92,4 +94,7 @@ Route::middleware(['auth', 'role:admin,manager'])
 
         Route::get('work-orders/{workOrder}', [AdminWorkOrderController::class, 'show'])->name('work-orders.show');
         Route::patch('work-orders/{workOrder}/correct', [AdminWorkOrderController::class, 'correct'])->name('work-orders.correct');
+
+        Route::patch('inventory/{inventoryItem}/adjust', [InventoryItemController::class, 'adjust'])->name('inventory.adjust');
+        Route::resource('inventory', InventoryItemController::class)->parameters(['inventory' => 'inventoryItem']);
     });

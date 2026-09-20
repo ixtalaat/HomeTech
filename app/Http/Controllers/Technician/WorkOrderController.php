@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Technician;
 
 use App\Enums\RequestStatus;
 use App\Exceptions\CompletedWorkOrderException;
+use App\Exceptions\InsufficientStockException;
 use App\Exceptions\WorkOrderException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Technician\RecordDiagnosisRequest;
 use App\Http\Requests\Technician\RecordNotesRequest;
 use App\Http\Requests\Technician\StoreLaborItemRequest;
+use App\Http\Requests\Technician\StoreMaterialUsageRequest;
 use App\Http\Requests\Technician\UploadWorkPhotosRequest;
+use App\Models\InventoryItem;
 use App\Models\MaintenanceRequest;
 use App\Models\WorkOrder;
 use App\Services\WorkOrderService;
@@ -58,9 +61,11 @@ class WorkOrderController extends Controller
         abort_unless($this->ownsWorkOrder($request, $workOrder), 404);
         $this->authorize('view', $workOrder);
 
-        $workOrder->load(['request.service', 'request.address', 'request.appointment', 'laborItems', 'technician.user']);
+        $workOrder->load(['request.service', 'request.address', 'request.appointment', 'laborItems', 'materialUsages.item', 'technician.user']);
 
-        return view('technician.jobs.show', compact('workOrder'));
+        $stockedItems = InventoryItem::inStock()->orderBy('name')->get();
+
+        return view('technician.jobs.show', compact('workOrder', 'stockedItems'));
     }
 
     /**
@@ -127,6 +132,23 @@ class WorkOrderController extends Controller
         }
 
         return back()->with('success', 'Labor item added successfully.');
+    }
+
+    /**
+     * Record material usage, decrementing stock.
+     */
+    public function recordMaterial(StoreMaterialUsageRequest $request, WorkOrder $workOrder): RedirectResponse
+    {
+        try {
+            $validated = $request->validated();
+            $item = InventoryItem::findOrFail($validated['inventory_item_id']);
+
+            $this->workOrders->recordMaterialUsage($workOrder, $request->user(), $item, (int) $validated['quantity']);
+        } catch (CompletedWorkOrderException|InsufficientStockException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return back()->with('success', 'Material usage recorded and stock updated.');
     }
 
     /**

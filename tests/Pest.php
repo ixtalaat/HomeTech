@@ -3,7 +3,9 @@
 use App\Models\MaintenanceRequest;
 use App\Models\Service;
 use App\Models\Technician;
+use App\Models\WorkOrder;
 use App\Services\TechnicianAssignmentService;
+use App\Services\WorkOrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
@@ -90,4 +92,14 @@ function scheduledRequest(): MaintenanceRequest
     $technician = skilledTechnician($request->service);
 
     return app(TechnicianAssignmentService::class)->assign($request->refresh(), $technician);
+}
+
+/**
+ * Create a scheduled request and start the visit, returning the work order.
+ */
+function inProgressWorkOrder(): WorkOrder
+{
+    $request = scheduledRequest();
+
+    return app(WorkOrderService::class)->startVisit($request->refresh(), $request->technician->user);
 }

@@ -10,6 +10,7 @@ use App\Exceptions\CancelledAppointmentException;
 use App\Exceptions\CompletedWorkOrderException;
 use App\Exceptions\WorkOrderException;
 use App\Models\AuditLog;
+use App\Models\InventoryItem;
 use App\Models\MaintenanceRequest;
 use App\Models\User;
 use App\Models\WorkOrder;
@@ -20,7 +21,8 @@ class WorkOrderService
 {
     public function __construct(
         private RequestStatusService $transitions,
-        private SchedulingService $scheduling
+        private SchedulingService $scheduling,
+        private InventoryService $inventory
     ) {}
 
     /**
@@ -121,6 +123,20 @@ class WorkOrderService
             'description' => $description,
             'cost' => $cost,
         ]);
+
+        return $workOrder->refresh();
+    }
+
+    /**
+     * Record material usage, decrementing stock with a linked movement (BR-003, BR-004).
+     *
+     * @throws CompletedWorkOrderException
+     */
+    public function recordMaterialUsage(WorkOrder $workOrder, ?User $actor, InventoryItem $item, int $quantity): WorkOrder
+    {
+        $this->guardEditable($workOrder, $actor);
+
+        $this->inventory->recordUsage($workOrder, $item, $quantity, $actor);
 
         return $workOrder->refresh();
     }

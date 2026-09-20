@@ -90,6 +90,16 @@ class WorkOrder extends Model
     }
 
     /**
+     * Get the material usage rows recorded for the work order.
+     *
+     * @return HasMany<MaterialUsage, $this>
+     */
+    public function materialUsages(): HasMany
+    {
+        return $this->hasMany(MaterialUsage::class);
+    }
+
+    /**
      * Scope a query to work orders of the given technician.
      *
      * @param  Builder<$this>  $query
@@ -105,6 +115,14 @@ class WorkOrder extends Model
     public function laborTotal(): float
     {
         return (float) $this->laborItems()->sum('cost');
+    }
+
+    /**
+     * Get the total materials cost (frozen unit costs).
+     */
+    public function materialsTotal(): float
+    {
+        return (float) $this->materialUsages()->selectRaw('COALESCE(SUM(quantity * unit_cost), 0) as total')->value('total');
     }
 
     /**

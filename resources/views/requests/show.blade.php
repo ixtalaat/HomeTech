@@ -30,6 +30,16 @@
                     <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Preferred Appointment</dt>
                     <dd class="mt-0.5 font-semibold text-slate-900">{{ $maintenanceRequest->preferred_date->format('d M Y') }} at {{ \Carbon\Carbon::parse($maintenanceRequest->preferred_time)->format('h:i A') }}</dd>
                 </div>
+                @if($maintenanceRequest->appointment && !$maintenanceRequest->appointment->isCancelled())
+                    <div class="rounded-xl bg-teal-50 p-3">
+                        <dt class="text-xs font-bold uppercase tracking-wider text-teal-600">Scheduled Visit ({{ $maintenanceRequest->appointment->status->label() }})</dt>
+                        <dd class="mt-0.5 font-semibold text-slate-900">
+                            {{ $maintenanceRequest->appointment->date->format('d M Y') }},
+                            {{ \Carbon\Carbon::parse($maintenanceRequest->appointment->start_time)->format('h:i A') }} –
+                            {{ \Carbon\Carbon::parse($maintenanceRequest->appointment->end_time)->format('h:i A') }}
+                        </dd>
+                    </div>
+                @endif
                 <div>
                     <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Description</dt>
                     <dd class="mt-0.5 text-slate-700">{{ $maintenanceRequest->description }}</dd>

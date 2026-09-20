@@ -1,0 +1,170 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\AppointmentStatus;
+use App\Enums\RequestStatus;
+use App\Exceptions\CancelledAppointmentException;
+use App\Exceptions\SchedulingConflictException;
+use App\Models\Appointment;
+use App\Models\MaintenanceRequest;
+use App\Models\Technician;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+class SchedulingService
+{
+    public function __construct(private RequestStatusService $transitions) {}
+
+    /**
+     * Determine whether the technician has a conflicting appointment (BR-002).
+     *
+     * Cancelled appointments free the calendar; boundary-touching windows
+     * (end == start) do not conflict.
+     */
+    public function hasConflict(int $technicianId, string $date, string $start, string $end, ?int $ignoreId = null): bool
+    {
+        $query = Appointment::forTechnicianOn($technicianId, $date)
+            ->blocking()
+            ->overlapping($start, $end);
+
+        if ($ignoreId !== null) {
+            $query->whereKeyNot($ignoreId);
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Book an appointment for an assigned request.
+     *
+     * @throws SchedulingConflictException
+     */
+    public function book(MaintenanceRequest $request, Technician $technician, string $date, string $start, string $end, ?User $actor = null): Appointment
+    {
+        if ($request->status !== RequestStatus::TechnicianAssigned) {
+            throw new SchedulingConflictException("Cannot book an appointment for request #{$request->id} with status '{$request->status->value}'.");
+        }
+
+        $this->guardFutureSlot($date, $start, $end);
+        $this->guardNoConflict($technician, $date, $start, $end);
+
+        return DB::transaction(function () use ($request, $technician, $date, $start, $end, $actor): Appointment {
+            $appointment = Appointment::create([
+                'maintenance_request_id' => $request->id,
+                'technician_id' => $technician->id,
+                'date' => $date,
+                'start_time' => $start,
+                'end_time' => $end,
+                'status' => AppointmentStatus::Scheduled,
+            ]);
+
+            $this->transitions->transition(
+                $request->refresh(),
+                RequestStatus::Scheduled,
+                $actor,
+                "Appointment booked for {$date} {$start}–{$end}."
+            );
+
+            return $appointment;
+        });
+    }
+
+    /**
+     * Reschedule an appointment, re-running the conflict check (BR-002).
+     *
+     * @throws SchedulingConflictException
+     */
+    public function reschedule(Appointment $appointment, string $date, string $start, string $end, ?User $actor = null): Appointment
+    {
+        if ($appointment->isCancelled()) {
+            throw new SchedulingConflictException('Cannot reschedule a cancelled appointment. Book a new one instead.');
+        }
+
+        $this->guardFutureSlot($date, $start, $end);
+        $this->guardNoConflict($appointment->technician, $date, $start, $end, $appointment->id);
+
+        return DB::transaction(function () use ($appointment, $date, $start, $end, $actor): Appointment {
+            $appointment->update([
+                'date' => $date,
+                'start_time' => $start,
+                'end_time' => $end,
+                'status' => AppointmentStatus::Rescheduled,
+            ]);
+
+            $appointment->request->statusHistories()->create([
+                'from_status' => RequestStatus::Scheduled->value,
+                'status' => RequestStatus::Scheduled->value,
+                'changed_by' => $actor?->id,
+                'reason' => "Appointment rescheduled to {$date} {$start}–{$end}.",
+            ]);
+
+            return $appointment->refresh();
+        });
+    }
+
+    /**
+     * Cancel an appointment, returning the request to technician_assigned for rebooking.
+     */
+    public function cancel(Appointment $appointment, ?User $actor = null, ?string $reason = null): Appointment
+    {
+        return DB::transaction(function () use ($appointment, $actor, $reason): Appointment {
+            $appointment->update(['status' => AppointmentStatus::Cancelled]);
+
+            $this->transitions->transition(
+                $appointment->request->refresh(),
+                RequestStatus::TechnicianAssigned,
+                $actor,
+                $reason ?? 'Appointment cancelled; awaiting a new slot.'
+            );
+
+            return $appointment->refresh();
+        });
+    }
+
+    /**
+     * Start the visit for an appointment. Refuses cancelled appointments (PRD §13).
+     *
+     * Epic 7 owns the visit lifecycle; this guard is pinned here.
+     *
+     * @throws CancelledAppointmentException
+     */
+    public function start(Appointment $appointment): Appointment
+    {
+        if ($appointment->isCancelled()) {
+            throw new CancelledAppointmentException('Cannot start a cancelled appointment.');
+        }
+
+        return $appointment;
+    }
+
+    /**
+     * Guard that the slot is a valid future window.
+     *
+     * @throws SchedulingConflictException
+     */
+    private function guardFutureSlot(string $date, string $start, string $end): void
+    {
+        if ($end <= $start) {
+            throw new SchedulingConflictException('The end time must be after the start time.');
+        }
+
+        if ($date <= now()->format('Y-m-d')) {
+            throw new SchedulingConflictException('Appointments must be booked for a future date.');
+        }
+    }
+
+    /**
+     * Guard that the technician is free for the slot (BR-002).
+     *
+     * @throws SchedulingConflictException
+     */
+    private function guardNoConflict(Technician $technician, string $date, string $start, string $end, ?int $ignoreId = null): void
+    {
+        if ($this->hasConflict($technician->id, $date, $start, $end, $ignoreId)) {
+            throw new SchedulingConflictException(
+                "Technician '{$technician->user->name}' already has an overlapping appointment on {$date}."
+            );
+        }
+    }
+}

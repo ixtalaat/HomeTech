@@ -1,23 +1,15 @@
 <?php
 
+use App\Enums\AppointmentStatus;
 use App\Enums\RequestStatus;
 use App\Enums\UserRole;
 use App\Exceptions\TechnicianAssignmentException;
 use App\Models\MaintenanceRequest;
-use App\Models\Service;
 use App\Models\Technician;
 use App\Models\User;
 use App\Services\TechnicianAssignmentService;
 
-function skilledTechnician(Service $service): Technician
-{
-    $technician = Technician::factory()->create();
-    $technician->categories()->sync([$service->service_category_id]);
-
-    return $technician->refresh();
-}
-
-it('assigns an eligible technician to an approved request', function () {
+it('assigns an eligible technician to an approved request and books the slot', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
     $request = MaintenanceRequest::factory()->approved()->create();
     $technician = skilledTechnician($request->service);
@@ -26,8 +18,13 @@ it('assigns an eligible technician to an approved request', function () {
         'technician_id' => $technician->id,
     ])->assertRedirect(route('admin.requests.show', $request));
 
-    expect($request->refresh()->status)->toBe(RequestStatus::TechnicianAssigned)
-        ->and($request->technician_id)->toBe($technician->id);
+    $request = $request->refresh();
+
+    expect($request->status)->toBe(RequestStatus::Scheduled)
+        ->and($request->technician_id)->toBe($technician->id)
+        ->and($request->appointment)->not->toBeNull()
+        ->and($request->appointment->technician_id)->toBe($technician->id)
+        ->and($request->appointment->date->format('Y-m-d'))->toBe($request->preferred_date->format('Y-m-d'));
 });
 
 it('rejects assignment when the technician lacks the category skill (BR-001)', function () {
@@ -84,13 +81,19 @@ it('reassigns and unassigns technicians', function () {
     $service->assign($request, $first, $admin);
     $service->reassign($request->refresh(), $second, $admin);
 
-    expect($request->refresh()->technician_id)->toBe($second->id)
-        ->and($request->status)->toBe(RequestStatus::TechnicianAssigned);
+    $request = $request->refresh();
+
+    expect($request->technician_id)->toBe($second->id)
+        ->and($request->status)->toBe(RequestStatus::Scheduled)
+        ->and($request->appointment->technician_id)->toBe($second->id);
 
     $service->unassign($request->refresh(), $admin);
 
-    expect($request->refresh()->technician_id)->toBeNull()
-        ->and($request->status)->toBe(RequestStatus::Approved);
+    $request = $request->refresh();
+
+    expect($request->technician_id)->toBeNull()
+        ->and($request->status)->toBe(RequestStatus::Approved)
+        ->and($request->appointment->status)->toBe(AppointmentStatus::Cancelled);
 });
 
 it('lists only eligible technicians for a request', function () {

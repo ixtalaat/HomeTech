@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use App\Enums\RequestStatus;
+use App\Enums\UserRole;
+use App\Models\MaintenanceRequest;
+use Illuminate\Foundation\Http\FormRequest;
+
+class BookAppointmentRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        $request = $this->route('maintenanceRequest');
+
+        return $this->user() !== null
+            && in_array($this->user()->role, [UserRole::Admin, UserRole::Manager], true)
+            && $request instanceof MaintenanceRequest
+            && $request->status === RequestStatus::TechnicianAssigned;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    public function rules(): array
+    {
+        return [
+            'date' => ['required', 'date', 'after:today'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+        ];
+    }
+}

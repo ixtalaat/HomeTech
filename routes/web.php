@@ -64,6 +64,9 @@ Route::middleware(['auth', 'role:admin,manager'])
         Route::patch('requests/{maintenanceRequest}/appointment', [AdminMaintenanceRequestController::class, 'updateAppointment'])->name('requests.appointment');
         Route::patch('requests/{maintenanceRequest}/assign', [AdminMaintenanceRequestController::class, 'assign'])->name('requests.assign');
         Route::patch('requests/{maintenanceRequest}/unassign', [AdminMaintenanceRequestController::class, 'unassign'])->name('requests.unassign');
+        Route::patch('requests/{maintenanceRequest}/book-appointment', [AdminMaintenanceRequestController::class, 'bookAppointment'])->name('requests.book-appointment');
+        Route::patch('requests/{maintenanceRequest}/reschedule-appointment', [AdminMaintenanceRequestController::class, 'rescheduleAppointment'])->name('requests.reschedule-appointment');
+        Route::patch('requests/{maintenanceRequest}/cancel-appointment', [AdminMaintenanceRequestController::class, 'cancelAppointment'])->name('requests.cancel-appointment');
         Route::resource('requests', AdminMaintenanceRequestController::class)
             ->only(['index', 'show'])
             ->parameters(['requests' => 'maintenanceRequest']);

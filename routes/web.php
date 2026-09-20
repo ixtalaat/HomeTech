@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdditionalWorkController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\InventoryItemController;
@@ -46,6 +47,9 @@ Route::middleware('auth')->group(function (): void {
     Route::resource('requests', MaintenanceRequestController::class)
         ->only(['index', 'create', 'store', 'show'])
         ->parameters(['requests' => 'maintenanceRequest']);
+
+    Route::patch('additional-work/{additionalWork}/approve', [AdditionalWorkController::class, 'approve'])->name('additional-work.approve');
+    Route::patch('additional-work/{additionalWork}/reject', [AdditionalWorkController::class, 'reject'])->name('additional-work.reject');
 });
 
 Route::middleware(['auth', 'role:technician'])
@@ -59,6 +63,8 @@ Route::middleware(['auth', 'role:technician'])
         Route::patch('jobs/{workOrder}/notes', [TechnicianWorkOrderController::class, 'recordNotes'])->name('jobs.notes');
         Route::post('jobs/{workOrder}/labor', [TechnicianWorkOrderController::class, 'addLabor'])->name('jobs.labor');
         Route::post('jobs/{workOrder}/materials', [TechnicianWorkOrderController::class, 'recordMaterial'])->name('jobs.materials');
+        Route::post('jobs/{workOrder}/additional-work', [TechnicianWorkOrderController::class, 'requestAdditional'])->name('jobs.additional-work');
+        Route::patch('jobs/additional-work/{additionalWork}/complete', [TechnicianWorkOrderController::class, 'completeAdditional'])->name('jobs.additional-work.complete');
         Route::post('jobs/{workOrder}/photos', [TechnicianWorkOrderController::class, 'uploadPhotos'])->name('jobs.photos');
         Route::patch('jobs/{workOrder}/complete', [TechnicianWorkOrderController::class, 'complete'])->name('jobs.complete');
     });

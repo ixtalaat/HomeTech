@@ -100,6 +100,16 @@ class WorkOrder extends Model
     }
 
     /**
+     * Get the additional work items requested for the work order.
+     *
+     * @return HasMany<AdditionalWork, $this>
+     */
+    public function additionalWorkItems(): HasMany
+    {
+        return $this->hasMany(AdditionalWork::class);
+    }
+
+    /**
      * Scope a query to work orders of the given technician.
      *
      * @param  Builder<$this>  $query
@@ -136,8 +146,8 @@ class WorkOrder extends Model
     /**
      * Determine whether the completion requirements are met.
      *
-     * Labor/materials hooks: Epic 8 extends material checks; additional-work
-     * resolution is wired in Epic 9. Hard blockers now: diagnosis + notes.
+     * Epic 8 extended material checks via usage rows. Additional work must
+     * be resolved (approved/rejected/completed — never pending).
      *
      * @return array<int, string> List of unmet requirement messages.
      */
@@ -151,6 +161,10 @@ class WorkOrder extends Model
 
         if (empty(trim((string) $this->work_notes))) {
             $missing[] = 'Work notes must be recorded before completion.';
+        }
+
+        if ($this->additionalWorkItems()->pending()->exists()) {
+            $missing[] = 'All additional work must be approved or rejected before completion.';
         }
 
         return $missing;

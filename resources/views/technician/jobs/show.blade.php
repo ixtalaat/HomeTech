@@ -150,11 +150,47 @@
             </div>
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-sm font-extrabold text-slate-900">Additional Work</h3>
+                <ul class="mt-3 space-y-2 text-sm">
+                    @forelse ($workOrder->additionalWorkItems as $extra)
+                        <li class="rounded-xl bg-slate-50 px-3 py-2">
+                            <div class="flex items-center justify-between">
+                                <span class="font-medium text-slate-700">{{ $extra->description }}</span>
+                                <span class="font-bold text-slate-900">{{ number_format($extra->cost, 2) }} EGP</span>
+                            </div>
+                            <div class="mt-1 flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-500">{{ $extra->status->label() }}</span>
+                                @if($extra->status === \App\Enums\AdditionalWorkStatus::Approved && !$workOrder->isCompleted())
+                                    <form method="POST" action="{{ route('technician.jobs.additional-work.complete', $extra) }}" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="text-xs font-bold text-teal-700 hover:underline">Mark performed</button>
+                                    </form>
+                                @endif
+                            </div>
+                        </li>
+                    @empty
+                        <p class="text-sm text-slate-400">No additional work requested yet.</p>
+                    @endforelse
+                </ul>
+                @unless($workOrder->isCompleted())
+                    <form method="POST" action="{{ route('technician.jobs.additional-work', $workOrder) }}" class="mt-3 space-y-3">
+                        @csrf
+                        <input type="text" name="description" required placeholder="Describe the extra problem…" class="form-input text-xs">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" name="cost" step="0.01" min="0" required placeholder="Extra cost (EGP)" class="form-input text-xs">
+                            <button type="submit" class="secondary-button text-xs">Request Approval</button>
+                        </div>
+                    </form>
+                @endunless
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 class="text-sm font-extrabold text-slate-900">Completion</h3>
                 @if($workOrder->isCompleted())
                     <p class="mt-2 text-sm text-slate-500">Completed {{ $workOrder->completed_at?->format('d M Y, h:i A') }}.</p>
                 @else
-                    <p class="mt-2 text-xs text-slate-500">Requires a recorded diagnosis and work notes.</p>
+                    <p class="mt-2 text-xs text-slate-500">Requires a recorded diagnosis, work notes, and resolved additional work.</p>
                     <form method="POST" action="{{ route('technician.jobs.complete', $workOrder) }}" class="mt-3" onsubmit="return confirm('Mark this job as completed?');">
                         @csrf
                         @method('PATCH')

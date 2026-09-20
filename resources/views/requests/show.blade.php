@@ -58,6 +58,31 @@
                 @endif
             </dl>
 
+            @php $pendingExtras = $maintenanceRequest->workOrder?->additionalWorkItems->where('status', \App\Enums\AdditionalWorkStatus::PendingApproval) ?? collect(); @endphp
+            @if($pendingExtras->isNotEmpty())
+                <div class="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                    <h3 class="text-sm font-extrabold text-amber-900">Approval Needed: Additional Work</h3>
+                    @foreach ($pendingExtras as $extra)
+                        <div class="mt-3 rounded-xl bg-white/80 p-3 text-sm">
+                            <p class="font-bold text-slate-900">{{ $extra->description }}</p>
+                            <p class="mt-0.5 text-xs text-slate-500">Additional cost: {{ number_format($extra->cost, 2) }} EGP · requested {{ $extra->created_at->format('d M Y, h:i A') }}</p>
+                            <div class="mt-2 flex gap-2">
+                                <form method="POST" action="{{ route('additional-work.approve', $extra) }}" class="flex-1">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="primary-button w-full text-xs">Approve ({{ number_format($extra->cost, 2) }} EGP)</button>
+                                </form>
+                                <form method="POST" action="{{ route('additional-work.reject', $extra) }}" class="flex-1" onsubmit="return confirm('Reject this additional work? It will not be billed.');">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="secondary-button w-full text-xs">Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
             @if(! empty($maintenanceRequest->photos))
                 <h3 class="mt-6 text-sm font-extrabold text-slate-900">Photos</h3>
                 <div class="mt-3 grid grid-cols-3 gap-2">

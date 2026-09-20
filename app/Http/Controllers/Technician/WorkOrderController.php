@@ -3,18 +3,22 @@
 namespace App\Http\Controllers\Technician;
 
 use App\Enums\RequestStatus;
+use App\Exceptions\AdditionalWorkException;
 use App\Exceptions\CompletedWorkOrderException;
 use App\Exceptions\InsufficientStockException;
 use App\Exceptions\WorkOrderException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Technician\RecordDiagnosisRequest;
 use App\Http\Requests\Technician\RecordNotesRequest;
+use App\Http\Requests\Technician\StoreAdditionalWorkRequest;
 use App\Http\Requests\Technician\StoreLaborItemRequest;
 use App\Http\Requests\Technician\StoreMaterialUsageRequest;
 use App\Http\Requests\Technician\UploadWorkPhotosRequest;
+use App\Models\AdditionalWork;
 use App\Models\InventoryItem;
 use App\Models\MaintenanceRequest;
 use App\Models\WorkOrder;
+use App\Services\AdditionalWorkService;
 use App\Services\WorkOrderService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -25,7 +29,10 @@ class WorkOrderController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(private WorkOrderService $workOrders) {}
+    public function __construct(
+        private WorkOrderService $workOrders,
+        private AdditionalWorkService $additionalWork
+    ) {}
 
     /**
      * Display the technician's jobs: scheduled requests awaiting start plus work orders.
@@ -61,7 +68,7 @@ class WorkOrderController extends Controller
         abort_unless($this->ownsWorkOrder($request, $workOrder), 404);
         $this->authorize('view', $workOrder);
 
-        $workOrder->load(['request.service', 'request.address', 'request.appointment', 'laborItems', 'materialUsages.item', 'technician.user']);
+        $workOrder->load(['request.service', 'request.address', 'request.appointment', 'laborItems', 'materialUsages.item', 'additionalWorkItems.requester', 'technician.user']);
 
         $stockedItems = InventoryItem::inStock()->orderBy('name')->get();
 
@@ -182,6 +189,46 @@ class WorkOrderController extends Controller
         }
 
         return back()->with('success', 'Job completed successfully. An invoice can now be generated.');
+    }
+
+    /**
+     * Request additional work approval from the customer.
+     */
+    public function requestAdditional(StoreAdditionalWorkRequest $request, WorkOrder $workOrder): RedirectResponse
+    {
+        try {
+            $validated = $request->validated();
+
+            $this->additionalWork->request(
+                $workOrder,
+                $request->user(),
+                $validated['description'],
+                (float) $validated['cost']
+            );
+        } catch (AdditionalWorkException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return back()->with('success', 'Additional work sent to the customer for approval.');
+    }
+
+    /**
+     * Mark approved additional work as performed.
+     */
+    public function completeAdditional(Request $request, AdditionalWork $additionalWork): RedirectResponse
+    {
+        $workOrder = $additionalWork->workOrder;
+
+        abort_unless($this->ownsWorkOrder($request, $workOrder), 404);
+        $this->authorize('update', $workOrder);
+
+        try {
+            $this->additionalWork->markCompleted($additionalWork, $request->user());
+        } catch (AdditionalWorkException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return back()->with('success', 'Additional work marked as performed.');
     }
 
     /**

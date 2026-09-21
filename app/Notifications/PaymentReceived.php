@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class PaymentReceived extends Notification implements ShouldQueue
@@ -26,7 +27,20 @@ class PaymentReceived extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject("Payment received for invoice {$this->invoice->number}")
+            ->line("We received your payment of {$this->amount} EGP for invoice {$this->invoice->number}.")
+            ->line("Remaining balance: {$this->invoice->remaining()} EGP.")
+            ->action('View Invoice', route('invoices.show', $this->invoice))
+            ->line('Thank you for using HomeTech!');
     }
 
     /**

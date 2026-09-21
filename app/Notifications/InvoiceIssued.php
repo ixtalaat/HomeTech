@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class InvoiceIssued extends Notification implements ShouldQueue
@@ -23,7 +24,19 @@ class InvoiceIssued extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject("Invoice {$this->invoice->number} issued")
+            ->line("Invoice {$this->invoice->number} for {$this->invoice->total} EGP has been issued for your maintenance request #{$this->invoice->maintenance_request_id}.")
+            ->action('View Invoice', route('invoices.show', $this->invoice))
+            ->line('Thank you for using HomeTech!');
     }
 
     /**

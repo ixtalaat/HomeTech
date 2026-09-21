@@ -161,7 +161,7 @@ class WorkOrderService
         $paths = $workOrder->{$column} ?? [];
 
         foreach ($photos as $photo) {
-            $paths[] = $photo->store("work-orders/{$workOrder->id}/{$slot}", 'public');
+            $paths[] = $photo->store("work-orders/{$workOrder->id}/{$slot}", 'local');
         }
 
         $workOrder->update([$column => $paths]);

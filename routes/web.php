@@ -15,8 +15,10 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TechnicianController;
 use App\Http\Controllers\Admin\WorkOrderController as AdminWorkOrderController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\NotificationController;
@@ -46,10 +48,17 @@ Route::middleware('guest')->group(function (): void {
 });
 
 Route::middleware('auth')->group(function (): void {
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:10,1'])->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+        ->middleware('throttle:10,1')->name('verification.send');
+});
+
+Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
@@ -73,9 +82,15 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+
+    Route::get('files/{path}', [FileController::class, 'show'])->where('path', '.*')->name('files.show');
 });
 
-Route::middleware(['auth', 'role:technician'])
+Route::middleware('auth')->group(function (): void {
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+});
+
+Route::middleware(['auth', 'verified', 'role:technician'])
     ->prefix('technician')
     ->name('technician.')
     ->group(function (): void {
@@ -93,7 +108,7 @@ Route::middleware(['auth', 'role:technician'])
         Route::patch('jobs/{workOrder}/complete', [TechnicianWorkOrderController::class, 'complete'])->name('jobs.complete');
     });
 
-Route::middleware(['auth', 'role:admin,manager'])
+Route::middleware(['auth', 'verified', 'role:admin,manager'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function (): void {

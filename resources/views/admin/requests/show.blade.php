@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <div class="mx-auto max-w-5xl">
@@ -48,8 +48,8 @@
                             <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">Photos</dt>
                             <div class="mt-2 grid grid-cols-3 gap-2">
                                 @foreach ($maintenanceRequest->photos as $photo)
-                                    <a href="{{ Storage::url($photo) }}" target="_blank">
-                                        <img src="{{ Storage::url($photo) }}" alt="Request photo" class="h-20 w-full rounded-lg border border-slate-200 object-cover">
+                                    <a href="{{ route('files.show', $photo) }}" target="_blank">
+                                        <img src="{{ route('files.show', $photo) }}" alt="Request photo" class="h-20 w-full rounded-lg border border-slate-200 object-cover">
                                     </a>
                                 @endforeach
                             </div>

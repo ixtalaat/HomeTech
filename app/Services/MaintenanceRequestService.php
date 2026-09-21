@@ -99,7 +99,7 @@ class MaintenanceRequestService
 
             $photoPaths = [];
             foreach ($photos as $photo) {
-                $photoPaths[] = $photo->store("request-photos/{$maintenanceRequest->id}", 'public');
+                $photoPaths[] = $photo->store("request-photos/{$maintenanceRequest->id}", 'local');
             }
 
             if ($photoPaths !== []) {

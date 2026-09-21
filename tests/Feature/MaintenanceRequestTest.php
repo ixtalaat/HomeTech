@@ -20,7 +20,7 @@ function validRequestPayload(Service $service, Address $address): array
 }
 
 it('creates a maintenance request with pending review status', function () {
-    Storage::fake('public');
+    Storage::fake('local');
     $customer = User::factory()->create(['role' => UserRole::Customer]);
     $service = Service::factory()->create(['is_active' => true]);
     $address = Address::factory()->create(['user_id' => $customer->id]);
@@ -35,7 +35,7 @@ it('creates a maintenance request with pending review status', function () {
         ->and($request->user_id)->toBe($customer->id)
         ->and($request->photos)->toHaveCount(1);
 
-    Storage::disk('public')->assertExists($request->photos[0]);
+    Storage::disk('local')->assertExists($request->photos[0]);
 
     expect($request->statusHistories)->toHaveCount(1)
         ->and($request->statusHistories->first()->status)->toBe(RequestStatus::PendingReview->value);

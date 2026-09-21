@@ -6,7 +6,6 @@ use App\Enums\UserRole;
 use App\Models\ServiceCategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class TechnicianSeeder extends Seeder
 {
@@ -48,7 +47,8 @@ class TechnicianSeeder extends Seeder
                 ['email' => $data['email']],
                 [
                     'name' => $data['name'],
-                    'password' => $password = Str::random(12),
+                    // Demo credential (documented in README); override per deploy via env.
+                    'password' => $password = env('TECHNICIAN_PASSWORD', 'password'),
                     'phone' => $data['phone'],
                     'role' => UserRole::Technician,
                     'is_active' => true,
@@ -58,8 +58,6 @@ class TechnicianSeeder extends Seeder
 
             if (! isset($password)) {
                 $this->command->info("Technician {$data['email']} already exists; password unchanged.");
-            } else {
-                $this->command->info("Technician {$data['email']} created with password: {$password}");
             }
 
             unset($password);

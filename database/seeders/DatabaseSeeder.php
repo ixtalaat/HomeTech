@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             ServiceCategorySeeder::class,
             ServiceSeeder::class,
             TechnicianSeeder::class,
+            DemoSeeder::class,
         ]);
     }
 }

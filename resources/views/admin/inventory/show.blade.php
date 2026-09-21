@@ -40,7 +40,7 @@
             </form>
             <div class="mt-4 flex gap-2">
                 <a href="{{ route('admin.inventory.edit', $inventoryItem) }}" class="secondary-button text-xs">Edit Item</a>
-                <form method="POST" action="{{ route('admin.inventory.destroy', $inventoryItem) }}" onsubmit="return confirm('Delete this item?');" class="inline">
+                <form method="POST" action="{{ route('admin.inventory.destroy', $inventoryItem) }}" data-confirm="Delete this item?" class="inline">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="rounded-xl border border-rose-200 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">Delete</button>

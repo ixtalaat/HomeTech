@@ -109,7 +109,7 @@
                                         class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">
                                         Edit
                                     </a>
-                                    <form method="POST" action="{{ route('admin.services.destroy', $service) }}" onsubmit="return confirm('Are you sure you want to delete this service?');" class="inline">
+                                    <form method="POST" action="{{ route('admin.services.destroy', $service) }}" data-confirm="Are you sure you want to delete this service?" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"

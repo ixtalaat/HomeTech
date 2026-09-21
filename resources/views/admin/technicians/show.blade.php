@@ -45,7 +45,7 @@
                 @method('PATCH')
                 <button type="submit" class="secondary-button text-xs">{{ $technician->is_active ? 'Deactivate' : 'Activate' }}</button>
             </form>
-            <form method="POST" action="{{ route('admin.technicians.destroy', $technician) }}" onsubmit="return confirm('Remove this technician?');" class="inline">
+            <form method="POST" action="{{ route('admin.technicians.destroy', $technician) }}" data-confirm="Remove this technician?" class="inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="rounded-xl border border-rose-200 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">Remove</button>

@@ -37,7 +37,7 @@
                                 class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-teal-700 hover:border-teal-300 hover:bg-teal-50 transition">Set Default</button>
                         </form>
                     @endunless
-                    <form method="POST" action="{{ route('addresses.destroy', $address) }}" onsubmit="return confirm('Delete this address?');" class="inline">
+                    <form method="POST" action="{{ route('addresses.destroy', $address) }}" data-confirm="Delete this address?" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit"

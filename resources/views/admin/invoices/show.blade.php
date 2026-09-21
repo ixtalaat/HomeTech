@@ -134,7 +134,7 @@
                 </div>
 
                 <div class="flex gap-2">
-                    <form method="POST" action="{{ route('admin.invoices.cancel', $invoice) }}" onsubmit="return confirm('Cancel this invoice?');" class="flex-1">
+                    <form method="POST" action="{{ route('admin.invoices.cancel', $invoice) }}" data-confirm="Cancel this invoice?" class="flex-1">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="w-full rounded-xl border border-rose-200 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">Cancel Invoice</button>

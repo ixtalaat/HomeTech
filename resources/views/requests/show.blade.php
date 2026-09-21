@@ -83,7 +83,7 @@
                                     @method('PATCH')
                                     <button type="submit" class="primary-button w-full text-xs">Approve ({{ number_format($extra->cost, 2) }} EGP)</button>
                                 </form>
-                                <form method="POST" action="{{ route('additional-work.reject', $extra) }}" class="flex-1" onsubmit="return confirm('Reject this additional work? It will not be billed.');">
+                                <form method="POST" action="{{ route('additional-work.reject', $extra) }}" class="flex-1" data-confirm="Reject this additional work? It will not be billed.">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="secondary-button w-full text-xs">Reject</button>
@@ -157,7 +157,7 @@
             </ol>
 
             @if(!$maintenanceRequest->cancellation && in_array($maintenanceRequest->status, [\App\Enums\RequestStatus::PendingReview, \App\Enums\RequestStatus::InfoRequested, \App\Enums\RequestStatus::Approved, \App\Enums\RequestStatus::TechnicianAssigned, \App\Enums\RequestStatus::Scheduled], true))
-                <form method="POST" action="{{ route('requests.cancel', $maintenanceRequest) }}" class="mt-4 space-y-3 border-t border-slate-100 pt-4" onsubmit="return confirm('Cancel this request? A fee may apply per the cancellation policy.');">
+                <form method="POST" action="{{ route('requests.cancel', $maintenanceRequest) }}" class="mt-4 space-y-3 border-t border-slate-100 pt-4" data-confirm="Cancel this request? A fee may apply per the cancellation policy.">
                     @csrf
                     <div>
                         <label for="reason" class="form-label text-xs">Cancellation Reason <span class="text-rose-500">*</span></label>

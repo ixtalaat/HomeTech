@@ -208,7 +208,7 @@
                     <p class="mt-2 text-sm text-slate-500">Completed {{ $workOrder->completed_at?->format('d M Y, h:i A') }}.</p>
                 @else
                     <p class="mt-2 text-xs text-slate-500">Requires a recorded diagnosis, work notes, and resolved additional work.</p>
-                    <form method="POST" action="{{ route('technician.jobs.complete', $workOrder) }}" class="mt-3" onsubmit="return confirm('Mark this job as completed?');">
+                    <form method="POST" action="{{ route('technician.jobs.complete', $workOrder) }}" class="mt-3" data-confirm="Mark this job as completed?">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="primary-button w-full text-xs">Complete Job</button>

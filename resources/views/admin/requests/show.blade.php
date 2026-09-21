@@ -108,7 +108,7 @@
                         <button type="submit" class="secondary-button w-full text-xs">Request More Info</button>
                     </form>
 
-                    <form method="POST" action="{{ route('admin.requests.reject', $maintenanceRequest) }}" class="mt-4 space-y-3 border-t border-slate-100 pt-4" onsubmit="return confirm('Reject this request?');">
+                    <form method="POST" action="{{ route('admin.requests.reject', $maintenanceRequest) }}" class="mt-4 space-y-3 border-t border-slate-100 pt-4" data-confirm="Reject this request?">
                         @csrf
                         @method('PATCH')
                         <div>
@@ -218,7 +218,7 @@
                         <button type="submit" class="secondary-button w-full text-xs">Reschedule</button>
                     </form>
                     <div class="mt-2 flex gap-2">
-                        <form method="POST" action="{{ route('admin.requests.cancel-appointment', $maintenanceRequest) }}" onsubmit="return confirm('Cancel this appointment?');" class="flex-1">
+                        <form method="POST" action="{{ route('admin.requests.cancel-appointment', $maintenanceRequest) }}" data-confirm="Cancel this appointment?" class="flex-1">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="w-full rounded-xl border border-rose-200 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">Cancel Appointment</button>
@@ -257,7 +257,7 @@
             @if(!$maintenanceRequest->cancellation && in_array($maintenanceRequest->status, [\App\Enums\RequestStatus::PendingReview, \App\Enums\RequestStatus::InfoRequested, \App\Enums\RequestStatus::Approved, \App\Enums\RequestStatus::TechnicianAssigned, \App\Enums\RequestStatus::Scheduled], true))
                 <div class="rounded-2xl border border-rose-200 bg-rose-50/50 p-6 shadow-sm">
                     <h3 class="text-sm font-extrabold text-slate-900">Cancel Request</h3>
-                    <form method="POST" action="{{ route('admin.requests.cancel', $maintenanceRequest) }}" class="mt-3 space-y-3" onsubmit="return confirm('Cancel this request per the policy?');">
+                    <form method="POST" action="{{ route('admin.requests.cancel', $maintenanceRequest) }}" class="mt-3 space-y-3" data-confirm="Cancel this request per the policy?">
                         @csrf
                         @method('PATCH')
                         <textarea name="reason" rows="2" required placeholder="Cancellation reason…" class="form-input text-xs"></textarea>

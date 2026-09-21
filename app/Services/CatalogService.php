@@ -43,7 +43,10 @@ class CatalogService
      */
     public function createService(array $attributes): Service
     {
-        return Service::create($this->normalizeServiceAttributes($attributes));
+        $service = Service::create($this->normalizeServiceAttributes($attributes));
+        $service->saveTranslations($this->arabicAttributes($attributes, ['name', 'description']));
+
+        return $service->refresh();
     }
 
     /**
@@ -54,6 +57,7 @@ class CatalogService
     public function updateService(Service $service, array $attributes): Service
     {
         $service->update($this->normalizeServiceAttributes($attributes));
+        $service->saveTranslations($this->arabicAttributes($attributes, ['name', 'description']));
 
         return $service->refresh();
     }
@@ -85,7 +89,10 @@ class CatalogService
      */
     public function createCategory(array $attributes): ServiceCategory
     {
-        return ServiceCategory::create($this->normalizeCategoryAttributes($attributes));
+        $category = ServiceCategory::create($this->normalizeCategoryAttributes($attributes));
+        $category->saveTranslations($this->arabicAttributes($attributes, ['name', 'description']));
+
+        return $category->refresh();
     }
 
     /**
@@ -96,6 +103,7 @@ class CatalogService
     public function updateCategory(ServiceCategory $category, array $attributes): ServiceCategory
     {
         $category->update($this->normalizeCategoryAttributes($attributes));
+        $category->saveTranslations($this->arabicAttributes($attributes, ['name', 'description']));
 
         return $category->refresh();
     }
@@ -142,7 +150,8 @@ class CatalogService
         if (! empty($search)) {
             $servicesQuery->where(function ($query) use ($search): void {
                 $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('translations', fn ($translationQuery): Builder => $translationQuery->where('name', 'like', "%{$search}%"));
             });
         }
 
@@ -223,5 +232,25 @@ class CatalogService
     private function parseBoolean(mixed $value): bool
     {
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * Extract Arabic (name_ar/description_ar) inputs into a translations payload.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @param  array<int, string>  $fields
+     * @return array<string, array<string, mixed>>
+     */
+    private function arabicAttributes(array $attributes, array $fields): array
+    {
+        $arabic = [];
+
+        foreach ($fields as $field) {
+            if (array_key_exists("{$field}_ar", $attributes)) {
+                $arabic[$field] = $attributes["{$field}_ar"];
+            }
+        }
+
+        return ['ar' => $arabic];
     }
 }

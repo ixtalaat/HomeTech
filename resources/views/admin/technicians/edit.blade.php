@@ -69,7 +69,7 @@
                             <input type="checkbox" name="skills[]" value="{{ $category->id }}"
                                 {{ in_array($category->id, $selectedSkills) ? 'checked' : '' }}
                                 class="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500">
-                            {{ $category->name }}
+                            {{ $category->display_name }}
                         </label>
                     @endforeach
                 </div>

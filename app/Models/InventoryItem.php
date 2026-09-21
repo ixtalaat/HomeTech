@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Database\Factories\InventoryItemFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +12,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class InventoryItem extends Model
 {
     /** @use HasFactory<InventoryItemFactory> */
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    /**
+     * Translatable attributes stored in the translations table.
+     *
+     * @var list<string>
+     */
+    protected array $translatableFields = ['name', 'notes'];
 
     /**
      * The attributes that are mass assignable.
@@ -50,6 +58,16 @@ class InventoryItem extends Model
     public function movements(): HasMany
     {
         return $this->hasMany(InventoryMovement::class);
+    }
+
+    /**
+     * Get the translations for the item.
+     *
+     * @return HasMany<InventoryItemTranslation, $this>
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(InventoryItemTranslation::class);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Database\Factories\ServiceCategoryFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,14 @@ use Illuminate\Support\Str;
 class ServiceCategory extends Model
 {
     /** @use HasFactory<ServiceCategoryFactory> */
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    /**
+     * Translatable attributes stored in the translations table.
+     *
+     * @var list<string>
+     */
+    protected array $translatableFields = ['name', 'description'];
 
     /**
      * The attributes that are mass assignable.
@@ -69,5 +77,15 @@ class ServiceCategory extends Model
     public function services(): HasMany
     {
         return $this->hasMany(Service::class);
+    }
+
+    /**
+     * Get the translations for the category.
+     *
+     * @return HasMany<ServiceCategoryTranslation, $this>
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(ServiceCategoryTranslation::class);
     }
 }

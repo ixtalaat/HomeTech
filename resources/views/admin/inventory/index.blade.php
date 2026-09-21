@@ -19,7 +19,7 @@
                 @foreach ($lowStockItems as $lowItem)
                     <li class="flex items-center justify-between rounded-xl bg-white/70 px-3 py-2">
                         <a href="{{ route('admin.inventory.show', $lowItem) }}" class="font-bold text-slate-900 hover:text-teal-700">
-                            {{ $lowItem->name }}
+                            {{ $lowItem->display_name }}
                         </a>
                         <span class="text-xs font-bold {{ $lowItem->current_stock === 0 ? 'text-rose-600' : 'text-amber-700' }}">
                             {{ $lowItem->current_stock }} {{ $lowItem->unit }} {{ __('left') }}
@@ -69,7 +69,7 @@
                     @forelse ($items as $item)
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-6 py-4">
-                                <p class="font-bold text-slate-900">{{ $item->name }}</p>
+                                <p class="font-bold text-slate-900">{{ $item->display_name }}</p>
                                 <p class="mt-0.5 text-xs text-slate-400">{{ $item->sku ?? $item->unit }}</p>
                             </td>
                             <td class="px-6 py-4 font-bold text-slate-900">{{ $item->current_stock }} <span class="text-xs font-medium text-slate-400">{{ $item->unit }}</span></td>

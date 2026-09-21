@@ -33,6 +33,11 @@ class InventoryService
                 'notes' => $attributes['notes'] ?? null,
             ]);
 
+            $item->saveTranslations(['ar' => [
+                'name' => $attributes['name_ar'] ?? null,
+                'notes' => $attributes['notes_ar'] ?? null,
+            ]]);
+
             if (($attributes['current_stock'] ?? 0) > 0) {
                 $this->applyMovement($item, (int) $attributes['current_stock'], MovementType::Purchase, null, null, $actor, 'Opening stock.');
                 $item->refresh();
@@ -57,6 +62,11 @@ class InventoryService
             'unit_cost' => $attributes['unit_cost'],
             'notes' => $attributes['notes'] ?? null,
         ]);
+
+        $item->saveTranslations(['ar' => [
+            'name' => $attributes['name_ar'] ?? null,
+            'notes' => $attributes['notes_ar'] ?? null,
+        ]]);
 
         return $item->refresh();
     }

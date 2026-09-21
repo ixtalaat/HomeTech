@@ -58,7 +58,7 @@
         <div class="mt-3 flex flex-wrap gap-2">
             @forelse ($technician->categories as $category)
                 <span class="inline-flex items-center rounded-lg bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">
-                    {{ $category->name }}
+                    {{ $category->display_name }}
                 </span>
             @empty
                 <p class="text-sm text-slate-500">{{ __('No skills assigned yet.') }}</p>

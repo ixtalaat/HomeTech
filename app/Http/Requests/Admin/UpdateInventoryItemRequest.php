@@ -36,6 +36,8 @@ class UpdateInventoryItemRequest extends FormRequest
             'low_stock_threshold' => ['required', 'integer', 'min:0', 'max:1000000'],
             'unit_cost' => ['required', 'numeric', 'min:0', 'max:999999.99'],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'name_ar' => ['nullable', 'string', 'max:255'],
+            'notes_ar' => ['nullable', 'string', 'max:2000'],
         ];
     }
 }

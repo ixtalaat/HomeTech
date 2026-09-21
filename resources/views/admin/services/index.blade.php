@@ -75,14 +75,14 @@
                     @forelse ($services as $service)
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-6 py-4">
-                                <p class="font-bold text-slate-900">{{ $service->name }}</p>
+                                <p class="font-bold text-slate-900">{{ $service->display_name }}</p>
                                 @if($service->description)
                                     <p class="mt-0.5 max-w-xs truncate text-xs text-slate-400">{{ $service->description }}</p>
                                 @endif
                             </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
-                                    {{ $service->category->name ?? __('Uncategorized') }}
+                                    {{ $service->category->display_name ?? __('Uncategorized') }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 font-bold text-slate-900">

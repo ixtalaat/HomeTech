@@ -39,27 +39,27 @@
                 <a href="{{ route('services.index') }}" class="hover:text-teal-700">{{ __('Services') }}</a>
                 <span>›</span>
                 <a href="{{ route('services.index', ['category' => $service->category->slug]) }}" class="hover:text-teal-700">
-                    {{ $service->category->name }}
+                    {{ $service->category->display_name }}
                 </a>
                 <span>›</span>
-                <span class="text-slate-900 truncate">{{ $service->name }}</span>
+                <span class="text-slate-900 truncate">{{ $service->display_name }}</span>
             </nav>
 
             <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_0.8fr]">
                 <!-- Main Service Information -->
                 <div>
                     <span class="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-teal-700">
-                        {{ $service->category->name }}
+                        {{ $service->category->display_name }}
                     </span>
 
                     <h1 class="mt-4 font-display text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-                        {{ $service->name }}
+                        {{ $service->display_name }}
                     </h1>
 
                     <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <h2 class="text-base font-bold text-slate-900">{{ __('Service Description & Scope') }}</h2>
                         <div class="mt-3 text-sm leading-7 text-slate-600 space-y-3">
-                            <p>{{ $service->description ?? __('Professional maintenance, thorough diagnostics, and reliable execution by experienced technicians.') }}</p>
+                            <p>{{ $service->translated('description') ?? __('Professional maintenance, thorough diagnostics, and reliable execution by experienced technicians.') }}</p>
                         </div>
                     </div>
 
@@ -87,12 +87,12 @@
 
                     @if($relatedServices->isNotEmpty())
                         <div class="mt-12">
-                            <h3 class="font-display text-xl font-bold text-slate-900">{{ __('Other :name Services', ['name' => $service->category->name]) }}</h3>
+                            <h3 class="font-display text-xl font-bold text-slate-900">{{ __('Other :name Services', ['name' => $service->category->display_name]) }}</h3>
                             <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 @foreach ($relatedServices as $related)
                                     <a href="{{ route('services.show', $related->slug) }}"
                                         class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-teal-300 hover:shadow-sm">
-                                        <p class="font-bold text-slate-900 text-sm">{{ $related->name }}</p>
+                                        <p class="font-bold text-slate-900 text-sm">{{ $related->display_name }}</p>
                                         <div class="mt-3 flex items-center justify-between text-xs">
                                             <span class="font-bold text-slate-900">{{ number_format($related->base_price, 2) }} {{ __('EGP') }}</span>
                                             <span class="text-teal-700 font-semibold">{{ __('View →') }}</span>

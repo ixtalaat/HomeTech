@@ -16,13 +16,23 @@
             @csrf
             @method('PUT')
 
-            <div>
-                <label for="name" class="form-label">{{ __('Category Name') }} <span class="text-rose-500">*</span></label>
-                <input type="text" id="name" name="name" value="{{ old('name', $category->name) }}" required
-                    class="form-input @error('name') border-rose-300 ring-rose-100 @enderror">
-                @error('name')
-                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label for="name" class="form-label">{{ __('Category Name') }} <span class="text-rose-500">*</span></label>
+                    <input type="text" id="name" name="name" value="{{ old('name', $category->name) }}" required
+                        class="form-input @error('name') border-rose-300 ring-rose-100 @enderror">
+                    @error('name')
+                        <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="name_ar" class="form-label">{{ __('Category Name (Arabic)') }}</label>
+                    <input type="text" id="name_ar" name="name_ar" value="{{ old('name_ar', $category->translate('ar')?->name) }}" dir="rtl"
+                        class="form-input @error('name_ar') border-rose-300 ring-rose-100 @enderror">
+                    @error('name_ar')
+                        <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div>
@@ -39,6 +49,15 @@
                 <textarea id="description" name="description" rows="3"
                     class="form-input @error('description') border-rose-300 ring-rose-100 @enderror">{{ old('description', $category->description) }}</textarea>
                 @error('description')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="description_ar" class="form-label">{{ __('Description (Arabic)') }}</label>
+                <textarea id="description_ar" name="description_ar" rows="3" dir="rtl"
+                    class="form-input @error('description_ar') border-rose-300 ring-rose-100 @enderror">{{ old('description_ar', $category->translate('ar')?->description) }}</textarea>
+                @error('description_ar')
                     <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
                 @enderror
             </div>

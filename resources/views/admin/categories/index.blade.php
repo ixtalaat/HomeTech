@@ -34,7 +34,7 @@
                                         {{ strtoupper(substr($category->name, 0, 2)) }}
                                     </div>
                                     <div>
-                                        <p class="font-bold text-slate-900">{{ $category->name }}</p>
+                                        <p class="font-bold text-slate-900">{{ $category->display_name }}</p>
                                         @if($category->description)
                                             <p class="mt-0.5 max-w-sm truncate text-xs text-slate-400">{{ $category->description }}</p>
                                         @endif

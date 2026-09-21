@@ -12,7 +12,7 @@
         <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
             @foreach ($awaitingStart as $maintenanceRequest)
                 <div class="rounded-2xl border border-amber-200 bg-amber-50/50 p-5 shadow-sm">
-                    <p class="font-bold text-slate-900">#{{ $maintenanceRequest->id }} · {{ $maintenanceRequest->service->name ?? '—' }}</p>
+                    <p class="font-bold text-slate-900">#{{ $maintenanceRequest->id }} · {{ $maintenanceRequest->service->display_name ?? '—' }}</p>
                     <p class="mt-1 text-sm text-slate-600">{{ $maintenanceRequest->address->title ?? '' }} — {{ $maintenanceRequest->address->street ?? '' }}, {{ $maintenanceRequest->address->city ?? '' }}</p>
                     <p class="mt-1 text-xs text-slate-500">
                         {{ __('Visit:') }} {{ $maintenanceRequest->appointment->date->format('d M Y') }},
@@ -51,7 +51,7 @@
                     @forelse ($workOrders as $workOrder)
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-6 py-4 font-bold text-slate-900">#{{ $workOrder->id }}</td>
-                            <td class="px-6 py-4 text-xs">{{ $workOrder->request->service->name ?? '—' }}</td>
+                            <td class="px-6 py-4 text-xs">{{ $workOrder->request->service->display_name ?? '—' }}</td>
                             <td class="px-6 py-4">
                                 <x-status-badge :status="$workOrder->status" />
                             </td>

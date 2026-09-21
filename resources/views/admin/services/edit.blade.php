@@ -42,6 +42,15 @@
             </div>
 
             <div>
+                <label for="name_ar" class="form-label">{{ __('Service Name (Arabic)') }}</label>
+                <input type="text" id="name_ar" name="name_ar" value="{{ old('name_ar', $service->translate('ar')?->name) }}" dir="rtl"
+                    class="form-input @error('name_ar') border-rose-300 ring-rose-100 @enderror">
+                @error('name_ar')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
                 <label for="slug" class="form-label">{{ __('Slug') }}</label>
                 <input type="text" id="slug" name="slug" value="{{ old('slug', $service->slug) }}"
                     class="form-input @error('slug') border-rose-300 ring-rose-100 @enderror">
@@ -75,6 +84,15 @@
                 <textarea id="description" name="description" rows="4"
                     class="form-input @error('description') border-rose-300 ring-rose-100 @enderror">{{ old('description', $service->description) }}</textarea>
                 @error('description')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="description_ar" class="form-label">{{ __('Description (Arabic)') }}</label>
+                <textarea id="description_ar" name="description_ar" rows="4" dir="rtl"
+                    class="form-input @error('description_ar') border-rose-300 ring-rose-100 @enderror">{{ old('description_ar', $service->translate('ar')?->description) }}</textarea>
+                @error('description_ar')
                     <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
                 @enderror
             </div>

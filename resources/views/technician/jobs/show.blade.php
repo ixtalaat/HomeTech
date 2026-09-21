@@ -30,7 +30,7 @@
             </ol>
         </div>
         <p class="mt-1 text-sm text-slate-500">
-            {{ $workOrder->request->service->name ?? '—' }} ·
+            {{ $workOrder->request->service->display_name ?? '—' }} ·
             {{ $workOrder->request->address->title ?? '' }} — {{ $workOrder->request->address->street ?? '' }}, {{ $workOrder->request->address->city ?? '' }}
         </p>
         @if($workOrder->isCompleted())
@@ -142,7 +142,7 @@
                 <ul class="mt-3 space-y-2 text-sm">
                     @forelse ($workOrder->materialUsages as $usage)
                         <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                            <span class="font-medium text-slate-700">{{ $usage->item->name ?? '—' }} × {{ $usage->quantity }}</span>
+                            <span class="font-medium text-slate-700">{{ $usage->item->display_name ?? '—' }} × {{ $usage->quantity }}</span>
                             <span class="font-bold text-slate-900">{{ number_format($usage->extendedCost(), 2) }} {{ __('EGP') }}</span>
                         </li>
                     @empty
@@ -156,7 +156,7 @@
                             <select name="inventory_item_id" required class="form-input text-xs" aria-label="{{ __('Material') }}">
                                 <option value="">{{ __('Select material') }}</option>
                                 @foreach ($stockedItems as $stockedItem)
-                                    <option value="{{ $stockedItem->id }}">{{ $stockedItem->name }} ({{ $stockedItem->current_stock }} {{ __('left') }})</option>
+                                    <option value="{{ $stockedItem->id }}">{{ $stockedItem->display_name }} ({{ $stockedItem->current_stock }} {{ __('left') }})</option>
                                 @endforeach
                             </select>
                             <input type="number" name="quantity" min="1" required placeholder="{{ __('Qty') }}" aria-label="{{ __('Quantity') }}" class="form-input text-xs">

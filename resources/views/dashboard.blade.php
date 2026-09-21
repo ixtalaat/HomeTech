@@ -36,7 +36,7 @@
                             <li>
                                 <a href="{{ route('requests.show', $recent) }}" class="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3 transition hover:bg-teal-50">
                                     <span>
-                                        <span class="block text-sm font-bold text-slate-900">#{{ $recent->id }} · {{ $recent->service->name ?? '' }}</span>
+                                        <span class="block text-sm font-bold text-slate-900">#{{ $recent->id }} · {{ $recent->service->display_name ?? '' }}</span>
                                         <span class="mt-0.5 block text-xs text-slate-500">
                                             @if($recent->appointment && !$recent->appointment->isCancelled())
                                                 {{ __('Visit :date at :time', ['date' => $recent->appointment->date->format('d M Y'), 'time' => \Carbon\Carbon::parse($recent->appointment->start_time)->format('h:i A')]) }}

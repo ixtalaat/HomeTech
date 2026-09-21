@@ -15,14 +15,25 @@
         <form method="POST" action="{{ route('admin.categories.store') }}" class="space-y-6">
             @csrf
 
-            <div>
-                <label for="name" class="form-label">{{ __('Category Name') }} <span class="text-rose-500">*</span></label>
-                <input type="text" id="name" name="name" value="{{ old('name') }}" required
-                    class="form-input @error('name') border-rose-300 ring-rose-100 @enderror"
-                    placeholder="{{ __('e.g. Air Conditioning') }}">
-                @error('name')
-                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label for="name" class="form-label">{{ __('Category Name') }} <span class="text-rose-500">*</span></label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                        class="form-input @error('name') border-rose-300 ring-rose-100 @enderror"
+                        placeholder="{{ __('e.g. Air Conditioning') }}">
+                    @error('name')
+                        <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="name_ar" class="form-label">{{ __('Category Name (Arabic)') }}</label>
+                    <input type="text" id="name_ar" name="name_ar" value="{{ old('name_ar') }}" dir="rtl"
+                        class="form-input @error('name_ar') border-rose-300 ring-rose-100 @enderror"
+                        placeholder="{{ __('e.g. تكييف') }}">
+                    @error('name_ar')
+                        <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div>
@@ -41,6 +52,15 @@
                     class="form-input @error('description') border-rose-300 ring-rose-100 @enderror"
                     placeholder="{{ __('Brief description of the services offered in this category...') }}">{{ old('description') }}</textarea>
                 @error('description')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="description_ar" class="form-label">{{ __('Description (Arabic)') }}</label>
+                <textarea id="description_ar" name="description_ar" rows="3" dir="rtl"
+                    class="form-input @error('description_ar') border-rose-300 ring-rose-100 @enderror">{{ old('description_ar') }}</textarea>
+                @error('description_ar')
                     <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
                 @enderror
             </div>

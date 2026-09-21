@@ -17,7 +17,7 @@
                     @forelse ($upcoming as $appointment)
                         <li class="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3">
                             <span>
-                                <span class="block text-sm font-bold text-slate-900">#{{ $appointment->maintenance_request_id }} · {{ $appointment->request->service->name ?? '' }}</span>
+                                <span class="block text-sm font-bold text-slate-900">#{{ $appointment->maintenance_request_id }} · {{ $appointment->request->service->display_name ?? '' }}</span>
                                 <span class="mt-0.5 block text-xs text-slate-500">{{ $appointment->request->address->city ?? '' }} · {{ $appointment->date->format('d M Y') }}, {{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }}</span>
                             </span>
                         </li>
@@ -33,7 +33,7 @@
                         <li>
                             <form method="POST" action="{{ route('technician.jobs.start', $job) }}" class="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-3">
                                 @csrf
-                                <span class="text-sm font-bold text-slate-900">#{{ $job->id }} · {{ $job->service->name ?? '' }}</span>
+                                <span class="text-sm font-bold text-slate-900">#{{ $job->id }} · {{ $job->service->display_name ?? '' }}</span>
                                 <button type="submit" class="secondary-button px-3 py-1.5 text-xs">{{ __('Start Visit') }}</button>
                             </form>
                         </li>

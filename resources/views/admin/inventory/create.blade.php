@@ -24,6 +24,14 @@
                     @enderror
                 </div>
                 <div>
+                    <label for="name_ar" class="form-label">{{ __('Name (Arabic)') }}</label>
+                    <input type="text" id="name_ar" name="name_ar" value="{{ old('name_ar') }}" dir="rtl"
+                        class="form-input @error('name_ar') border-rose-300 @enderror">
+                    @error('name_ar')
+                        <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
                     <label for="sku" class="form-label">{{ __('SKU') }}</label>
                     <input type="text" id="sku" name="sku" value="{{ old('sku') }}"
                         class="form-input @error('sku') border-rose-300 @enderror">
@@ -74,6 +82,14 @@
                     <input type="text" id="notes" name="notes" value="{{ old('notes') }}"
                         class="form-input @error('notes') border-rose-300 @enderror">
                     @error('notes')
+                        <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="notes_ar" class="form-label">{{ __('Notes (Arabic)') }}</label>
+                    <input type="text" id="notes_ar" name="notes_ar" value="{{ old('notes_ar') }}" dir="rtl"
+                        class="form-input @error('notes_ar') border-rose-300 @enderror">
+                    @error('notes_ar')
                         <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
                     @enderror
                 </div>

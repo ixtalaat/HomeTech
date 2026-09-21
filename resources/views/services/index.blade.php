@@ -81,7 +81,7 @@
                     @foreach ($categories as $cat)
                         <a href="{{ route('services.index', array_merge(request()->only('search'), ['category' => $cat->slug])) }}"
                             class="shrink-0 rounded-full px-4 py-2 text-xs font-bold transition {{ request('category') === $cat->slug ? 'bg-teal-700 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:border-teal-300 hover:text-teal-700' }}">
-                            {{ $cat->name }}
+                            {{ $cat->display_name }}
                             <span class="ml-1 opacity-70">({{ $cat->services_count }})</span>
                         </a>
                     @endforeach
@@ -94,9 +94,9 @@
             <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
                 @if($selectedCategory)
                     <div class="mb-8">
-                        <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $selectedCategory->name }}</h2>
+                        <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $selectedCategory->display_name }}</h2>
                         @if($selectedCategory->description)
-                            <p class="mt-1 text-sm text-slate-500 max-w-2xl">{{ $selectedCategory->description }}</p>
+                            <p class="mt-1 text-sm text-slate-500 max-w-2xl">{{ $selectedCategory->translated('description') }}</p>
                         @endif
                     </div>
                 @endif
@@ -106,7 +106,7 @@
                         <div class="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-teal-300 hover:shadow-md">
                             <div class="flex items-center justify-between">
                                 <span class="rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-700">
-                                    {{ $service->category->name }}
+                                    {{ $service->category->display_name }}
                                 </span>
                                 <span class="flex items-center gap-1 text-xs font-medium text-slate-500">
                                     <svg class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
@@ -116,7 +116,7 @@
                                 </span>
                             </div>
 
-                            <h3 class="mt-4 font-display text-lg font-bold text-slate-900">{{ $service->name }}</h3>
+                            <h3 class="mt-4 font-display text-lg font-bold text-slate-900">{{ $service->display_name }}</h3>
                             
                             <p class="mt-2 flex-1 text-sm leading-6 text-slate-500 line-clamp-3">
                                 {{ $service->description ?? __('Professional maintenance and diagnostics by qualified technicians.') }}

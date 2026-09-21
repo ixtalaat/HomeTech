@@ -25,6 +25,14 @@
                     @enderror
                 </div>
                 <div>
+                    <label for="name_ar" class="form-label">{{ __('Name (Arabic)') }}</label>
+                    <input type="text" id="name_ar" name="name_ar" value="{{ old('name_ar', $inventoryItem->translate('ar')?->name) }}" dir="rtl"
+                        class="form-input @error('name_ar') border-rose-300 @enderror">
+                    @error('name_ar')
+                        <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
                     <label for="sku" class="form-label">{{ __('SKU') }}</label>
                     <input type="text" id="sku" name="sku" value="{{ old('sku', $inventoryItem->sku) }}"
                         class="form-input @error('sku') border-rose-300 @enderror">
@@ -65,6 +73,14 @@
                 <label for="notes" class="form-label">{{ __('Notes') }}</label>
                 <textarea id="notes" name="notes" rows="3" class="form-input @error('notes') border-rose-300 @enderror">{{ old('notes', $inventoryItem->notes) }}</textarea>
                 @error('notes')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="notes_ar" class="form-label">{{ __('Notes (Arabic)') }}</label>
+                <textarea id="notes_ar" name="notes_ar" rows="3" dir="rtl" class="form-input @error('notes_ar') border-rose-300 @enderror">{{ old('notes_ar', $inventoryItem->translate('ar')?->notes) }}</textarea>
+                @error('notes_ar')
                     <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
                 @enderror
             </div>

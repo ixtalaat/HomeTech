@@ -41,6 +41,8 @@ class UpdateServiceRequest extends FormRequest
             'base_price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
             'estimated_duration_minutes' => ['required', 'integer', 'min:5', 'max:1440'],
             'is_active' => ['sometimes', 'boolean'],
+            'name_ar' => ['nullable', 'string', 'max:255'],
+            'description_ar' => ['nullable', 'string', 'max:3000'],
         ];
     }
 }

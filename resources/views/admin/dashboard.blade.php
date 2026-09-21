@@ -82,7 +82,7 @@
             <ul class="mt-3 space-y-2 text-sm">
                 @forelse ($upcoming_appointments as $appointment)
                     <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                        <span class="font-medium text-slate-700">#{{ $appointment->maintenance_request_id }} · {{ $appointment->request->service->name ?? '' }}</span>
+                        <span class="font-medium text-slate-700">#{{ $appointment->maintenance_request_id }} · {{ $appointment->request->service->display_name ?? '' }}</span>
                         <span class="text-xs text-slate-500">{{ $appointment->date->format('d M') }}, {{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }}</span>
                     </li>
                 @empty
@@ -96,7 +96,7 @@
             <ul class="mt-3 space-y-2 text-sm">
                 @forelse ($unassigned_jobs as $job)
                     <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                        <a href="{{ route('admin.requests.show', $job) }}" class="font-bold text-teal-700 hover:underline">#{{ $job->id }} · {{ $job->service->name ?? '' }}</a>
+                        <a href="{{ route('admin.requests.show', $job) }}" class="font-bold text-teal-700 hover:underline">#{{ $job->id }} · {{ $job->service->display_name ?? '' }}</a>
                         <span class="text-xs text-slate-500">{{ $job->user->name ?? '' }}</span>
                     </li>
                 @empty
@@ -110,7 +110,7 @@
             <ul class="mt-3 space-y-2 text-sm">
                 @forelse ($waiting_approval as $job)
                     <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                        <a href="{{ route('admin.requests.show', $job) }}" class="font-bold text-teal-700 hover:underline">#{{ $job->id }} · {{ $job->service->name ?? '' }}</a>
+                        <a href="{{ route('admin.requests.show', $job) }}" class="font-bold text-teal-700 hover:underline">#{{ $job->id }} · {{ $job->service->display_name ?? '' }}</a>
                         <span class="text-xs text-slate-500">{{ $job->user->name ?? '' }}</span>
                     </li>
                 @empty
@@ -124,7 +124,7 @@
             <ul class="mt-3 space-y-2 text-sm">
                 @forelse ($recent_requests as $job)
                     <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                        <a href="{{ route('admin.requests.show', $job) }}" class="font-bold text-teal-700 hover:underline">#{{ $job->id }} · {{ $job->service->name ?? '' }}</a>
+                        <a href="{{ route('admin.requests.show', $job) }}" class="font-bold text-teal-700 hover:underline">#{{ $job->id }} · {{ $job->service->display_name ?? '' }}</a>
                         <span class="text-xs text-slate-500">{{ $job->status->label() }}</span>
                     </li>
                 @empty

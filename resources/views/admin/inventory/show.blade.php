@@ -7,7 +7,7 @@
             <span>← {{ __('Back to inventory') }}</span>
         </a>
         <div class="mt-2 flex flex-wrap items-center gap-3">
-            <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $inventoryItem->name }}</h2>
+            <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $inventoryItem->display_name }}</h2>
             @if($inventoryItem->isLowOnStock())
                 <span class="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">{{ __('Low Stock') }}</span>
             @endif

@@ -27,7 +27,7 @@
                         <option value="">{{ __('Select a service') }}</option>
                         @foreach ($services as $service)
                             <option value="{{ $service->id }}" {{ (string) old('service_id', $selectedService) === (string) $service->id ? 'selected' : '' }}>
-                                {{ $service->name }} — {{ number_format($service->base_price, 2) }} {{ __('EGP') }}
+                                {{ $service->display_name }} — {{ number_format($service->base_price, 2) }} {{ __('EGP') }}
                             </option>
                         @endforeach
                     </select>

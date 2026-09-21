@@ -31,7 +31,7 @@
                 <dl class="mt-4 space-y-3 text-sm">
                     <div>
                         <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Service') }}</dt>
-                        <dd class="mt-0.5 font-semibold text-slate-900">{{ $maintenanceRequest->service->name ?? '—' }}</dd>
+                        <dd class="mt-0.5 font-semibold text-slate-900">{{ $maintenanceRequest->service->display_name ?? '—' }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Address') }}</dt>

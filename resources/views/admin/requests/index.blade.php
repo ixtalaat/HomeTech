@@ -50,7 +50,7 @@
                     @forelse ($requests as $maintenanceRequest)
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-6 py-4">
-                                <p class="font-bold text-slate-900">#{{ $maintenanceRequest->id }} · {{ $maintenanceRequest->service->name ?? '—' }}</p>
+                                <p class="font-bold text-slate-900">#{{ $maintenanceRequest->id }} · {{ $maintenanceRequest->service->display_name ?? '—' }}</p>
                                 <p class="mt-0.5 max-w-xs truncate text-xs text-slate-400">{{ $maintenanceRequest->description }}</p>
                             </td>
                             <td class="px-6 py-4 text-xs font-medium">{{ $maintenanceRequest->user->name ?? '—' }}</td>

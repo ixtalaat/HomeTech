@@ -44,6 +44,8 @@ class AdditionalWorkDecided extends Notification implements ShouldQueue
             'additional_work_id' => $this->additionalWork->id,
             'maintenance_request_id' => $request->id,
             'approved' => $this->approved,
+            'message_key' => $this->approved ? 'notifications.additional_work_approved' : 'notifications.additional_work_rejected',
+            'message_params' => ['description' => $this->additionalWork->description, 'id' => $request->id],
             'message' => "The customer {$verdict} the additional work '{$this->additionalWork->description}' for request #{$request->id}.",
         ];
     }

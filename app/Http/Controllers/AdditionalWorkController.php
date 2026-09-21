@@ -28,7 +28,7 @@ class AdditionalWorkController extends Controller
 
         return redirect()
             ->route('requests.show', $additionalWork->workOrder->maintenance_request_id)
-            ->with('success', 'Additional work approved. The technician can now proceed.');
+            ->with('success', __('Additional work approved. The technician can now proceed.'));
     }
 
     /**
@@ -44,6 +44,6 @@ class AdditionalWorkController extends Controller
 
         return redirect()
             ->route('requests.show', $additionalWork->workOrder->maintenance_request_id)
-            ->with('success', 'Additional work rejected. It will not be billed.');
+            ->with('success', __('Additional work rejected. It will not be billed.'));
     }
 }

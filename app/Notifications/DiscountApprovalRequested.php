@@ -39,6 +39,8 @@ class DiscountApprovalRequested extends Notification implements ShouldQueue
             'type' => 'discount_approval_requested',
             'discount_approval_id' => $this->approval->id,
             'invoice_id' => $invoice->id,
+            'message_key' => 'notifications.discount_approval_requested',
+            'message_params' => ['value' => (float) $this->approval->discount_value, 'type' => $this->approval->discount_type->value, 'number' => $invoice->number],
             'message' => "Discount approval needed: {$this->approval->discount_value} {$this->approval->discount_type->value} on invoice {$invoice->number}.",
         ];
     }

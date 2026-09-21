@@ -66,7 +66,7 @@ class CustomerController extends Controller
 
         return redirect()
             ->route('admin.customers.show', $customer)
-            ->with('success', 'Customer updated successfully.');
+            ->with('success', __('Customer updated successfully.'));
     }
 
     /**
@@ -80,6 +80,6 @@ class CustomerController extends Controller
         $customer = $this->customers->toggleStatus($customer);
         $statusLabel = $customer->is_active ? 'activated' : 'deactivated';
 
-        return back()->with('success', "Customer '{$customer->name}' was {$statusLabel} successfully.");
+        return back()->with('success', __('Customer :name was :status successfully.', ['name' => $customer->name, 'status' => $statusLabel]));
     }
 }

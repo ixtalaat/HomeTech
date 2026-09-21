@@ -51,7 +51,7 @@ class AddressController extends Controller
 
         return redirect()
             ->route('addresses.index')
-            ->with('success', 'Address added successfully.');
+            ->with('success', __('Address added successfully.'));
     }
 
     /**
@@ -77,7 +77,7 @@ class AddressController extends Controller
 
         return redirect()
             ->route('addresses.index')
-            ->with('success', 'Address updated successfully.');
+            ->with('success', __('Address updated successfully.'));
     }
 
     /**
@@ -96,7 +96,7 @@ class AddressController extends Controller
 
         return redirect()
             ->route('addresses.index')
-            ->with('success', 'Address deleted successfully.');
+            ->with('success', __('Address deleted successfully.'));
     }
 
     /**
@@ -109,6 +109,6 @@ class AddressController extends Controller
 
         $this->addresses->setDefault($address);
 
-        return back()->with('success', 'Default address updated successfully.');
+        return back()->with('success', __('Default address updated successfully.'));
     }
 }

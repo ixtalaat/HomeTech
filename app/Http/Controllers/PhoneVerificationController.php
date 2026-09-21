@@ -26,7 +26,7 @@ class PhoneVerificationController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Verification code sent via WhatsApp.');
+        return back()->with('success', __('Verification code sent via WhatsApp.'));
     }
 
     /**
@@ -40,6 +40,6 @@ class PhoneVerificationController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Phone number verified successfully.');
+        return back()->with('success', __('Phone number verified successfully.'));
     }
 }

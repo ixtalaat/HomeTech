@@ -36,6 +36,8 @@ class RequestApproved extends Notification implements ShouldQueue
         return [
             'type' => 'request_approved',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.request_approved',
+            'message_params' => ['id' => $this->request->id],
             'message' => "Your maintenance request #{$this->request->id} was approved.",
         ];
     }

@@ -97,7 +97,7 @@ class WorkOrderController extends Controller
 
         return redirect()
             ->route('technician.jobs.show', $workOrder)
-            ->with('success', 'Visit started. The job is now in progress.');
+            ->with('success', __('Visit started. The job is now in progress.'));
     }
 
     /**
@@ -117,7 +117,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Customer notified that you are on the way.');
+        return back()->with('success', __('Customer notified that you are on the way.'));
     }
 
     /**
@@ -131,7 +131,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Diagnosis recorded successfully.');
+        return back()->with('success', __('Diagnosis recorded successfully.'));
     }
 
     /**
@@ -145,7 +145,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Work notes recorded successfully.');
+        return back()->with('success', __('Work notes recorded successfully.'));
     }
 
     /**
@@ -161,7 +161,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Labor item added successfully.');
+        return back()->with('success', __('Labor item added successfully.'));
     }
 
     /**
@@ -178,7 +178,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Material usage recorded and stock updated.');
+        return back()->with('success', __('Material usage recorded and stock updated.'));
     }
 
     /**
@@ -194,7 +194,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Photos uploaded successfully.');
+        return back()->with('success', __('Photos uploaded successfully.'));
     }
 
     /**
@@ -211,7 +211,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Job completed successfully. An invoice can now be generated.');
+        return back()->with('success', __('Job completed successfully. An invoice can now be generated.'));
     }
 
     /**
@@ -232,7 +232,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Additional work sent to the customer for approval.');
+        return back()->with('success', __('Additional work sent to the customer for approval.'));
     }
 
     /**
@@ -251,7 +251,7 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Additional work marked as performed.');
+        return back()->with('success', __('Additional work marked as performed.'));
     }
 
     /**

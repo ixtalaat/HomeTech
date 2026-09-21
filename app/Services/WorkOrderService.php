@@ -39,13 +39,13 @@ class WorkOrderService
         }
 
         if ($request->technician === null || ($request->technician->user_id !== $actor->id && ! $this->isStaff($actor))) {
-            throw new WorkOrderException('Only the assigned technician (or staff) can start this visit.');
+            throw new WorkOrderException(__('Only the assigned technician (or staff) can start this visit.'));
         }
 
         $appointment = $request->appointment;
 
         if ($appointment === null) {
-            throw new WorkOrderException('Cannot start the visit without a booked appointment.');
+            throw new WorkOrderException(__('Cannot start the visit without a booked appointment.'));
         }
 
         try {
@@ -154,7 +154,7 @@ class WorkOrderService
         $this->guardEditable($workOrder, $actor);
 
         if (! in_array($slot, ['before', 'after'], true)) {
-            throw new WorkOrderException('Photos must be uploaded to the before or after slot.');
+            throw new WorkOrderException(__('Photos must be uploaded to the before or after slot.'));
         }
 
         $column = $slot === 'before' ? 'before_photos' : 'after_photos';
@@ -217,7 +217,7 @@ class WorkOrderService
     public function correct(WorkOrder $workOrder, User $actor, array $attributes, string $reason): WorkOrder
     {
         if (! $this->isStaff($actor)) {
-            throw new WorkOrderException('Only admin or manager staff can correct a work order.');
+            throw new WorkOrderException(__('Only admin or manager staff can correct a work order.'));
         }
 
         $allowed = array_intersect_key($attributes, array_flip(['diagnosis', 'work_notes']));
@@ -248,7 +248,7 @@ class WorkOrderService
     private function guardEditable(WorkOrder $workOrder, ?User $actor): void
     {
         if ($workOrder->isCompleted() && ($actor === null || ! $this->isStaff($actor))) {
-            throw new CompletedWorkOrderException('This work order is completed and cannot be edited. Contact staff for a correction.');
+            throw new CompletedWorkOrderException(__('This work order is completed and cannot be edited. Contact staff for a correction.'));
         }
     }
 

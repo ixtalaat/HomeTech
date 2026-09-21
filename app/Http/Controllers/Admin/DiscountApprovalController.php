@@ -41,7 +41,7 @@ class DiscountApprovalController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Discount approved and applied to the invoice.');
+        return back()->with('success', __('Discount approved and applied to the invoice.'));
     }
 
     /**
@@ -55,6 +55,6 @@ class DiscountApprovalController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Discount request rejected.');
+        return back()->with('success', __('Discount request rejected.'));
     }
 }

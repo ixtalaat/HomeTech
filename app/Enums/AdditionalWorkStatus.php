@@ -15,10 +15,10 @@ enum AdditionalWorkStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::PendingApproval => 'Pending Approval',
-            self::Approved => 'Approved',
-            self::Rejected => 'Rejected',
-            self::Completed => 'Completed',
+            self::PendingApproval => __('statuses.pending_approval'),
+            self::Approved => __('statuses.approved'),
+            self::Rejected => __('statuses.rejected'),
+            self::Completed => __('statuses.completed'),
         };
     }
 }

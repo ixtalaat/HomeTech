@@ -16,11 +16,11 @@ enum AppointmentStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Scheduled => 'Scheduled',
-            self::Confirmed => 'Confirmed',
-            self::Rescheduled => 'Rescheduled',
-            self::Cancelled => 'Cancelled',
-            self::Completed => 'Completed',
+            self::Scheduled => __('statuses.scheduled'),
+            self::Confirmed => __('statuses.confirmed'),
+            self::Rescheduled => __('statuses.rescheduled'),
+            self::Cancelled => __('statuses.cancelled'),
+            self::Completed => __('statuses.completed'),
         };
     }
 }

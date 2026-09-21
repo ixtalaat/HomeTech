@@ -77,7 +77,7 @@ class AddressService
     public function delete(Address $address): void
     {
         if ($address->maintenanceRequests()->exists()) {
-            throw new AddressInUseException('This address cannot be deleted because it is used by maintenance requests.');
+            throw new AddressInUseException(__('This address cannot be deleted because it is used by maintenance requests.'));
         }
 
         DB::transaction(function () use ($address): void {

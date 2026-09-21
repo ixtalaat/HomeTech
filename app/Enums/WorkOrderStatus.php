@@ -14,9 +14,9 @@ enum WorkOrderStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Open => 'Open',
-            self::InProgress => 'In Progress',
-            self::Completed => 'Completed',
+            self::Open => __('statuses.open'),
+            self::InProgress => __('statuses.in_progress'),
+            self::Completed => __('statuses.completed'),
         };
     }
 }

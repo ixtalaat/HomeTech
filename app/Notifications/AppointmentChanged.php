@@ -39,6 +39,8 @@ class AppointmentChanged extends Notification implements ShouldQueue
         return [
             'type' => 'appointment_changed',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.appointment_changed',
+            'message_params' => ['id' => $this->request->id, 'summary' => $this->summary],
             'message' => "The appointment for your request #{$this->request->id} changed: {$this->summary}.",
         ];
     }

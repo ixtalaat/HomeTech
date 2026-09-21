@@ -36,7 +36,7 @@ class PaymentService
         $amount = round($amount, 2);
 
         if ($amount <= 0) {
-            throw new BillingException('Payment amount must be positive.');
+            throw new BillingException(__('Payment amount must be positive.'));
         }
 
         if ($amount > $invoice->remaining()) {
@@ -88,11 +88,11 @@ class PaymentService
     public function confirm(Payment $payment, User $actor): Payment
     {
         if (! $this->isStaff($actor)) {
-            throw new BillingException('Only staff can confirm payments.');
+            throw new BillingException(__('Only staff can confirm payments.'));
         }
 
         if ($payment->confirmed_at !== null) {
-            throw new BillingException('This payment is already confirmed.');
+            throw new BillingException(__('This payment is already confirmed.'));
         }
 
         return DB::transaction(function () use ($payment, $actor): Payment {

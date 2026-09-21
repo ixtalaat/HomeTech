@@ -39,6 +39,8 @@ class JobCancelled extends Notification implements ShouldQueue
         return [
             'type' => 'job_cancelled',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.job_cancelled',
+            'message_params' => ['id' => $this->request->id, 'reason' => $this->reason],
             'message' => "Job #{$this->request->id} was cancelled: {$this->reason}.",
         ];
     }

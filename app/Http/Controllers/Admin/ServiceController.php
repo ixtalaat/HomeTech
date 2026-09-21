@@ -45,7 +45,7 @@ class ServiceController extends Controller
 
         return redirect()
             ->route('admin.services.index')
-            ->with('success', 'Service created successfully.');
+            ->with('success', __('Service created successfully.'));
     }
 
     /**
@@ -67,7 +67,7 @@ class ServiceController extends Controller
 
         return redirect()
             ->route('admin.services.index')
-            ->with('success', 'Service updated successfully.');
+            ->with('success', __('Service updated successfully.'));
     }
 
     /**
@@ -78,7 +78,7 @@ class ServiceController extends Controller
         $service = $this->catalog->toggleServiceStatus($service);
         $statusLabel = $service->is_active ? 'activated' : 'deactivated';
 
-        return back()->with('success', "Service '{$service->name}' was {$statusLabel} successfully.");
+        return back()->with('success', __('Service :name was :status successfully.', ['name' => $service->name, 'status' => $statusLabel]));
     }
 
     /**
@@ -90,6 +90,6 @@ class ServiceController extends Controller
 
         return redirect()
             ->route('admin.services.index')
-            ->with('success', 'Service deleted successfully.');
+            ->with('success', __('Service deleted successfully.'));
     }
 }

@@ -36,6 +36,8 @@ class JobAssigned extends Notification implements ShouldQueue
         return [
             'type' => 'job_assigned',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.job_assigned',
+            'message_params' => ['id' => $this->request->id, 'service' => $this->request->service->name],
             'message' => "New job assigned: request #{$this->request->id} ({$this->request->service->name}).",
         ];
     }

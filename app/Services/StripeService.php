@@ -33,7 +33,7 @@ class StripeService
     public function checkout(Invoice $invoice, User $customer, ?float $amount = null): Session
     {
         if (! $invoice->isOwnedBy($customer)) {
-            throw new StripeException('You can only pay your own invoices online.');
+            throw new StripeException(__('You can only pay your own invoices online.'));
         }
 
         if (! $invoice->acceptsPayments()) {
@@ -86,14 +86,14 @@ class StripeService
         }
 
         if (($session->payment_status ?? null) !== 'paid') {
-            throw new StripeException('This Stripe session is not paid yet.');
+            throw new StripeException(__('This Stripe session is not paid yet.'));
         }
 
         $invoiceId = (int) ($session->metadata->invoice_id ?? 0);
         $invoice = Invoice::find($invoiceId);
 
         if ($invoice === null || ! $invoice->isOwnedBy($actor)) {
-            throw new StripeException('This payment session does not match your invoices.');
+            throw new StripeException(__('This payment session does not match your invoices.'));
         }
 
         $existing = Payment::where('reference', $session->id)->first();
@@ -132,7 +132,7 @@ class StripeService
         $secret = config('services.stripe.secret');
 
         if (! is_string($secret) || $secret === '') {
-            throw new StripeException('Online payments are not configured (STRIPE_SECRET missing).');
+            throw new StripeException(__('Online payments are not configured (STRIPE_SECRET missing).'));
         }
 
         return new StripeClient($secret);

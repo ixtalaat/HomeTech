@@ -36,6 +36,8 @@ class JobCompleted extends Notification implements ShouldQueue
         return [
             'type' => 'job_completed',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.job_completed',
+            'message_params' => ['id' => $this->request->id],
             'message' => "The work for your request #{$this->request->id} is completed.",
         ];
     }

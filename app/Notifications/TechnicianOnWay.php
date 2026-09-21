@@ -38,6 +38,8 @@ class TechnicianOnWay extends Notification implements ShouldQueue
         return [
             'type' => 'technician_on_way',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.technician_on_way',
+            'message_params' => ['technician' => $technician, 'id' => $this->request->id],
             'message' => "{$technician} is on the way for your request #{$this->request->id}.",
         ];
     }

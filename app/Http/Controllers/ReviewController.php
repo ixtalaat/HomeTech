@@ -37,6 +37,6 @@ class ReviewController extends Controller
 
         return redirect()
             ->route('requests.show', $maintenanceRequest)
-            ->with('success', 'Thank you for your feedback!');
+            ->with('success', __('Thank you for your feedback!'));
     }
 }

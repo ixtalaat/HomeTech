@@ -20,11 +20,11 @@ class ReviewService
     public function submit(MaintenanceRequest $request, User $customer, int $rating, ?string $comment = null): Review
     {
         if ($request->user_id !== $customer->id) {
-            throw new ReviewException('Only the customer who owns this job can review it.');
+            throw new ReviewException(__('Only the customer who owns this job can review it.'));
         }
 
         if ($customer->role !== UserRole::Customer) {
-            throw new ReviewException('Only customers can submit reviews.');
+            throw new ReviewException(__('Only customers can submit reviews.'));
         }
 
         if (! in_array($request->status, $this->reviewableStatuses(), true)) {
@@ -32,11 +32,11 @@ class ReviewService
         }
 
         if ($rating < 1 || $rating > 5) {
-            throw new ReviewException('Rating must be between 1 and 5 stars.');
+            throw new ReviewException(__('Rating must be between 1 and 5 stars.'));
         }
 
         if ($request->review !== null) {
-            throw new ReviewException('This job has already been reviewed.');
+            throw new ReviewException(__('This job has already been reviewed.'));
         }
 
         return DB::transaction(function () use ($request, $customer, $rating, $comment): Review {

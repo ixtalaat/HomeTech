@@ -36,6 +36,8 @@ class RequestSubmitted extends Notification implements ShouldQueue
         return [
             'type' => 'request_submitted',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.request_submitted',
+            'message_params' => ['id' => $this->request->id],
             'message' => "Your maintenance request #{$this->request->id} was submitted and is pending review.",
         ];
     }

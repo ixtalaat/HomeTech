@@ -54,6 +54,6 @@ class WorkOrderController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Correction applied and logged successfully.');
+        return back()->with('success', __('Correction applied and logged successfully.'));
     }
 }

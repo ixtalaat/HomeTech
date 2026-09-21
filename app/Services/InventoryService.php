@@ -84,7 +84,7 @@ class InventoryService
     public function recordUsage(WorkOrder $workOrder, InventoryItem $item, int $quantity, ?User $actor = null): MaterialUsage
     {
         if ($quantity <= 0) {
-            throw new InsufficientStockException('Usage quantity must be positive.');
+            throw new InsufficientStockException(__('Usage quantity must be positive.'));
         }
 
         return DB::transaction(function () use ($workOrder, $item, $quantity, $actor): MaterialUsage {
@@ -119,7 +119,7 @@ class InventoryService
     public function purchase(InventoryItem $item, int $quantity, ?User $actor = null, ?string $notes = null): InventoryMovement
     {
         if ($quantity <= 0) {
-            throw new InsufficientStockException('Purchase quantity must be positive.');
+            throw new InsufficientStockException(__('Purchase quantity must be positive.'));
         }
 
         return DB::transaction(function () use ($item, $quantity, $actor, $notes): InventoryMovement {
@@ -135,7 +135,7 @@ class InventoryService
     public function returnStock(InventoryItem $item, int $quantity, ?User $actor = null, ?string $notes = null): InventoryMovement
     {
         if ($quantity <= 0) {
-            throw new InsufficientStockException('Return quantity must be positive.');
+            throw new InsufficientStockException(__('Return quantity must be positive.'));
         }
 
         return DB::transaction(function () use ($item, $quantity, $actor, $notes): InventoryMovement {

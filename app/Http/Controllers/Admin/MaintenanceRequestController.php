@@ -78,7 +78,7 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', 'Maintenance request approved successfully.');
+            ->with('success', __('Maintenance request approved successfully.'));
     }
 
     /**
@@ -98,7 +98,7 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', 'Maintenance request rejected.');
+            ->with('success', __('Maintenance request rejected.'));
     }
 
     /**
@@ -118,7 +118,7 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', 'Information request sent to the customer.');
+            ->with('success', __('Information request sent to the customer.'));
     }
 
     /**
@@ -128,7 +128,7 @@ class MaintenanceRequestController extends Controller
     {
         $this->reviews->updateAppointment($maintenanceRequest, $request->validated());
 
-        return back()->with('success', 'Appointment updated successfully.');
+        return back()->with('success', __('Appointment updated successfully.'));
     }
 
     /**
@@ -141,10 +141,10 @@ class MaintenanceRequestController extends Controller
 
             if ($maintenanceRequest->status === RequestStatus::Scheduled) {
                 $this->assignments->reassign($maintenanceRequest, $technician, $request->user());
-                $message = "Request reassigned to '{$technician->user->name}' successfully.";
+                $message = __('Request reassigned to :name successfully.', ['name' => $technician->user->name]);
             } else {
                 $this->assignments->assign($maintenanceRequest, $technician, $request->user());
-                $message = "Technician '{$technician->user->name}' assigned and appointment booked successfully.";
+                $message = __('Technician :name assigned and appointment booked successfully.', ['name' => $technician->user->name]);
             }
         } catch (TechnicianAssignmentException $exception) {
             return back()->with('error', $exception->getMessage());
@@ -172,7 +172,7 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', 'Technician unassigned. The request is approved again.');
+            ->with('success', __('Technician unassigned. The request is approved again.'));
     }
 
     /**
@@ -192,7 +192,7 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', 'Request cancelled per the cancellation policy.');
+            ->with('success', __('Request cancelled per the cancellation policy.'));
     }
 
     /**
@@ -217,7 +217,7 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', 'Appointment booked successfully.');
+            ->with('success', __('Appointment booked successfully.'));
     }
 
     /**
@@ -241,7 +241,7 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', 'Appointment rescheduled successfully.');
+            ->with('success', __('Appointment rescheduled successfully.'));
     }
 
     /**
@@ -256,6 +256,6 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', 'Appointment cancelled. The request is awaiting a new slot.');
+            ->with('success', __('Appointment cancelled. The request is awaiting a new slot.'));
     }
 }

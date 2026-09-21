@@ -14,9 +14,9 @@ enum DiscountApprovalStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending => 'Pending',
-            self::Approved => 'Approved',
-            self::Rejected => 'Rejected',
+            self::Pending => __('statuses.pending'),
+            self::Approved => __('statuses.approved'),
+            self::Rejected => __('statuses.rejected'),
         };
     }
 }

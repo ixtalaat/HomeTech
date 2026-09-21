@@ -23,11 +23,11 @@ class PhoneVerificationService
     public function sendCode(User $user): PhoneVerification
     {
         if (empty($user->phone)) {
-            throw new PhoneVerificationException('Add a phone number to your profile first.');
+            throw new PhoneVerificationException(__('Add a phone number to your profile first.'));
         }
 
         if ($user->phone_verified_at !== null) {
-            throw new PhoneVerificationException('This phone number is already verified.');
+            throw new PhoneVerificationException(__('This phone number is already verified.'));
         }
 
         $code = (string) random_int(100000, 999999);
@@ -66,25 +66,25 @@ class PhoneVerificationService
         $verification = PhoneVerification::where('user_id', $user->id)->latest()->first();
 
         if ($verification === null) {
-            throw new PhoneVerificationException('No verification code was requested. Send a new one first.');
+            throw new PhoneVerificationException(__('No verification code was requested. Send a new one first.'));
         }
 
         if ($verification->isExpired()) {
             $verification->delete();
 
-            throw new PhoneVerificationException('The code expired. Send a new one.');
+            throw new PhoneVerificationException(__('The code expired. Send a new one.'));
         }
 
         if ($verification->attempts >= (int) config('whatsapp.code_max_attempts', 5)) {
             $verification->delete();
 
-            throw new PhoneVerificationException('Too many wrong attempts. Send a new code.');
+            throw new PhoneVerificationException(__('Too many wrong attempts. Send a new code.'));
         }
 
         $verification->increment('attempts');
 
         if (! Hash::check($code, $verification->code_hash)) {
-            throw new PhoneVerificationException('Wrong code. Try again.');
+            throw new PhoneVerificationException(__('Wrong code. Try again.'));
         }
 
         return DB::transaction(function () use ($user, $verification): User {

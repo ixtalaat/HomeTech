@@ -21,6 +21,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PhoneVerificationController;
@@ -37,6 +38,8 @@ Route::get('/', function () {
 // Public service catalogue
 Route::get('/services', [ServiceBrowseController::class, 'index'])->name('services.index');
 Route::get('/services/{slug}', [ServiceBrowseController::class, 'show'])->name('services.show');
+
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');

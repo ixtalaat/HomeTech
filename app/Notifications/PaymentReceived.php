@@ -54,6 +54,8 @@ class PaymentReceived extends Notification implements ShouldQueue
             'type' => 'payment_received',
             'invoice_id' => $this->invoice->id,
             'maintenance_request_id' => $this->invoice->maintenance_request_id,
+            'message_key' => 'notifications.payment_received',
+            'message_params' => ['amount' => $this->amount, 'number' => $this->invoice->number, 'remaining' => $this->invoice->remaining()],
             'message' => "Payment of {$this->amount} EGP received for invoice {$this->invoice->number}. Remaining: {$this->invoice->remaining()} EGP.",
         ];
     }

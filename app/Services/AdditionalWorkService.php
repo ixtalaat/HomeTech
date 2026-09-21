@@ -30,11 +30,11 @@ class AdditionalWorkService
     public function request(WorkOrder $workOrder, User $technician, string $description, float $cost): AdditionalWork
     {
         if ($workOrder->status !== WorkOrderStatus::InProgress) {
-            throw new AdditionalWorkException('Additional work can only be requested while the job is in progress.');
+            throw new AdditionalWorkException(__('Additional work can only be requested while the job is in progress.'));
         }
 
         if ($cost < 0) {
-            throw new AdditionalWorkException('Additional work cost cannot be negative.');
+            throw new AdditionalWorkException(__('Additional work cost cannot be negative.'));
         }
 
         return DB::transaction(function () use ($workOrder, $technician, $description, $cost): AdditionalWork {
@@ -70,17 +70,17 @@ class AdditionalWorkService
     public function decide(AdditionalWork $item, User $customer, bool $approve): AdditionalWork
     {
         if (! $item->isPending()) {
-            throw new AdditionalWorkException('This additional work has already been decided.');
+            throw new AdditionalWorkException(__('This additional work has already been decided.'));
         }
 
         $ownerId = $item->workOrder->request->user_id;
 
         if ($ownerId !== $customer->id) {
-            throw new AdditionalWorkException('Only the customer who owns this job can decide on additional work.');
+            throw new AdditionalWorkException(__('Only the customer who owns this job can decide on additional work.'));
         }
 
         if ($item->requested_by === $customer->id) {
-            throw new AdditionalWorkException('Technicians cannot approve their own additional work.');
+            throw new AdditionalWorkException(__('Technicians cannot approve their own additional work.'));
         }
 
         return DB::transaction(function () use ($item, $customer, $approve): AdditionalWork {
@@ -115,11 +115,11 @@ class AdditionalWorkService
     public function markCompleted(AdditionalWork $item, User $technician): AdditionalWork
     {
         if ($item->status !== AdditionalWorkStatus::Approved) {
-            throw new AdditionalWorkException('Only approved additional work can be marked as performed.');
+            throw new AdditionalWorkException(__('Only approved additional work can be marked as performed.'));
         }
 
         if ($item->workOrder->technician === null || $item->workOrder->technician->user_id !== $technician->id) {
-            throw new AdditionalWorkException('Only the assigned technician can mark this work as performed.');
+            throw new AdditionalWorkException(__('Only the assigned technician can mark this work as performed.'));
         }
 
         $item->update([

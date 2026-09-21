@@ -50,6 +50,8 @@ class InvoiceIssued extends Notification implements ShouldQueue
             'type' => 'invoice_issued',
             'invoice_id' => $this->invoice->id,
             'maintenance_request_id' => $this->invoice->maintenance_request_id,
+            'message_key' => 'notifications.invoice_issued',
+            'message_params' => ['number' => $this->invoice->number, 'total' => $this->invoice->total, 'id' => $this->invoice->maintenance_request_id],
             'message' => "Invoice {$this->invoice->number} ({$this->invoice->total} EGP) was issued for your request #{$this->invoice->maintenance_request_id}.",
         ];
     }

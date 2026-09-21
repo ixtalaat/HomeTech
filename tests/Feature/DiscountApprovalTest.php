@@ -38,6 +38,7 @@ it('lets managers approve and reject queued discounts', function () {
     $service = app(InvoiceService::class);
 
     $workOrder = completedWorkOrderWithCharges();
+    $workOrder->request->service->update(['base_price' => 1000.00]);
     $invoice = $service->generate($workOrder, $admin);
     $approval = $service->requestDiscountApproval($invoice, $admin, DiscountType::Percent, 25.00);
 

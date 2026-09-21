@@ -39,6 +39,8 @@ class TechnicianAssignedToRequest extends Notification implements ShouldQueue
         return [
             'type' => 'technician_assigned',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.technician_assigned',
+            'message_params' => ['name' => $this->technicianName, 'id' => $this->request->id],
             'message' => "Technician {$this->technicianName} was assigned to your request #{$this->request->id}.",
         ];
     }

@@ -87,7 +87,7 @@ class InvoiceController extends Controller
 
         return redirect()
             ->route('admin.invoices.show', $invoice)
-            ->with('success', "Invoice {$invoice->number} generated as draft.");
+            ->with('success', __('Invoice :number generated as draft.', ['number' => $invoice->number]));
     }
 
     /**
@@ -103,7 +103,7 @@ class InvoiceController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', "Invoice {$invoice->number} issued.");
+        return back()->with('success', __('Invoice :number issued.', ['number' => $invoice->number]));
     }
 
     /**
@@ -125,8 +125,8 @@ class InvoiceController extends Controller
         }
 
         return back()->with('success', $outcome === 'queued'
-            ? 'Discount sent to managers for approval.'
-            : 'Discount applied successfully.');
+            ? __('Discount sent to managers for approval.')
+            : __('Discount applied successfully.'));
     }
 
     /**
@@ -150,7 +150,7 @@ class InvoiceController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Payment recorded successfully.');
+        return back()->with('success', __('Payment recorded successfully.'));
     }
 
     /**
@@ -166,7 +166,7 @@ class InvoiceController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Payment confirmed and applied to the balance.');
+        return back()->with('success', __('Payment confirmed and applied to the balance.'));
     }
 
     /**
@@ -182,7 +182,7 @@ class InvoiceController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', "Invoice {$invoice->number} cancelled.");
+        return back()->with('success', __('Invoice :number cancelled.', ['number' => $invoice->number]));
     }
 
     /**
@@ -198,6 +198,6 @@ class InvoiceController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', "Invoice {$invoice->number} closed.");
+        return back()->with('success', __('Invoice :number closed.', ['number' => $invoice->number]));
     }
 }

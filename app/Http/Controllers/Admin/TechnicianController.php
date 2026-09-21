@@ -53,7 +53,7 @@ class TechnicianController extends Controller
 
         return redirect()
             ->route('admin.technicians.show', $technician)
-            ->with('success', 'Technician created successfully.');
+            ->with('success', __('Technician created successfully.'));
     }
 
     /**
@@ -90,7 +90,7 @@ class TechnicianController extends Controller
 
         return redirect()
             ->route('admin.technicians.show', $technician)
-            ->with('success', 'Technician updated successfully.');
+            ->with('success', __('Technician updated successfully.'));
     }
 
     /**
@@ -103,7 +103,7 @@ class TechnicianController extends Controller
         $technician = $this->technicians->toggleStatus($technician);
         $statusLabel = $technician->is_active ? 'activated' : 'deactivated';
 
-        return back()->with('success', "Technician '{$technician->user->name}' was {$statusLabel} successfully.");
+        return back()->with('success', __('Technician :name was :status successfully.', ['name' => $technician->user->name, 'status' => $statusLabel]));
     }
 
     /**
@@ -114,11 +114,11 @@ class TechnicianController extends Controller
         $this->authorize('update', $technician);
 
         if (! $this->technicians->delete($technician)) {
-            return back()->with('error', 'This technician cannot be deleted because they have assigned requests. Deactivate them instead.');
+            return back()->with('error', __('This technician cannot be deleted because they have assigned requests. Deactivate them instead.'));
         }
 
         return redirect()
             ->route('admin.technicians.index')
-            ->with('success', 'Technician removed successfully.');
+            ->with('success', __('Technician removed successfully.'));
     }
 }

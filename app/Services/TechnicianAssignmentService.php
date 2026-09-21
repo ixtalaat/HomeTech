@@ -119,7 +119,7 @@ class TechnicianAssignmentService
     public function unassign(MaintenanceRequest $request, ?User $actor = null): MaintenanceRequest
     {
         if (! in_array($request->status, [RequestStatus::TechnicianAssigned, RequestStatus::Scheduled, RequestStatus::TechnicianOnWay], true)) {
-            throw new TechnicianAssignmentException('Only an assigned request can be unassigned.');
+            throw new TechnicianAssignmentException(__('Only an assigned request can be unassigned.'));
         }
 
         return DB::transaction(function () use ($request, $actor): MaintenanceRequest {
@@ -202,7 +202,7 @@ class TechnicianAssignmentService
     private function guardTechnicianEligible(MaintenanceRequest $request, Technician $technician): void
     {
         if (! $technician->is_active || $technician->user === null || ! $technician->user->is_active) {
-            throw new TechnicianAssignmentException('Cannot assign an inactive technician.');
+            throw new TechnicianAssignmentException(__('Cannot assign an inactive technician.'));
         }
 
         $category = $request->service->category;

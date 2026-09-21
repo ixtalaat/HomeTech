@@ -13,8 +13,8 @@ enum DiscountType: string
     public function label(): string
     {
         return match ($this) {
-            self::Fixed => 'Fixed Amount',
-            self::Percent => 'Percentage',
+            self::Fixed => __('statuses.fixed_amount'),
+            self::Percent => __('statuses.percentage'),
         };
     }
 }

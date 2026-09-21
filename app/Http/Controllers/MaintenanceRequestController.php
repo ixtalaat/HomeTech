@@ -64,7 +64,7 @@ class MaintenanceRequestController extends Controller
 
         return redirect()
             ->route('requests.show', $maintenanceRequest)
-            ->with('success', 'Maintenance request submitted successfully. It is now pending review.');
+            ->with('success', __('Maintenance request submitted successfully. It is now pending review.'));
     }
 
     /**

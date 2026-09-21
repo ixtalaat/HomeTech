@@ -82,7 +82,7 @@ class SchedulingService
     public function reschedule(Appointment $appointment, string $date, string $start, string $end, ?User $actor = null): Appointment
     {
         if ($appointment->isCancelled()) {
-            throw new SchedulingConflictException('Cannot reschedule a cancelled appointment. Book a new one instead.');
+            throw new SchedulingConflictException(__('Cannot reschedule a cancelled appointment. Book a new one instead.'));
         }
 
         $this->guardFutureSlot($date, $start, $end);
@@ -142,15 +142,15 @@ class SchedulingService
     public function markOnWay(MaintenanceRequest $request, User $technicianUser): MaintenanceRequest
     {
         if ($request->status !== RequestStatus::Scheduled) {
-            throw new SchedulingConflictException('Only a scheduled job can be marked as on the way.');
+            throw new SchedulingConflictException(__('Only a scheduled job can be marked as on the way.'));
         }
 
         if ($request->technician === null || $request->technician->user_id !== $technicianUser->id) {
-            throw new SchedulingConflictException('Only the assigned technician can mark this job as on the way.');
+            throw new SchedulingConflictException(__('Only the assigned technician can mark this job as on the way.'));
         }
 
         if ($request->appointment === null || $request->appointment->isCancelled()) {
-            throw new SchedulingConflictException('There is no active appointment for this job.');
+            throw new SchedulingConflictException(__('There is no active appointment for this job.'));
         }
 
         return DB::transaction(function () use ($request, $technicianUser): MaintenanceRequest {
@@ -177,7 +177,7 @@ class SchedulingService
     public function start(Appointment $appointment): Appointment
     {
         if ($appointment->isCancelled()) {
-            throw new CancelledAppointmentException('Cannot start a cancelled appointment.');
+            throw new CancelledAppointmentException(__('Cannot start a cancelled appointment.'));
         }
 
         return $appointment;
@@ -191,11 +191,11 @@ class SchedulingService
     private function guardFutureSlot(string $date, string $start, string $end): void
     {
         if ($end <= $start) {
-            throw new SchedulingConflictException('The end time must be after the start time.');
+            throw new SchedulingConflictException(__('The end time must be after the start time.'));
         }
 
         if ($date <= now()->format('Y-m-d')) {
-            throw new SchedulingConflictException('Appointments must be booked for a future date.');
+            throw new SchedulingConflictException(__('Appointments must be booked for a future date.'));
         }
     }
 

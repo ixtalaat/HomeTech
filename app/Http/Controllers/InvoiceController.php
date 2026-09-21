@@ -79,7 +79,7 @@ class InvoiceController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Payment received. Thank you!');
+        return back()->with('success', __('Payment received. Thank you!'));
     }
 
     /**
@@ -115,7 +115,7 @@ class InvoiceController extends Controller
         $sessionId = (string) $request->query('session_id', '');
 
         if ($sessionId === '') {
-            return redirect()->route('invoices.index')->with('error', 'Missing Stripe session.');
+            return redirect()->route('invoices.index')->with('error', __('Missing Stripe session.'));
         }
 
         try {
@@ -126,7 +126,7 @@ class InvoiceController extends Controller
 
         return redirect()
             ->route('invoices.show', $payment->invoice_id)
-            ->with('success', 'Online payment received. Thank you!');
+            ->with('success', __('Online payment received. Thank you!'));
     }
 
     /**
@@ -136,6 +136,6 @@ class InvoiceController extends Controller
     {
         return redirect()
             ->route('invoices.show', $invoice)
-            ->with('error', 'Online payment was cancelled. No charge was made.');
+            ->with('error', __('Online payment was cancelled. No charge was made.'));
     }
 }

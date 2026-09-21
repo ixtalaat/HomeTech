@@ -42,7 +42,7 @@ class PricingService
         $amount = $this->computeAmount($subtotal, $type, $value);
 
         if ($this->requiresManagerApproval($type, $value) && $actor->role !== UserRole::Manager) {
-            throw new BillingException('This discount requires manager approval.');
+            throw new BillingException(__('This discount requires manager approval.'));
         }
 
         return $amount;
@@ -56,11 +56,11 @@ class PricingService
     public function computeAmount(float $subtotal, DiscountType $type, float $value): float
     {
         if ($value < 0) {
-            throw new BillingException('Discount value cannot be negative.');
+            throw new BillingException(__('Discount value cannot be negative.'));
         }
 
         if ($type === DiscountType::Percent && $value > 100) {
-            throw new BillingException('Percentage discount cannot exceed 100%.');
+            throw new BillingException(__('Percentage discount cannot exceed 100%.'));
         }
 
         $amount = $type === DiscountType::Percent
@@ -68,7 +68,7 @@ class PricingService
             : round($value, 2);
 
         if ($amount > $subtotal) {
-            throw new BillingException('Discount cannot make the invoice total negative.');
+            throw new BillingException(__('Discount cannot make the invoice total negative.'));
         }
 
         return $amount;

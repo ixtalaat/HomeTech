@@ -67,7 +67,7 @@ class InventoryItemController extends Controller
 
         return redirect()
             ->route('admin.inventory.show', $item)
-            ->with('success', 'Inventory item created successfully.');
+            ->with('success', __('Inventory item created successfully.'));
     }
 
     /**
@@ -101,7 +101,7 @@ class InventoryItemController extends Controller
 
         return redirect()
             ->route('admin.inventory.show', $inventoryItem)
-            ->with('success', 'Inventory item updated successfully.');
+            ->with('success', __('Inventory item updated successfully.'));
     }
 
     /**
@@ -117,7 +117,7 @@ class InventoryItemController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Stock adjusted successfully.');
+        return back()->with('success', __('Stock adjusted successfully.'));
     }
 
     /**
@@ -128,11 +128,11 @@ class InventoryItemController extends Controller
         $this->authorize('delete', $inventoryItem);
 
         if (! $this->inventory->deleteItem($inventoryItem)) {
-            return back()->with('error', 'This item cannot be deleted because it has movement or usage history.');
+            return back()->with('error', __('This item cannot be deleted because it has movement or usage history.'));
         }
 
         return redirect()
             ->route('admin.inventory.index')
-            ->with('success', 'Inventory item deleted successfully.');
+            ->with('success', __('Inventory item deleted successfully.'));
     }
 }

@@ -16,11 +16,11 @@ enum MovementType: string
     public function label(): string
     {
         return match ($this) {
-            self::Purchase => 'Purchase',
-            self::Adjustment => 'Adjustment',
-            self::Consumption => 'Consumption',
-            self::Return => 'Return',
-            self::Reversal => 'Reversal',
+            self::Purchase => __('statuses.purchase'),
+            self::Adjustment => __('statuses.adjustment'),
+            self::Consumption => __('statuses.consumption'),
+            self::Return => __('statuses.return'),
+            self::Reversal => __('statuses.reversal'),
         };
     }
 }

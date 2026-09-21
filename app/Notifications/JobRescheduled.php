@@ -39,6 +39,8 @@ class JobRescheduled extends Notification implements ShouldQueue
         return [
             'type' => 'job_rescheduled',
             'maintenance_request_id' => $this->request->id,
+            'message_key' => 'notifications.job_rescheduled',
+            'message_params' => ['id' => $this->request->id, 'summary' => $this->summary],
             'message' => "Job #{$this->request->id} rescheduled: {$this->summary}.",
         ];
     }

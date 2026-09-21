@@ -37,7 +37,7 @@ class WhatsAppService
         $from = config('whatsapp.twilio.from');
 
         if (! is_string($sid) || $sid === '' || ! is_string($token) || $token === '' || ! is_string($from) || $from === '') {
-            throw new RuntimeException('Twilio WhatsApp is not configured (TWILIO_SID/AUTH_TOKEN/WHATSAPP_FROM).');
+            throw new RuntimeException(__('Twilio WhatsApp is not configured (TWILIO_SID/AUTH_TOKEN/WHATSAPP_FROM).'));
         }
 
         $response = Http::asForm()
@@ -64,7 +64,7 @@ class WhatsAppService
         $phoneNumberId = config('whatsapp.meta.phone_number_id');
 
         if (! is_string($token) || $token === '' || ! is_string($phoneNumberId) || $phoneNumberId === '') {
-            throw new RuntimeException('Meta WhatsApp is not configured (WHATSAPP_TOKEN/PHONE_NUMBER_ID).');
+            throw new RuntimeException(__('Meta WhatsApp is not configured (WHATSAPP_TOKEN/PHONE_NUMBER_ID).'));
         }
 
         $response = Http::withToken($token)

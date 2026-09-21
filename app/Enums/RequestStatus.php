@@ -25,20 +25,20 @@ enum RequestStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::PendingReview => 'Pending Review',
-            self::InfoRequested => 'Info Requested',
-            self::Approved => 'Approved',
-            self::Rejected => 'Rejected',
-            self::TechnicianAssigned => 'Technician Assigned',
-            self::Scheduled => 'Scheduled',
-            self::TechnicianOnWay => 'Technician On The Way',
-            self::InProgress => 'In Progress',
-            self::WaitingCustomerApproval => 'Waiting Customer Approval',
-            self::Completed => 'Completed',
-            self::Invoiced => 'Invoiced',
-            self::Paid => 'Paid',
-            self::Closed => 'Closed',
-            self::Cancelled => 'Cancelled',
+            self::PendingReview => __('statuses.pending_review'),
+            self::InfoRequested => __('statuses.info_requested'),
+            self::Approved => __('statuses.approved'),
+            self::Rejected => __('statuses.rejected'),
+            self::TechnicianAssigned => __('statuses.technician_assigned'),
+            self::Scheduled => __('statuses.scheduled'),
+            self::TechnicianOnWay => __('statuses.technician_on_way'),
+            self::InProgress => __('statuses.in_progress'),
+            self::WaitingCustomerApproval => __('statuses.waiting_customer_approval'),
+            self::Completed => __('statuses.completed'),
+            self::Invoiced => __('statuses.invoiced'),
+            self::Paid => __('statuses.paid'),
+            self::Closed => __('statuses.closed'),
+            self::Cancelled => __('statuses.cancelled'),
         };
     }
 

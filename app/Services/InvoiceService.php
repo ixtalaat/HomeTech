@@ -39,7 +39,7 @@ class InvoiceService
         $request = $workOrder->request;
 
         if ($workOrder->status->value !== 'completed' || $request->status !== RequestStatus::Completed) {
-            throw new BillingException('Invoices can only be generated for completed jobs.');
+            throw new BillingException(__('Invoices can only be generated for completed jobs.'));
         }
 
         if ($request->invoice !== null) {
@@ -81,7 +81,7 @@ class InvoiceService
         $request = $cancellation->request;
 
         if ((float) $cancellation->fee <= 0) {
-            throw new BillingException('Only cancellations with a fee can be invoiced.');
+            throw new BillingException(__('Only cancellations with a fee can be invoiced.'));
         }
 
         if ($request->invoice !== null) {
@@ -246,7 +246,7 @@ class InvoiceService
         $this->guardManager($manager);
 
         if (! $approval->isPending()) {
-            throw new BillingException('This discount request has already been decided.');
+            throw new BillingException(__('This discount request has already been decided.'));
         }
 
         $invoice = $approval->invoice;
@@ -279,7 +279,7 @@ class InvoiceService
         $this->guardManager($manager);
 
         if (! $approval->isPending()) {
-            throw new BillingException('This discount request has already been decided.');
+            throw new BillingException(__('This discount request has already been decided.'));
         }
 
         $approval->update([
@@ -316,7 +316,7 @@ class InvoiceService
     private function guardManager(User $actor): void
     {
         if ($actor->role !== UserRole::Manager) {
-            throw new BillingException('Only managers can decide discount approvals.');
+            throw new BillingException(__('Only managers can decide discount approvals.'));
         }
     }
 
@@ -347,11 +347,11 @@ class InvoiceService
     public function cancelInvoice(Invoice $invoice, User $actor): Invoice
     {
         if ($invoice->status === InvoiceStatus::Paid) {
-            throw new BillingException('Paid invoices cannot be cancelled through normal operations.');
+            throw new BillingException(__('Paid invoices cannot be cancelled through normal operations.'));
         }
 
         if ((float) $invoice->paid_amount > 0) {
-            throw new BillingException('Invoices with recorded payments cannot be cancelled.');
+            throw new BillingException(__('Invoices with recorded payments cannot be cancelled.'));
         }
 
         $invoice->update(['status' => InvoiceStatus::Cancelled]);
@@ -369,7 +369,7 @@ class InvoiceService
     public function markClosed(Invoice $invoice, User $actor): Invoice
     {
         if ($invoice->status !== InvoiceStatus::Paid) {
-            throw new BillingException('Only fully paid invoices can be closed.');
+            throw new BillingException(__('Only fully paid invoices can be closed.'));
         }
 
         $this->transitions->transition(

@@ -41,7 +41,7 @@ class ServiceCategoryController extends Controller
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Service category created successfully.');
+            ->with('success', __('Service category created successfully.'));
     }
 
     /**
@@ -61,7 +61,7 @@ class ServiceCategoryController extends Controller
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Service category updated successfully.');
+            ->with('success', __('Service category updated successfully.'));
     }
 
     /**
@@ -72,11 +72,11 @@ class ServiceCategoryController extends Controller
         if (! $this->catalog->deleteCategory($category)) {
             return redirect()
                 ->route('admin.categories.index')
-                ->with('error', 'Cannot delete a category with existing services. Please reassign or delete its services first.');
+                ->with('error', __('Cannot delete a category with existing services. Please reassign or delete its services first.'));
         }
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Service category deleted successfully.');
+            ->with('success', __('Service category deleted successfully.'));
     }
 }

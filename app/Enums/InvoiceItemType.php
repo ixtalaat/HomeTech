@@ -16,11 +16,11 @@ enum InvoiceItemType: string
     public function label(): string
     {
         return match ($this) {
-            self::Service => 'Service',
-            self::Labor => 'Labor',
-            self::Material => 'Material',
-            self::Additional => 'Additional Work',
-            self::Fee => 'Fee',
+            self::Service => __('statuses.service'),
+            self::Labor => __('statuses.labor'),
+            self::Material => __('statuses.material'),
+            self::Additional => __('statuses.additional_work'),
+            self::Fee => __('statuses.fee'),
         };
     }
 }

@@ -16,34 +16,64 @@
     </div>
 
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Today's Jobs</p>
-            <p class="mt-1 font-display text-3xl font-extrabold text-slate-900">{{ $todays_jobs }}</p>
-        </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Requests</p>
-            <p class="mt-1 font-display text-3xl font-extrabold text-amber-600">{{ $pending_requests }}</p>
-        </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Jobs</p>
-            <p class="mt-1 font-display text-3xl font-extrabold text-teal-600">{{ $active_jobs }}</p>
-        </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Completed Today</p>
-            <p class="mt-1 font-display text-3xl font-extrabold text-emerald-600">{{ $completed_today }}</p>
-        </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Unpaid Invoices</p>
-            <p class="mt-1 font-display text-3xl font-extrabold text-rose-600">{{ $unpaid_invoices }}</p>
-            <p class="mt-0.5 text-xs font-semibold text-slate-500">{{ number_format($outstanding_total, 2) }} EGP outstanding</p>
-        </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Low-Stock Items</p>
-            <p class="mt-1 font-display text-3xl font-extrabold {{ $low_stock_count > 0 ? 'text-amber-600' : 'text-slate-900' }}">{{ $low_stock_count }}</p>
-            @if($low_stock_items->isNotEmpty())
-                <p class="mt-0.5 text-xs text-slate-500">{{ $low_stock_items->pluck('name')->join(', ') }}</p>
-            @endif
-        </div>
+        <a href="{{ route('admin.requests.index') }}" class="stat-card transition hover:border-teal-200 hover:shadow-md" aria-label="View today's jobs">
+            <span class="stat-icon bg-teal-50 text-teal-600" aria-hidden="true">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+            </span>
+            <span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">Today's Jobs</span>
+                <span class="mt-0.5 block font-display text-3xl font-extrabold text-slate-900">{{ $todays_jobs }}</span>
+            </span>
+        </a>
+        <a href="{{ route('admin.requests.index', ['status' => 'pending_review']) }}" class="stat-card transition hover:border-amber-200 hover:shadow-md" aria-label="View pending requests">
+            <span class="stat-icon bg-amber-50 text-amber-600" aria-hidden="true">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </span>
+            <span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">Pending Requests</span>
+                <span class="mt-0.5 block font-display text-3xl font-extrabold text-amber-600">{{ $pending_requests }}</span>
+            </span>
+        </a>
+        <a href="{{ route('admin.requests.index') }}" class="stat-card transition hover:border-teal-200 hover:shadow-md" aria-label="View active jobs">
+            <span class="stat-icon bg-teal-50 text-teal-600" aria-hidden="true">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </span>
+            <span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">Active Jobs</span>
+                <span class="mt-0.5 block font-display text-3xl font-extrabold text-teal-600">{{ $active_jobs }}</span>
+            </span>
+        </a>
+        <a href="{{ route('admin.reports.jobs') }}" class="stat-card transition hover:border-emerald-200 hover:shadow-md" aria-label="View job reports">
+            <span class="stat-icon bg-emerald-50 text-emerald-600" aria-hidden="true">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+            </span>
+            <span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">Completed Today</span>
+                <span class="mt-0.5 block font-display text-3xl font-extrabold text-emerald-600">{{ $completed_today }}</span>
+            </span>
+        </a>
+        <a href="{{ route('admin.invoices.index') }}" class="stat-card transition hover:border-rose-200 hover:shadow-md" aria-label="View unpaid invoices">
+            <span class="stat-icon bg-rose-50 text-rose-600" aria-hidden="true">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6V3Zm8 0v5h5"/></svg>
+            </span>
+            <span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">Unpaid Invoices</span>
+                <span class="mt-0.5 block font-display text-3xl font-extrabold text-rose-600">{{ $unpaid_invoices }}</span>
+                <span class="mt-0.5 block text-xs font-semibold text-slate-500">{{ number_format($outstanding_total, 2) }} EGP outstanding</span>
+            </span>
+        </a>
+        <a href="{{ route('admin.inventory.index', ['filter' => 'low-stock']) }}" class="stat-card transition hover:border-amber-200 hover:shadow-md" aria-label="View low-stock items">
+            <span class="stat-icon bg-amber-50 text-amber-600" aria-hidden="true">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1ZM7 10h2v2H7v-2Zm0 4h2v2H7v-2Zm4-4h6v2h-6v-2Zm0 4h6v2h-6v-2Z"/></svg>
+            </span>
+            <span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">Low-Stock Items</span>
+                <span class="mt-0.5 block font-display text-3xl font-extrabold {{ $low_stock_count > 0 ? 'text-amber-600' : 'text-slate-900' }}">{{ $low_stock_count }}</span>
+                @if($low_stock_items->isNotEmpty())
+                    <span class="mt-0.5 block text-xs text-slate-500">{{ $low_stock_items->pluck('name')->join(', ') }}</span>
+                @endif
+            </span>
+        </a>
     </div>
 
     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">

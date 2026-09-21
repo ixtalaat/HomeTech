@@ -8,9 +8,26 @@
         </a>
         <div class="mt-2 flex flex-wrap items-center gap-3">
             <h2 class="font-display text-2xl font-extrabold text-slate-900">Job #{{ $workOrder->id }}</h2>
-            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">
-                {{ $workOrder->status->label() }}
-            </span>
+            <x-status-badge :status="$workOrder->status" />
+        </div>
+        @php
+            $steps = [
+                ['label' => 'Diagnosis', 'done' => ! empty($workOrder->diagnosis)],
+                ['label' => 'Notes', 'done' => ! empty($workOrder->work_notes)],
+                ['label' => 'Charges', 'done' => $workOrder->laborItems->isNotEmpty() || $workOrder->materialUsages->isNotEmpty()],
+                ['label' => 'Extras resolved', 'done' => $workOrder->additionalWorkItems->where('status', \App\Enums\AdditionalWorkStatus::PendingApproval)->isEmpty()],
+            ];
+            $doneSteps = collect($steps)->where('done')->count();
+        @endphp
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" role="img" aria-label="Job progress: {{ $doneSteps }} of {{ count($steps) }} steps complete">
+            <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full rounded-full bg-teal-500 transition-all" style="width: {{ (int) ($doneSteps / count($steps) * 100) }}%"></div>
+            </div>
+            <ol class="mt-3 flex flex-wrap gap-2">
+                @foreach ($steps as $step)
+                    <li class="badge {{ $step['done'] ? 'badge-success' : 'badge-neutral' }}">{{ $step['label'] }}</li>
+                @endforeach
+            </ol>
         </div>
         <p class="mt-1 text-sm text-slate-500">
             {{ $workOrder->request->service->name ?? '—' }} ·

@@ -268,10 +268,10 @@
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 class="text-sm font-extrabold text-slate-900">Status History</h3>
-                <ol class="mt-4 space-y-4">
+                <ol class="timeline mt-4">
                     @forelse ($maintenanceRequest->statusHistories as $history)
-                        <li class="flex gap-3">
-                            <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-teal-500"></span>
+                        <li class="timeline-item">
+                            <span class="timeline-dot" aria-hidden="true"></span>
                             <div class="text-sm">
                                 <p class="font-bold text-slate-900">
                                     @if($history->from_status)

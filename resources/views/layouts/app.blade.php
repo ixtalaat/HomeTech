@@ -15,6 +15,7 @@
 </head>
 
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-teal-600 focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white">Skip to content</a>
     <div class="min-h-screen lg:flex">
         <aside class="hidden w-72 shrink-0 flex-col border-r border-slate-200 bg-white px-6 py-7 lg:flex">
             <a href="{{ route('dashboard') }}" aria-label="HomeTech dashboard">
@@ -162,7 +163,7 @@
                     support →</a>
             </div>
         </aside>
-        <main class="min-w-0 flex-1">
+        <main id="main-content" class="min-w-0 flex-1" tabindex="-1">
             <header
                 class="flex items-center justify-between border-b border-slate-200 bg-white/90 px-5 py-4 backdrop-blur sm:px-8">
                 <div>
@@ -209,6 +210,38 @@
 
                 @yield('content')
             </div>
+
+            <nav class="sticky bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-2 backdrop-blur lg:hidden" aria-label="Mobile navigation">
+                <div class="flex items-center gap-1 overflow-x-auto">
+                    <a href="{{ route('dashboard') }}" @class(['flex shrink-0 flex-col items-center gap-1 rounded-xl px-4 py-2 text-[11px] font-bold', 'text-teal-700' => request()->routeIs('dashboard'), 'text-slate-500' => ! request()->routeIs('dashboard')])>
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1-1v-9Z"/><path d="M9 21v-6h6v6"/></svg>
+                        <span>Home</span>
+                    </a>
+                    <a href="{{ route('services.index') }}" @class(['flex shrink-0 flex-col items-center gap-1 rounded-xl px-4 py-2 text-[11px] font-bold', 'text-teal-700' => request()->routeIs('services.*'), 'text-slate-500' => ! request()->routeIs('services.*')])>
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                        <span>Services</span>
+                    </a>
+                    <a href="{{ route('requests.index') }}" @class(['flex shrink-0 flex-col items-center gap-1 rounded-xl px-4 py-2 text-[11px] font-bold', 'text-teal-700' => request()->routeIs('requests.*'), 'text-slate-500' => ! request()->routeIs('requests.*')])>
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 12h6M9 16h6M13 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8l-5-5Z"/></svg>
+                        <span>Requests</span>
+                    </a>
+                    @if(auth()->user() && auth()->user()->role === \App\Enums\UserRole::Technician)
+                        <a href="{{ route('technician.jobs.index') }}" @class(['flex shrink-0 flex-col items-center gap-1 rounded-xl px-4 py-2 text-[11px] font-bold', 'text-teal-700' => request()->routeIs('technician.*'), 'text-slate-500' => ! request()->routeIs('technician.*')])>
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                            <span>Jobs</span>
+                        </a>
+                    @else
+                        <a href="{{ route('invoices.index') }}" @class(['flex shrink-0 flex-col items-center gap-1 rounded-xl px-4 py-2 text-[11px] font-bold', 'text-teal-700' => request()->routeIs('invoices.*'), 'text-slate-500' => ! request()->routeIs('invoices.*')])>
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l4 4v14H6V3Zm8 0v5h5"/></svg>
+                            <span>Bills</span>
+                        </a>
+                    @endif
+                    <a href="{{ route('profile.edit') }}" @class(['flex shrink-0 flex-col items-center gap-1 rounded-xl px-4 py-2 text-[11px] font-bold', 'text-teal-700' => request()->routeIs('profile.*'), 'text-slate-500' => ! request()->routeIs('profile.*')])>
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+                        <span>Profile</span>
+                    </a>
+                </div>
+            </nav>
         </main>
     </div>
 </body>

@@ -8,10 +8,17 @@
         </a>
         <div class="mt-2 flex flex-wrap items-center gap-3">
             <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $invoice->number }}</h2>
-            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">
-                {{ $invoice->status->label() }}
-            </span>
+            <x-status-badge :status="$invoice->status" />
         </div>
+        @if($invoice->remaining() > 0 && $invoice->acceptsPayments())
+            <p class="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900" role="status">
+                Balance due: {{ number_format($invoice->remaining(), 2) }} EGP — pay in full or partially below.
+            </p>
+        @elseif($invoice->status === \App\Enums\InvoiceStatus::Paid)
+            <p class="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-900" role="status">
+                Fully paid. Thank you!
+            </p>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">

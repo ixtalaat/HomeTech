@@ -13,8 +13,12 @@
 
 @layer base {
     body { font-family: var(--font-sans); }
-    button, a, input { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
-    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid rgb(45 212 191 / 0.45); outline-offset: 3px; }
+    button, a, input, select, textarea { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgb(45 212 191 / 0.45); outline-offset: 3px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
 @layer components {
@@ -23,11 +27,46 @@
     .form-input::placeholder { color: rgb(148 163 184); }
     .form-input:hover { border-color: rgb(148 163 184); }
     .form-input:focus { border-color: rgb(13 148 136); box-shadow: 0 0 0 4px rgb(20 184 166 / 0.12); outline: none; }
-    .primary-button, .secondary-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: .875rem; padding: .8rem 1.15rem; font-size: .875rem; font-weight: 700; }
+    .primary-button, .secondary-button, .danger-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: .875rem; padding: .8rem 1.15rem; font-size: .875rem; font-weight: 700; min-height: 44px; }
     .primary-button { background: rgb(13 148 136); color: white; box-shadow: 0 8px 18px rgb(13 148 136 / 0.18); }
     .primary-button:hover { background: rgb(15 118 110); transform: translateY(-1px); }
+    .primary-button:active { transform: translateY(0); }
     .secondary-button { border: 1px solid rgb(203 213 225); background: white; color: rgb(15 23 42); }
     .secondary-button:hover { border-color: rgb(94 234 212); background: rgb(240 253 250); color: rgb(15 118 110); }
+    .danger-button { border: 1px solid rgb(253 164 175); background: white; color: rgb(190 18 60); }
+    .danger-button:hover { background: rgb(255 241 242); }
+    .danger-button:disabled, .primary-button:disabled, .secondary-button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
     .stat-card { display: flex; align-items: center; gap: 1rem; border: 1px solid rgb(226 232 240); border-radius: 1.5rem; background: white; padding: 1.25rem; box-shadow: 0 1px 2px rgb(15 23 42 / 0.03); }
     .stat-icon { display: flex; height: 2.75rem; width: 2.75rem; align-items: center; justify-content: center; border-radius: 1rem; font-weight: 800; }
+
+    /* Cards */
+    .card { border-radius: 1rem; border: 1px solid rgb(226 232 240); background: white; padding: 1.5rem; box-shadow: 0 1px 2px rgb(15 23 42 / 0.03); }
+    .card-title { font-size: .875rem; font-weight: 800; color: rgb(15 23 42); }
+    .card-subtitle { margin-top: .25rem; font-size: .75rem; color: rgb(100 116 139); }
+
+    /* Status badges — semantic color per domain state */
+    .badge { display: inline-flex; align-items: center; gap: .375rem; border-radius: 9999px; padding: .25rem .75rem; font-size: .75rem; font-weight: 700; white-space: nowrap; }
+    .badge::before { content: ''; height: .375rem; width: .375rem; border-radius: 9999px; background: currentColor; }
+    .badge-neutral { background: rgb(241 245 249); color: rgb(71 85 105); }
+    .badge-info { background: rgb(224 242 254); color: rgb(12 74 110); }
+    .badge-pending { background: rgb(254 243 199); color: rgb(146 64 14); }
+    .badge-active { background: rgb(204 251 241); color: rgb(17 94 89); }
+    .badge-success { background: rgb(220 252 231); color: rgb(22 101 52); }
+    .badge-danger { background: rgb(255 228 230); color: rgb(159 18 57); }
+
+    /* Timeline stepper */
+    .timeline { list-style: none; margin: 0; padding: 0; }
+    .timeline-item { position: relative; display: flex; gap: .75rem; padding-bottom: 1.25rem; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-item::before { content: ''; position: absolute; left: 5px; top: 18px; bottom: 2px; width: 2px; background: rgb(226 232 240); border-radius: 2px; }
+    .timeline-item:last-child::before { display: none; }
+    .timeline-dot { position: relative; z-index: 1; margin-top: 4px; height: 12px; width: 12px; flex-shrink: 0; border-radius: 9999px; background: rgb(20 184 166); box-shadow: 0 0 0 4px rgb(204 251 241); }
+    .timeline-dot-muted { background: rgb(148 163 184); box-shadow: 0 0 0 4px rgb(241 245 249); }
+
+    /* Empty states */
+    .empty-state { border-radius: 1rem; border: 1px dashed rgb(203 213 225); background: white; padding: 3rem 1.5rem; text-align: center; font-size: .875rem; color: rgb(100 116 139); }
+
+    /* Definition rows */
+    .detail-label { font-size: .6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgb(148 163 184); }
+    .detail-value { margin-top: .125rem; font-weight: 600; color: rgb(15 23 42); }
 }

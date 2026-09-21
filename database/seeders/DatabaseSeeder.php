@@ -19,9 +19,11 @@ class DatabaseSeeder extends Seeder
 
         User::firstOrCreate(
             ['email' => 'test@example.com'],
-            User::factory()->make([
+            [
                 'name' => 'Test User',
-            ])->toArray()
+                'password' => 'password',
+                'email_verified_at' => now(),
+            ]
         );
 
         $this->call([

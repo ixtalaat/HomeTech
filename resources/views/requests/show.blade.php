@@ -109,8 +109,33 @@
         </div>
 
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 class="text-sm font-extrabold text-slate-900">Status History</h3>
-            <ol class="mt-4 space-y-4">
+            <h3 class="text-sm font-extrabold text-slate-900">Your Review</h3>
+            @if($maintenanceRequest->review)
+                <p class="mt-2 text-lg font-extrabold text-amber-500">{{ str_repeat('★', $maintenanceRequest->review->rating) }}{{ str_repeat('☆', 5 - $maintenanceRequest->review->rating) }}</p>
+                @if($maintenanceRequest->review->comment)
+                    <p class="mt-1 text-sm text-slate-700">{{ $maintenanceRequest->review->comment }}</p>
+                @endif
+            @elseif(in_array($maintenanceRequest->status, [\App\Enums\RequestStatus::Completed, \App\Enums\RequestStatus::Invoiced, \App\Enums\RequestStatus::Paid, \App\Enums\RequestStatus::Closed], true))
+                <form method="POST" action="{{ route('requests.reviews.store', $maintenanceRequest) }}" class="mt-3 space-y-3">
+                    @csrf
+                    <div class="grid grid-cols-2 gap-2">
+                        <select name="rating" required class="form-input text-xs" aria-label="Rating">
+                            <option value="">Rating…</option>
+                            @for($stars = 5; $stars >= 1; $stars--)
+                                <option value="{{ $stars }}">{{ $stars }} star{{ $stars > 1 ? 's' : '' }}</option>
+                            @endfor
+                        </select>
+                        <input type="text" name="comment" maxlength="2000" placeholder="Comment (optional)" class="form-input text-xs">
+                    </div>
+                    <button type="submit" class="primary-button w-full text-xs">Submit Review</button>
+                </form>
+            @else
+                <p class="mt-2 text-xs text-slate-500">You can review this job once it is completed.</p>
+            @endif
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 class="text-sm font-extrabold text-slate-900">Status History</h3>            <ol class="mt-4 space-y-4">
                 @forelse ($maintenanceRequest->statusHistories as $history)
                     <li class="flex gap-3">
                         <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-teal-500"></span>

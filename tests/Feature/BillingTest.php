@@ -21,7 +21,7 @@ it('calculates the pricing breakdown with tracked components', function () {
     expect($breakdown['labor'])->toBe(100.00)
         ->and($breakdown['materials'])->toBe(150.00)
         ->and($breakdown['additional'])->toBe(100.00)
-        ->and($breakdown['subtotal'])->toBe($breakdown['service_base'] + 350.00);
+        ->and($breakdown['subtotal'])->toBe(round($breakdown['service_base'] + 350.00, 2));
 });
 
 it('applies fixed and percent discounts with guards', function () {

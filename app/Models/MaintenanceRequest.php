@@ -136,6 +136,16 @@ class MaintenanceRequest extends Model
     }
 
     /**
+     * Get the review for the request.
+     *
+     * @return HasOne<Review, $this>
+     */
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
+    }
+
+    /**
      * Get the staff member who reviewed the request.
      *
      * @return BelongsTo<User, $this>

@@ -27,7 +27,11 @@ it('cancels far-future appointments for free and near ones with a fee (BR-008)',
     expect((float) $free->fee)->toBe(0.0);
 
     $near = scheduledRequest();
-    $near->appointment->update(['date' => now()->addDay()->format('Y-m-d')]);
+    $near->appointment->update([
+        'date' => now()->format('Y-m-d'),
+        'start_time' => now()->addHours(2)->format('H:i'),
+        'end_time' => now()->addHours(3)->format('H:i'),
+    ]);
     $base = (float) $near->service->base_price;
     $late = $service->cancel($near->refresh(), $near->user, 'Emergency came up.');
     expect((float) $late->fee)->toBe(round($base * 10 / 100, 2));

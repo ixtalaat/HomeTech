@@ -13,6 +13,12 @@
             </span>
         </div>
         <p class="mt-1 text-sm text-slate-500">{{ $maintenanceRequest->user->name ?? '—' }} · Submitted {{ $maintenanceRequest->created_at->format('d M Y, h:i A') }}</p>
+        @if($maintenanceRequest->review)
+            <p class="mt-2 rounded-xl bg-amber-50 p-3 text-sm text-slate-700">
+                <span class="font-extrabold text-amber-500">{{ str_repeat('★', $maintenanceRequest->review->rating) }}{{ str_repeat('☆', 5 - $maintenanceRequest->review->rating) }}</span>
+                {{ $maintenanceRequest->review->comment ? " — {$maintenanceRequest->review->comment}" : '' }}
+            </p>
+        @endif
         @if($maintenanceRequest->workOrder)
             <a href="{{ route('admin.work-orders.show', $maintenanceRequest->workOrder) }}" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-teal-700 hover:underline">
                 View work order #{{ $maintenanceRequest->workOrder->id }} ({{ $maintenanceRequest->workOrder->status->label() }}) →

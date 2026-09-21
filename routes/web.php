@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\InventoryItemController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceRequestController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TechnicianController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceBrowseController;
 use App\Http\Controllers\Technician\WorkOrderController as TechnicianWorkOrderController;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +59,8 @@ Route::middleware('auth')->group(function (): void {
     Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
 
     Route::post('requests/{maintenanceRequest}/cancel', [MaintenanceRequestController::class, 'cancel'])->name('requests.cancel');
+
+    Route::post('requests/{maintenanceRequest}/reviews', [ReviewController::class, 'store'])->name('requests.reviews.store');
 });
 
 Route::middleware(['auth', 'role:technician'])
@@ -119,4 +123,6 @@ Route::middleware(['auth', 'role:admin,manager'])
         Route::patch('invoices/{invoice}/cancel', [AdminInvoiceController::class, 'cancel'])->name('invoices.cancel');
         Route::patch('invoices/{invoice}/close', [AdminInvoiceController::class, 'close'])->name('invoices.close');
         Route::resource('invoices', AdminInvoiceController::class)->only(['index', 'show']);
+
+        Route::resource('reviews', AdminReviewController::class)->only(['index']);
     });

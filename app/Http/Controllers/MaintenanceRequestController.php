@@ -75,7 +75,7 @@ class MaintenanceRequestController extends Controller
         abort_unless($maintenanceRequest->isOwnedBy($request->user()), 404);
         $this->authorize('view', $maintenanceRequest);
 
-        $maintenanceRequest->load(['service.category', 'address', 'appointment', 'workOrder.additionalWorkItems', 'invoice', 'cancellation', 'statusHistories']);
+        $maintenanceRequest->load(['service.category', 'address', 'appointment', 'workOrder.additionalWorkItems', 'invoice', 'cancellation', 'review', 'statusHistories']);
 
         return view('requests.show', compact('maintenanceRequest'));
     }

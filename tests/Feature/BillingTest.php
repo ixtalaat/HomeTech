@@ -132,7 +132,7 @@ it('lets owners pay their own invoices', function () {
 
     $this->actingAs($customer)->post(route('invoices.pay', $invoice), [
         'amount' => (float) $invoice->refresh()->total,
-        'method' => 'card',
+        'method' => 'cash',
     ])->assertRedirect();
 
     expect($invoice->refresh()->status)->toBe(InvoiceStatus::Paid);

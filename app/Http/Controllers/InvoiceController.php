@@ -53,18 +53,26 @@ class InvoiceController extends Controller
 
     /**
      * Pay the invoice (full or partial).
+     *
+     * Card payments are processed securely through Stripe Checkout;
+     * cash and bank transfers are recorded directly.
      */
     public function pay(MakePaymentRequest $request, Invoice $invoice): RedirectResponse
     {
         abort_unless($invoice->isOwnedBy($request->user()), 404);
 
-        try {
-            $validated = $request->validated();
+        $validated = $request->validated();
+        $method = PaymentMethod::from($validated['method']);
 
+        if ($method === PaymentMethod::Card) {
+            return $this->startCardPayment($request, $invoice, (float) $validated['amount']);
+        }
+
+        try {
             $this->payments->pay(
                 $invoice,
                 (float) $validated['amount'],
-                PaymentMethod::from($validated['method']),
+                $method,
                 $request->user()
             );
         } catch (BillingException $exception) {
@@ -82,8 +90,16 @@ class InvoiceController extends Controller
         abort_unless($invoice->isOwnedBy($request->user()), 404);
         $this->authorize('pay', $invoice);
 
+        return $this->startCardPayment($request, $invoice, $invoice->remaining());
+    }
+
+    /**
+     * Start a card payment for the given amount via Stripe Checkout.
+     */
+    private function startCardPayment(Request $request, Invoice $invoice, float $amount): RedirectResponse
+    {
         try {
-            $session = $this->stripe->checkout($invoice, $request->user());
+            $session = $this->stripe->checkout($invoice, $request->user(), $amount);
         } catch (StripeException $exception) {
             return back()->with('error', $exception->getMessage());
         }

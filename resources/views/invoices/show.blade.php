@@ -72,23 +72,18 @@
             @if($invoice->acceptsPayments())
                 <div class="rounded-2xl border border-teal-200 bg-teal-50/50 p-6 shadow-sm">
                     <h3 class="text-sm font-extrabold text-slate-900">Make a Payment</h3>
-                    <p class="mt-1 text-xs text-slate-500">Pay in full ({{ number_format($invoice->remaining(), 2) }} EGP) or partially.</p>
-                    <form method="POST" action="{{ route('invoices.stripe.checkout', $invoice) }}" class="mt-3">
+                    <p class="mt-1 text-xs text-slate-500">Card payments go through secure Stripe Checkout; cash and bank transfers are recorded directly.</p>
+                    <form method="POST" action="{{ route('invoices.pay', $invoice) }}" class="mt-3 space-y-3">
                         @csrf
-                        <button type="submit" class="primary-button w-full text-xs">Pay {{ number_format($invoice->remaining(), 2) }} EGP Online by Card</button>
-                    </form>
-                    <form method="POST" action="{{ route('invoices.pay', $invoice) }}" class="mt-3 space-y-3 border-t border-teal-100 pt-3">
-                        @csrf
-                        <p class="text-xs font-bold text-slate-500">Or record a manual payment:</p>
                         <div class="grid grid-cols-2 gap-2">
                             <input type="number" name="amount" step="0.01" min="0.01" max="{{ $invoice->remaining() }}" required value="{{ $invoice->remaining() }}" class="form-input text-xs">
                             <select name="method" required class="form-input text-xs" aria-label="Method">
+                                <option value="card">Card (online)</option>
                                 <option value="cash">Cash</option>
-                                <option value="card">Card</option>
                                 <option value="bank_transfer">Bank Transfer</option>
                             </select>
                         </div>
-                        <button type="submit" class="secondary-button w-full text-xs">Record Manual Payment</button>
+                        <button type="submit" class="primary-button w-full text-xs">Pay {{ number_format($invoice->remaining(), 2) }} EGP</button>
                     </form>
                 </div>
             @endif

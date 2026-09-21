@@ -24,13 +24,13 @@ class StripeService
     ) {}
 
     /**
-     * Create a hosted Checkout Session for the invoice balance.
+     * Create a hosted Checkout Session for full or partial payment.
      *
      * Amounts go to Stripe in piasters (EGP × 100).
      *
      * @throws StripeException
      */
-    public function checkout(Invoice $invoice, User $customer): Session
+    public function checkout(Invoice $invoice, User $customer, ?float $amount = null): Session
     {
         if (! $invoice->isOwnedBy($customer)) {
             throw new StripeException('You can only pay your own invoices online.');
@@ -40,11 +40,13 @@ class StripeService
             throw new StripeException("Invoice {$invoice->number} cannot be paid online in status '{$invoice->status->value}'.");
         }
 
-        $amount = (int) round($invoice->remaining() * 100);
+        $amount = $amount === null ? $invoice->remaining() : round($amount, 2);
 
-        if ($amount <= 0) {
-            throw new StripeException('There is nothing left to pay on this invoice.');
+        if ($amount <= 0 || $amount > $invoice->remaining()) {
+            throw new StripeException("Online payment must be between 1 piaster and {$invoice->remaining()} EGP.");
         }
+
+        $piaster = (int) round($amount * 100);
 
         try {
             return $this->client()->checkout->sessions->create([
@@ -55,7 +57,7 @@ class StripeService
                     'price_data' => [
                         'currency' => 'egp',
                         'product_data' => ['name' => "HomeTech invoice {$invoice->number}"],
-                        'unit_amount' => $amount,
+                        'unit_amount' => $piaster,
                     ],
                     'quantity' => 1,
                 ]],

@@ -94,6 +94,32 @@ it('creates a checkout session for the remaining balance', function () {
     $this->actingAs($stranger)->post(route('invoices.stripe.checkout', $invoice))->assertNotFound();
 });
 
+it('routes card payments through Stripe and records cash directly', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $workOrder = completedWorkOrderWithCharges();
+    $invoice = app(InvoiceService::class)->generate($workOrder, $admin);
+    app(InvoiceService::class)->issue($invoice->refresh(), $admin);
+    $customer = $invoice->user;
+
+    $this->app->bind(StripeService::class, fn ($app) => stripeService());
+
+    // Card → Stripe Checkout (partial amount honored).
+    $this->actingAs($customer)->post(route('invoices.pay', $invoice), [
+        'amount' => 100.00,
+        'method' => 'card',
+    ])->assertRedirect('https://checkout.stripe.com/pay/cs_test_fake123');
+
+    expect(Payment::count())->toBe(0);
+
+    // Cash → recorded immediately.
+    $this->actingAs($customer)->post(route('invoices.pay', $invoice), [
+        'amount' => 100.00,
+        'method' => 'cash',
+    ])->assertRedirect();
+
+    expect($invoice->refresh()->status)->toBe(InvoiceStatus::PartiallyPaid);
+});
+
 it('settles paid sessions idempotently and refuses the rest', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
     $workOrder = completedWorkOrderWithCharges();

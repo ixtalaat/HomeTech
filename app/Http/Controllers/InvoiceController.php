@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\PaymentMethod;
 use App\Exceptions\BillingException;
+use App\Exceptions\StripeException;
 use App\Http\Requests\MakePaymentRequest;
 use App\Models\Invoice;
 use App\Services\PaymentService;
+use App\Services\StripeService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +18,10 @@ class InvoiceController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(private PaymentService $payments) {}
+    public function __construct(
+        private PaymentService $payments,
+        private StripeService $stripe
+    ) {}
 
     /**
      * Display a listing of the customer's invoices.
@@ -67,5 +72,54 @@ class InvoiceController extends Controller
         }
 
         return back()->with('success', 'Payment received. Thank you!');
+    }
+
+    /**
+     * Start a Stripe Checkout Session for the invoice balance.
+     */
+    public function stripeCheckout(Request $request, Invoice $invoice): RedirectResponse
+    {
+        abort_unless($invoice->isOwnedBy($request->user()), 404);
+        $this->authorize('pay', $invoice);
+
+        try {
+            $session = $this->stripe->checkout($invoice, $request->user());
+        } catch (StripeException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()->away($session->url);
+    }
+
+    /**
+     * Settle a completed Stripe Checkout Session (idempotent).
+     */
+    public function stripeSuccess(Request $request): RedirectResponse
+    {
+        $sessionId = (string) $request->query('session_id', '');
+
+        if ($sessionId === '') {
+            return redirect()->route('invoices.index')->with('error', 'Missing Stripe session.');
+        }
+
+        try {
+            $payment = $this->stripe->handleSuccess($sessionId, $request->user());
+        } catch (StripeException $exception) {
+            return redirect()->route('invoices.index')->with('error', $exception->getMessage());
+        }
+
+        return redirect()
+            ->route('invoices.show', $payment->invoice_id)
+            ->with('success', 'Online payment received. Thank you!');
+    }
+
+    /**
+     * Return from a cancelled Stripe Checkout Session.
+     */
+    public function stripeCancel(Invoice $invoice): RedirectResponse
+    {
+        return redirect()
+            ->route('invoices.show', $invoice)
+            ->with('error', 'Online payment was cancelled. No charge was made.');
     }
 }

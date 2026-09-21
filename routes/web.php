@@ -73,8 +73,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::patch('additional-work/{additionalWork}/approve', [AdditionalWorkController::class, 'approve'])->name('additional-work.approve');
     Route::patch('additional-work/{additionalWork}/reject', [AdditionalWorkController::class, 'reject'])->name('additional-work.reject');
 
+    Route::get('invoices/stripe/success', [InvoiceController::class, 'stripeSuccess'])->name('invoices.stripe.success');
+    Route::get('invoices/{invoice}/stripe/cancel', [InvoiceController::class, 'stripeCancel'])->name('invoices.stripe.cancel');
     Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
     Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'pay'])->name('invoices.pay');
+    Route::post('invoices/{invoice}/stripe/checkout', [InvoiceController::class, 'stripeCheckout'])->name('invoices.stripe.checkout');
 
     Route::post('requests/{maintenanceRequest}/cancel', [MaintenanceRequestController::class, 'cancel'])->name('requests.cancel');
 

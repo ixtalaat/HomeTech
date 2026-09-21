@@ -14,6 +14,7 @@ use App\Models\InventoryItem;
 use App\Models\MaintenanceRequest;
 use App\Models\User;
 use App\Models\WorkOrder;
+use App\Notifications\JobCompleted;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
@@ -199,6 +200,8 @@ class WorkOrderService
                 $actor,
                 'Work completed.'
             );
+
+            $workOrder->request->user->notify(new JobCompleted($workOrder->request));
 
             return $workOrder->refresh();
         });

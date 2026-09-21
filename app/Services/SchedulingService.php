@@ -10,6 +10,9 @@ use App\Models\Appointment;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
 use App\Models\User;
+use App\Notifications\AppointmentChanged;
+use App\Notifications\JobCancelled;
+use App\Notifications\JobRescheduled;
 use Illuminate\Support\Facades\DB;
 
 class SchedulingService
@@ -99,6 +102,10 @@ class SchedulingService
                 'reason' => "Appointment rescheduled to {$date} {$start}–{$end}.",
             ]);
 
+            $summary = "{$date} {$start}–{$end}";
+            $appointment->request->user->notify(new AppointmentChanged($appointment->request, $summary));
+            $appointment->technician->user->notify(new JobRescheduled($appointment->request, $summary));
+
             return $appointment->refresh();
         });
     }
@@ -116,6 +123,10 @@ class SchedulingService
                 RequestStatus::TechnicianAssigned,
                 $actor,
                 $reason ?? 'Appointment cancelled; awaiting a new slot.'
+            );
+
+            $appointment->technician->user->notify(
+                new JobCancelled($appointment->request, $reason ?? 'The appointment was cancelled.')
             );
 
             return $appointment->refresh();

@@ -3,9 +3,11 @@
 use App\Http\Controllers\AdditionalWorkController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InventoryItemController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceRequestController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
@@ -15,6 +17,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceRequestController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceBrowseController;
@@ -61,6 +64,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('requests/{maintenanceRequest}/cancel', [MaintenanceRequestController::class, 'cancel'])->name('requests.cancel');
 
     Route::post('requests/{maintenanceRequest}/reviews', [ReviewController::class, 'store'])->name('requests.reviews.store');
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
 });
 
 Route::middleware(['auth', 'role:technician'])
@@ -84,7 +90,12 @@ Route::middleware(['auth', 'role:admin,manager'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function (): void {
-        Route::get('/', [ServiceController::class, 'index'])->name('dashboard');
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('reports/revenue', [ReportController::class, 'revenue'])->name('reports.revenue');
+        Route::get('reports/jobs', [ReportController::class, 'jobs'])->name('reports.jobs');
+        Route::get('reports/technicians', [ReportController::class, 'technicians'])->name('reports.technicians');
+        Route::get('reports/inventory', [ReportController::class, 'inventory'])->name('reports.inventory');
 
         Route::resource('categories', ServiceCategoryController::class);
         Route::patch('services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');

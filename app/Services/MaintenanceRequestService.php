@@ -7,6 +7,7 @@ use App\Models\Address;
 use App\Models\MaintenanceRequest;
 use App\Models\Service;
 use App\Models\User;
+use App\Notifications\RequestSubmitted;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
@@ -111,6 +112,8 @@ class MaintenanceRequestService
                 'changed_by' => $user->id,
                 'reason' => null,
             ]);
+
+            $user->notify(new RequestSubmitted($maintenanceRequest));
 
             return $maintenanceRequest;
         });

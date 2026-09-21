@@ -8,6 +8,8 @@ use App\Exceptions\TechnicianAssignmentException;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
 use App\Models\User;
+use App\Notifications\JobAssigned;
+use App\Notifications\TechnicianAssignedToRequest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -55,6 +57,9 @@ class TechnicianAssignmentService
 
             $this->scheduling->book($request->refresh(), $technician, $date, $start, $end, $actor);
 
+            $request->user->notify(new TechnicianAssignedToRequest($request->refresh(), $technician->user->name));
+            $technician->user->notify(new JobAssigned($request->refresh()));
+
             return $request->refresh();
         });
     }
@@ -95,6 +100,9 @@ class TechnicianAssignmentService
                     'changed_by' => $actor?->id,
                     'reason' => "Reassigned to {$technician->user->name}.",
                 ]);
+
+                $request->user->notify(new TechnicianAssignedToRequest($request->refresh(), $technician->user->name));
+                $technician->user->notify(new JobAssigned($request->refresh()));
 
                 return $request->refresh();
             });

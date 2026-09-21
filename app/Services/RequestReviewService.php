@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\RequestStatus;
 use App\Models\MaintenanceRequest;
 use App\Models\User;
+use App\Notifications\RequestApproved;
 
 class RequestReviewService
 {
@@ -34,6 +35,8 @@ class RequestReviewService
             $reviewer,
             $attributes['admin_note'] ?? null
         );
+
+        $request->user->notify(new RequestApproved($request->refresh()));
 
         $request->update(['reviewed_by' => $reviewer->id, 'reviewed_at' => now()]);
 

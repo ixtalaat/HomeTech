@@ -7,6 +7,7 @@ use App\Enums\RequestStatus;
 use App\Enums\WorkOrderStatus;
 use App\Exceptions\AdditionalWorkException;
 use App\Models\AdditionalWork;
+use App\Models\AuditLog;
 use App\Models\User;
 use App\Models\WorkOrder;
 use App\Notifications\AdditionalWorkDecided;
@@ -95,6 +96,10 @@ class AdditionalWorkService
                 $customer,
                 $approve ? 'Customer approved the additional work.' : 'Customer rejected the additional work.'
             );
+
+            AuditLog::record($customer, 'additional_work.decided', $item->refresh(), [
+                'approved' => $approve,
+            ]);
 
             $item->requester->notify(new AdditionalWorkDecided($item->refresh(), $approve));
 

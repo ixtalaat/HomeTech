@@ -5,9 +5,11 @@ namespace App\Services;
 use App\Enums\AppointmentStatus;
 use App\Enums\RequestStatus;
 use App\Exceptions\BillingException;
+use App\Models\AuditLog;
 use App\Models\Cancellation;
 use App\Models\MaintenanceRequest;
 use App\Models\User;
+use App\Notifications\JobCancelled;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -54,6 +56,14 @@ class CancellationService
                 $actor,
                 $fee > 0 ? "Cancelled with a fee of {$fee} EGP: {$reason}" : "Cancelled without fee: {$reason}"
             );
+
+            AuditLog::record($actor, 'request.cancelled', $request->refresh(), [
+                'fee' => $fee,
+            ], $reason);
+
+            if ($request->technician !== null && $request->technician->user !== null) {
+                $request->technician->user->notify(new JobCancelled($request->refresh(), $reason));
+            }
 
             return $cancellation;
         });

@@ -4,9 +4,10 @@ namespace App\Notifications;
 
 use App\Models\AdditionalWork;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class AdditionalWorkRequiresApproval extends Notification
+class AdditionalWorkRequiresApproval extends Notification implements ShouldQueue
 {
     use Queueable;
 

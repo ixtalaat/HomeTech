@@ -10,6 +10,7 @@ use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\User;
+use App\Notifications\PaymentReceived;
 use Illuminate\Support\Facades\DB;
 
 class PaymentService
@@ -71,6 +72,8 @@ class PaymentService
                 'method' => $method->value,
                 'remaining' => $invoice->remaining(),
             ]);
+
+            $invoice->user->notify(new PaymentReceived($invoice->refresh(), $amount));
 
             return $payment;
         });

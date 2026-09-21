@@ -1,0 +1,234 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\InvoiceStatus;
+use App\Enums\RequestStatus;
+use App\Models\Appointment;
+use App\Models\InventoryItem;
+use App\Models\InventoryMovement;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
+use App\Models\MaintenanceRequest;
+use App\Models\Payment;
+use App\Models\Technician;
+use App\Models\WorkOrder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+
+class ReportingService
+{
+    /**
+     * Operational overview for the admin dashboard (PRD §25).
+     *
+     * @return array<string, mixed>
+     */
+    public function dashboard(): array
+    {
+        $today = now()->format('Y-m-d');
+
+        return [
+            'todays_jobs' => Appointment::where('date', $today)->whereNotIn('status', ['cancelled'])->count(),
+            'pending_requests' => MaintenanceRequest::where('status', RequestStatus::PendingReview)->count(),
+            'active_jobs' => MaintenanceRequest::whereIn('status', [RequestStatus::InProgress, RequestStatus::WaitingCustomerApproval])->count(),
+            'completed_today' => MaintenanceRequest::where('status', RequestStatus::Completed)->whereDate('updated_at', $today)->count(),
+            'unpaid_invoices' => Invoice::outstanding()->count(),
+            'outstanding_total' => (float) Invoice::outstanding()->selectRaw('COALESCE(SUM(total - paid_amount), 0) as total')->value('total'),
+            'low_stock_count' => InventoryItem::lowStock()->count(),
+            'low_stock_items' => InventoryItem::lowStock()->orderBy('current_stock')->limit(5)->get(),
+            'upcoming_appointments' => Appointment::with(['request.service', 'technician.user'])
+                ->where('date', '>=', $today)
+                ->whereNotIn('status', ['cancelled', 'completed'])
+                ->orderBy('date')
+                ->orderBy('start_time')
+                ->limit(8)
+                ->get(),
+            'unassigned_jobs' => MaintenanceRequest::with(['service', 'user'])
+                ->where('status', RequestStatus::Approved)
+                ->whereNull('technician_id')
+                ->latest()
+                ->limit(8)
+                ->get(),
+            'waiting_approval' => MaintenanceRequest::with(['service', 'user'])
+                ->where('status', RequestStatus::WaitingCustomerApproval)
+                ->latest()
+                ->limit(8)
+                ->get(),
+            'recent_requests' => MaintenanceRequest::with(['service', 'user'])
+                ->latest()
+                ->limit(8)
+                ->get(),
+        ];
+    }
+
+    /**
+     * Daily revenue for the last 30 days (from payments).
+     *
+     * @return Collection<int, object>
+     */
+    public function revenueDaily(): Collection
+    {
+        return Payment::selectRaw('DATE(paid_at) as day, COALESCE(SUM(amount), 0) as total')
+            ->where('paid_at', '>=', now()->subDays(30))
+            ->groupBy('day')
+            ->orderBy('day')
+            ->get();
+    }
+
+    /**
+     * Monthly revenue for the last 12 months (from payments).
+     *
+     * @return Collection<int, object>
+     */
+    public function revenueMonthly(): Collection
+    {
+        return Payment::selectRaw("DATE_FORMAT(paid_at, '%Y-%m') as month, COALESCE(SUM(amount), 0) as total")
+            ->where('paid_at', '>=', now()->subMonths(12))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    }
+
+    /**
+     * Revenue by service (invoiced line totals).
+     *
+     * @return Collection<int, object>
+     */
+    public function revenueByService(): Collection
+    {
+        return InvoiceItem::selectRaw('services.name as name, COALESCE(SUM(invoice_items.total), 0) as total')
+            ->join('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
+            ->join('maintenance_requests', 'maintenance_requests.id', '=', 'invoices.maintenance_request_id')
+            ->join('services', 'services.id', '=', 'maintenance_requests.service_id')
+            ->whereNotIn('invoices.status', [InvoiceStatus::Cancelled])
+            ->groupBy('services.id', 'services.name')
+            ->orderByDesc('total')
+            ->get();
+    }
+
+    /**
+     * Revenue by technician (paid amounts on their requests' invoices).
+     *
+     * @return Collection<int, object>
+     */
+    public function revenueByTechnician(): Collection
+    {
+        return Invoice::selectRaw('users.name as name, COALESCE(SUM(invoices.paid_amount), 0) as total')
+            ->join('maintenance_requests', 'maintenance_requests.id', '=', 'invoices.maintenance_request_id')
+            ->join('technicians', 'technicians.id', '=', 'maintenance_requests.technician_id')
+            ->join('users', 'users.id', '=', 'technicians.user_id')
+            ->whereNotIn('invoices.status', [InvoiceStatus::Cancelled])
+            ->groupBy('users.id', 'users.name')
+            ->orderByDesc('total')
+            ->get();
+    }
+
+    /**
+     * Outstanding invoices with balances.
+     *
+     * @return Collection<int, Invoice>
+     */
+    public function outstandingInvoices(): Collection
+    {
+        return Invoice::outstanding()->with('user')->latest()->get();
+    }
+
+    /**
+     * Job counts by request status.
+     *
+     * @return array<string, int>
+     */
+    public function jobsByStatus(): array
+    {
+        return MaintenanceRequest::selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->map(fn ($total): int => (int) $total)
+            ->all();
+    }
+
+    /**
+     * Job counts by service.
+     *
+     * @return Collection<int, object>
+     */
+    public function jobsByService(): Collection
+    {
+        return MaintenanceRequest::selectRaw('services.name as name, COUNT(*) as total')
+            ->join('services', 'services.id', '=', 'maintenance_requests.service_id')
+            ->groupBy('services.id', 'services.name')
+            ->orderByDesc('total')
+            ->get();
+    }
+
+    /**
+     * Average completion time in hours (visit start to work completion).
+     */
+    public function averageCompletionHours(): ?float
+    {
+        $seconds = WorkOrder::whereNotNull('started_at')
+            ->whereNotNull('completed_at')
+            ->selectRaw('AVG(TIMESTAMPDIFF(SECOND, started_at, completed_at)) as avg_seconds')
+            ->value('avg_seconds');
+
+        return $seconds === null ? null : round((float) $seconds / 3600, 1);
+    }
+
+    /**
+     * Per-technician performance: workload, completions, revenue, ratings.
+     *
+     * @return Collection<int, object>
+     */
+    public function technicianStats(): Collection
+    {
+        return Technician::selectRaw(implode(', ', [
+            'technicians.id as id',
+            'users.name as name',
+            'COUNT(DISTINCT maintenance_requests.id) as assigned',
+            "COUNT(DISTINCT CASE WHEN maintenance_requests.status = 'completed' THEN maintenance_requests.id END) as completed",
+            "COUNT(DISTINCT CASE WHEN maintenance_requests.status = 'cancelled' THEN maintenance_requests.id END) as cancelled",
+            'COALESCE(SUM(invoices.paid_amount), 0) as revenue',
+            'COALESCE(AVG(reviews.rating), 0) as avg_rating',
+            'COUNT(DISTINCT reviews.id) as reviews_count',
+        ]))
+            ->join('users', 'users.id', '=', 'technicians.user_id')
+            ->leftJoin('maintenance_requests', 'maintenance_requests.technician_id', '=', 'technicians.id')
+            ->leftJoin('invoices', function ($join): void {
+                $join->on('invoices.maintenance_request_id', '=', 'maintenance_requests.id')
+                    ->whereNotIn('invoices.status', [InvoiceStatus::Cancelled]);
+            })
+            ->leftJoin('reviews', 'reviews.maintenance_request_id', '=', 'maintenance_requests.id')
+            ->groupBy('technicians.id', 'users.name')
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Inventory overview: stock, consumption, low stock, most used, movements.
+     *
+     * @return array<string, mixed>
+     */
+    public function inventoryReport(): array
+    {
+        return [
+            'items' => InventoryItem::orderBy('name')->get(),
+            'low_stock' => InventoryItem::lowStock()->orderBy('current_stock')->get(),
+            'most_used' => InventoryMovement::selectRaw('inventory_items.name as name, COALESCE(SUM(ABS(inventory_movements.quantity)), 0) as moved')
+                ->join('inventory_items', 'inventory_items.id', '=', 'inventory_movements.inventory_item_id')
+                ->where('inventory_movements.type', 'consumption')
+                ->groupBy('inventory_items.id', 'inventory_items.name')
+                ->orderByDesc('moved')
+                ->limit(10)
+                ->get(),
+            'recent_movements' => InventoryMovement::with('item')->latest()->limit(20)->get(),
+        ];
+    }
+
+    /**
+     * Total revenue ever collected (dashboard helper, avoids DB::raw in views).
+     */
+    public function totalRevenue(): float
+    {
+        return (float) (Payment::sum('amount') ?? 0);
+    }
+}

@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Models\AdditionalWork;
+use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class AdditionalWorkDecided extends Notification implements ShouldQueue
+class PaymentReceived extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -15,8 +15,8 @@ class AdditionalWorkDecided extends Notification implements ShouldQueue
      * Create a new notification instance.
      */
     public function __construct(
-        public AdditionalWork $additionalWork,
-        public bool $approved
+        public Invoice $invoice,
+        public float $amount
     ) {}
 
     /**
@@ -36,15 +36,11 @@ class AdditionalWorkDecided extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        $request = $this->additionalWork->workOrder->request;
-        $verdict = $this->approved ? 'approved' : 'rejected';
-
         return [
-            'type' => 'additional_work_decided',
-            'additional_work_id' => $this->additionalWork->id,
-            'maintenance_request_id' => $request->id,
-            'approved' => $this->approved,
-            'message' => "The customer {$verdict} the additional work '{$this->additionalWork->description}' for request #{$request->id}.",
+            'type' => 'payment_received',
+            'invoice_id' => $this->invoice->id,
+            'maintenance_request_id' => $this->invoice->maintenance_request_id,
+            'message' => "Payment of {$this->amount} EGP received for invoice {$this->invoice->number}. Remaining: {$this->invoice->remaining()} EGP.",
         ];
     }
 }

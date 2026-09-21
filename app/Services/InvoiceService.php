@@ -11,6 +11,7 @@ use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Models\WorkOrder;
+use App\Notifications\InvoiceIssued;
 use Illuminate\Support\Facades\DB;
 
 class InvoiceService
@@ -85,6 +86,8 @@ class InvoiceService
             );
 
             AuditLog::record($actor, 'invoice.issued', $invoice);
+
+            $invoice->user->notify(new InvoiceIssued($invoice->refresh()));
 
             return $invoice->refresh();
         });

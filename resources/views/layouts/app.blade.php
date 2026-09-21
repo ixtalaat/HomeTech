@@ -86,6 +86,30 @@
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 2 2.9 6.26 6.6.57-5 4.4 1.5 6.47L12 16.9 5.99 19.7l1.5-6.47-5-4.4 6.6-.57L12 2Z"/></svg>
                         <span>Reviews</span>
                     </a>
+
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Reports</p>
+                    </div>
+
+                    <a href="{{ route('admin.reports.revenue') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.reports.revenue') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <span>Revenue</span>
+                    </a>
+
+                    <a href="{{ route('admin.reports.jobs') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.reports.jobs') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <span>Jobs</span>
+                    </a>
+
+                    <a href="{{ route('admin.reports.technicians') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.reports.technicians') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <span>Technicians</span>
+                    </a>
+
+                    <a href="{{ route('admin.reports.inventory') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.reports.inventory') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <span>Inventory</span>
+                    </a>
                 @endif
 
                 <div class="pt-4 pb-1">
@@ -142,6 +166,15 @@
                         {{ $heading ?? 'Your service overview' }}</h1>
                 </div>
                 <div class="flex items-center gap-3">
+                    <a href="{{ route('notifications.index') }}" aria-label="Notifications"
+                        class="relative rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+                        @if(auth()->user()->unreadNotifications()->count() > 0)
+                            <span class="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-extrabold text-white">
+                                {{ auth()->user()->unreadNotifications()->count() }}
+                            </span>
+                        @endif
+                    </a>
                     <a href="{{ route('profile.edit') }}"
                         class="hidden text-sm font-semibold text-slate-500 transition hover:text-slate-900 sm:block">{{ auth()->user()->name }}</a>
                     <form method="POST" action="{{ route('logout') }}">

@@ -2,13 +2,22 @@
 
 namespace Database\Seeders;
 
+use App\Enums\InvoiceStatus;
 use App\Enums\RequestStatus;
 use App\Enums\UserRole;
+use App\Models\Address;
 use App\Models\InventoryItem;
+use App\Models\Invoice;
 use App\Models\MaintenanceRequest;
 use App\Models\Service;
+use App\Models\Technician;
 use App\Models\User;
 use App\Services\InventoryService;
+use App\Services\InvoiceService;
+use App\Services\RequestReviewService;
+use App\Services\TechnicianAssignmentService;
+use App\Services\WorkOrderService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Seeder;
 
 class DemoSeeder extends Seeder
@@ -80,6 +89,112 @@ class DemoSeeder extends Seeder
                 'changed_by' => $customer->id,
             ]);
         }
+
+        $this->stageShowcaseJob($customer, $address);
+    }
+
+    /**
+     * Stage two lively jobs: one in-progress visit with today's appointment
+     * (active jobs, today's jobs, technician portal) and one completed job
+     * with an issued unpaid invoice (unpaid invoices, revenue reports).
+     *
+     * Each stages only when no equivalent exists, so reseeds stay quiet.
+     */
+    private function stageShowcaseJob(User $customer, Address $address): void
+    {
+        $admin = User::where('role', UserRole::Admin)->first();
+        $plumber = Technician::whereHas('user', fn ($query): Builder => $query->where('email', 'ahmed@hometech.com'))->first();
+        $electrician = Technician::whereHas('user', fn ($query): Builder => $query->where('email', 'sara@hometech.com'))->first();
+
+        if ($admin === null || $plumber === null || $electrician === null) {
+            return;
+        }
+
+        $this->stageActiveJob($customer, $address, $admin, $plumber);
+        $this->stageCompletedJob($customer, $address, $admin, $electrician);
+    }
+
+    /**
+     * Stage an in-progress visit with today's appointment.
+     */
+    private function stageActiveJob(User $customer, Address $address, User $admin, Technician $plumber): void
+    {
+        $hasActiveJob = MaintenanceRequest::where('user_id', $customer->id)
+            ->whereIn('status', [
+                RequestStatus::Approved,
+                RequestStatus::TechnicianAssigned,
+                RequestStatus::Scheduled,
+                RequestStatus::TechnicianOnWay,
+                RequestStatus::InProgress,
+                RequestStatus::WaitingCustomerApproval,
+            ])
+            ->exists();
+
+        if ($hasActiveJob) {
+            return;
+        }
+
+        $service = Service::where('slug', 'faucet-tap-repair')->first() ?? Service::first();
+
+        $request = MaintenanceRequest::create([
+            'user_id' => $customer->id,
+            'service_id' => $service->id,
+            'address_id' => $address->id,
+            'description' => 'Kitchen faucet is leaking constantly.',
+            'preferred_date' => now()->addDays(2)->format('Y-m-d'),
+            'preferred_time' => '09:00',
+            'status' => RequestStatus::PendingReview,
+        ]);
+
+        app(RequestReviewService::class)->approve($request->refresh(), $admin, []);
+        app(TechnicianAssignmentService::class)->assign($request->refresh(), $plumber, $admin);
+
+        $request->refresh()->appointment->update(['date' => now()->format('Y-m-d')]);
+
+        $workOrders = app(WorkOrderService::class);
+        $workOrder = $workOrders->startVisit($request->refresh(), $plumber->user);
+        $workOrders->recordDiagnosis($workOrder, $plumber->user, 'Worn faucet cartridge, steady drip.');
+        $workOrders->recordNotes($workOrder, $plumber->user, 'Cartridge replaced, pressure tested, no further leaks.');
+    }
+
+    /**
+     * Stage a completed job with an issued unpaid invoice.
+     */
+    private function stageCompletedJob(User $customer, Address $address, User $admin, Technician $electrician): void
+    {
+        $hasUnpaidInvoice = Invoice::where('user_id', $customer->id)
+            ->whereIn('status', [InvoiceStatus::Issued, InvoiceStatus::PartiallyPaid])
+            ->exists();
+
+        if ($hasUnpaidInvoice) {
+            return;
+        }
+
+        $service = Service::where('slug', 'wall-socket-switch-replacement')->first() ?? Service::first();
+
+        $request = MaintenanceRequest::create([
+            'user_id' => $customer->id,
+            'service_id' => $service->id,
+            'address_id' => $address->id,
+            'description' => 'Living room socket sparks when plugging in.',
+            'preferred_date' => now()->addDays(2)->format('Y-m-d'),
+            'preferred_time' => '14:00',
+            'status' => RequestStatus::PendingReview,
+        ]);
+
+        $workOrders = app(WorkOrderService::class);
+        app(RequestReviewService::class)->approve($request->refresh(), $admin, []);
+        app(TechnicianAssignmentService::class)->assign($request->refresh(), $electrician, $admin);
+
+        $workOrder = $workOrders->startVisit($request->refresh(), $electrician->user);
+        $workOrders->recordDiagnosis($workOrder, $electrician->user, 'Loose wiring in the socket box.');
+        $workOrders->recordNotes($workOrder, $electrician->user, 'Rewired and replaced the socket face.');
+        $workOrders->addLaborItem($workOrder->refresh(), $electrician->user, 'Socket rewiring', 120.00);
+        $workOrders->complete($workOrder->refresh(), $electrician->user);
+
+        $invoices = app(InvoiceService::class);
+        $invoice = $invoices->generate($workOrder->refresh(), $admin);
+        $invoices->issue($invoice, $admin);
     }
 
     /**

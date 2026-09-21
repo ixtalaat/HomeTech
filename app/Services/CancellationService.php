@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\DB;
 
 class CancellationService
 {
-    public function __construct(private RequestStatusService $transitions) {}
+    public function __construct(
+        private RequestStatusService $transitions,
+        private InvoiceService $invoices
+    ) {}
 
     /**
      * Cancel a request per the configurable policy (BR-008).
@@ -60,6 +63,10 @@ class CancellationService
             AuditLog::record($actor, 'request.cancelled', $request->refresh(), [
                 'fee' => $fee,
             ], $reason);
+
+            if ($fee > 0) {
+                $this->invoices->generateForCancellation($cancellation, $actor);
+            }
 
             if ($request->technician !== null && $request->technician->user !== null) {
                 $request->technician->user->notify(new JobCancelled($request->refresh(), $reason));

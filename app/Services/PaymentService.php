@@ -57,12 +57,16 @@ class PaymentService
             if ($invoice->isPaid()) {
                 $invoice->update(['status' => InvoiceStatus::Paid]);
 
-                $this->transitions->transition(
-                    $invoice->request->refresh(),
-                    RequestStatus::Paid,
-                    $actor,
-                    "Invoice {$invoice->number} settled in full."
-                );
+                $request = $invoice->request->refresh();
+
+                if ($request->status === RequestStatus::Invoiced) {
+                    $this->transitions->transition(
+                        $request,
+                        RequestStatus::Paid,
+                        $actor,
+                        "Invoice {$invoice->number} settled in full."
+                    );
+                }
             } else {
                 $invoice->update(['status' => InvoiceStatus::PartiallyPaid]);
             }

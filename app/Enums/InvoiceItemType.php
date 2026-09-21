@@ -8,6 +8,7 @@ enum InvoiceItemType: string
     case Labor = 'labor';
     case Material = 'material';
     case Additional = 'additional';
+    case Fee = 'fee';
 
     /**
      * Get a human-readable label for the type.
@@ -19,6 +20,7 @@ enum InvoiceItemType: string
             self::Labor => 'Labor',
             self::Material => 'Material',
             self::Additional => 'Additional Work',
+            self::Fee => 'Fee',
         };
     }
 }

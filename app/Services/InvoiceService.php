@@ -10,6 +10,7 @@ use App\Enums\RequestStatus;
 use App\Enums\UserRole;
 use App\Exceptions\BillingException;
 use App\Models\AuditLog;
+use App\Models\Cancellation;
 use App\Models\DiscountApproval;
 use App\Models\Invoice;
 use App\Models\User;
@@ -69,7 +70,61 @@ class InvoiceService
     }
 
     /**
+     * Generate a draft fee invoice for a cancellation with a fee.
+     *
+     * Staff may cancel (waive) it like any unpaid invoice.
+     *
+     * @throws BillingException
+     */
+    public function generateForCancellation(Cancellation $cancellation, User $actor): Invoice
+    {
+        $request = $cancellation->request;
+
+        if ((float) $cancellation->fee <= 0) {
+            throw new BillingException('Only cancellations with a fee can be invoiced.');
+        }
+
+        if ($request->invoice !== null) {
+            throw new BillingException("Request #{$request->id} already has invoice {$request->invoice->number}.");
+        }
+
+        return DB::transaction(function () use ($cancellation, $request, $actor): Invoice {
+            $invoice = Invoice::create([
+                'number' => 'PENDING',
+                'maintenance_request_id' => $request->id,
+                'user_id' => $request->user_id,
+                'subtotal' => $cancellation->fee,
+                'total' => $cancellation->fee,
+                'status' => InvoiceStatus::Draft,
+                'created_by' => $actor->id,
+                'notes' => "Cancellation fee: {$cancellation->reason}",
+            ]);
+
+            $invoice->update(['number' => 'INV-'.str_pad((string) $invoice->id, 5, '0', STR_PAD_LEFT)]);
+
+            $invoice->items()->create([
+                'item_type' => InvoiceItemType::Fee,
+                'description' => "Late cancellation fee for request #{$request->id}",
+                'quantity' => 1,
+                'unit_price' => $cancellation->fee,
+                'total' => $cancellation->fee,
+                'source_type' => $cancellation->getMorphClass(),
+                'source_id' => $cancellation->getKey(),
+            ]);
+
+            AuditLog::record($actor, 'invoice.generated', $invoice->refresh(), [
+                'total' => $invoice->total,
+                'cancellation_fee' => true,
+            ]);
+
+            return $invoice->refresh();
+        });
+    }
+
+    /**
      * Issue a draft invoice, making it payable and the request invoiced.
+     *
+     * Cancelled requests stay cancelled — only the invoice moves.
      *
      * @throws BillingException
      */
@@ -82,12 +137,16 @@ class InvoiceService
         return DB::transaction(function () use ($invoice, $actor): Invoice {
             $invoice->update(['status' => InvoiceStatus::Issued, 'issued_at' => now()]);
 
-            $this->transitions->transition(
-                $invoice->request->refresh(),
-                RequestStatus::Invoiced,
-                $actor,
-                "Invoice {$invoice->number} issued."
-            );
+            $request = $invoice->request->refresh();
+
+            if ($request->status === RequestStatus::Completed) {
+                $this->transitions->transition(
+                    $request,
+                    RequestStatus::Invoiced,
+                    $actor,
+                    "Invoice {$invoice->number} issued."
+                );
+            }
 
             AuditLog::record($actor, 'invoice.issued', $invoice);
 

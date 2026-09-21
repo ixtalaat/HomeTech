@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\InvoiceStatus;
 use App\Enums\RequestStatus;
+use App\Enums\WorkOrderStatus;
 use App\Models\Appointment;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
@@ -12,12 +13,101 @@ use App\Models\InvoiceItem;
 use App\Models\MaintenanceRequest;
 use App\Models\Payment;
 use App\Models\Technician;
+use App\Models\User;
 use App\Models\WorkOrder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ReportingService
 {
+    /**
+     * Personal overview for a customer: their active jobs, visits, and balance.
+     *
+     * @return array<string, mixed>
+     */
+    public function customerOverview(User $user): array
+    {
+        $today = now()->format('Y-m-d');
+
+        $activeStatuses = [
+            RequestStatus::Approved,
+            RequestStatus::TechnicianAssigned,
+            RequestStatus::Scheduled,
+            RequestStatus::TechnicianOnWay,
+            RequestStatus::InProgress,
+            RequestStatus::WaitingCustomerApproval,
+        ];
+
+        return [
+            'active_services' => MaintenanceRequest::ownedBy($user->id)->whereIn('status', $activeStatuses)->count(),
+            'upcoming_visits' => Appointment::whereHas('request', fn ($query): Builder => $query->ownedBy($user->id))
+                ->where('date', '>=', $today)
+                ->whereNotIn('status', ['cancelled', 'completed'])
+                ->count(),
+            'completed_jobs' => MaintenanceRequest::ownedBy($user->id)
+                ->whereIn('status', [RequestStatus::Completed, RequestStatus::Invoiced, RequestStatus::Paid, RequestStatus::Closed])
+                ->count(),
+            'outstanding_balance' => (float) Invoice::ownedBy($user->id)->outstanding()
+                ->selectRaw('COALESCE(SUM(total - paid_amount), 0) as total')->value('total'),
+            'recent_requests' => MaintenanceRequest::ownedBy($user->id)
+                ->with(['service', 'appointment'])
+                ->latest()
+                ->limit(5)
+                ->get(),
+        ];
+    }
+
+    /**
+     * Personal overview for a technician: assigned work, visits, completions.
+     *
+     * @return array<string, mixed>
+     */
+    public function technicianOverview(User $user): array
+    {
+        $today = now()->format('Y-m-d');
+        $technician = $user->technician;
+
+        if ($technician === null) {
+            return [
+                'active_jobs' => 0,
+                'upcoming_visits' => 0,
+                'completed_jobs' => 0,
+                'upcoming' => collect(),
+                'assigned' => collect(),
+            ];
+        }
+
+        return [
+            'active_jobs' => MaintenanceRequest::where('technician_id', $technician->id)
+                ->whereIn('status', [RequestStatus::Scheduled, RequestStatus::TechnicianOnWay, RequestStatus::InProgress, RequestStatus::WaitingCustomerApproval])
+                ->count(),
+            'upcoming_visits' => Appointment::forTechnicianOn($technician->id, $today)->blocking()->count()
+                + Appointment::where('technician_id', $technician->id)
+                    ->where('date', '>', $today)
+                    ->blocking()
+                    ->count(),
+            'completed_jobs' => WorkOrder::forTechnician($technician->id)
+                ->where('status', WorkOrderStatus::Completed)
+                ->count(),
+            'upcoming' => Appointment::with(['request.service', 'request.address'])
+                ->where('technician_id', $technician->id)
+                ->where('date', '>=', $today)
+                ->blocking()
+                ->orderBy('date')
+                ->orderBy('start_time')
+                ->limit(5)
+                ->get(),
+            'assigned' => MaintenanceRequest::with(['service', 'appointment'])
+                ->where('technician_id', $technician->id)
+                ->whereIn('status', [RequestStatus::Scheduled, RequestStatus::TechnicianOnWay])
+                ->whereDoesntHave('workOrder')
+                ->latest()
+                ->limit(5)
+                ->get(),
+        ];
+    }
+
     /**
      * Operational overview for the admin dashboard (PRD §25).
      *

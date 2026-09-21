@@ -3,7 +3,7 @@
 use App\Http\Controllers\AdditionalWorkController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DiscountApprovalController;
 use App\Http\Controllers\Admin\InventoryItemController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceRequestController;
@@ -57,9 +58,7 @@ Route::middleware('auth')->group(function (): void {
 });
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
@@ -119,7 +118,7 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function (): void {
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('reports/revenue', [ReportController::class, 'revenue'])->name('reports.revenue');
         Route::get('reports/jobs', [ReportController::class, 'jobs'])->name('reports.jobs');

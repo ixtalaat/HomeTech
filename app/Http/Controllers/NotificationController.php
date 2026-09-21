@@ -33,6 +33,11 @@ class NotificationController extends Controller
 
         $requestId = $notification->data['maintenance_request_id'] ?? null;
 
+        if ($requestId === null && isset($notification->data['invoice_id'])
+            && in_array($request->user()->role, [UserRole::Admin, UserRole::Manager], true)) {
+            return redirect()->route('admin.invoices.show', $notification->data['invoice_id']);
+        }
+
         if ($requestId === null) {
             return redirect()->route('notifications.index');
         }

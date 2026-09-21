@@ -2,15 +2,19 @@
 
 namespace App\Services;
 
+use App\Enums\DiscountApprovalStatus;
 use App\Enums\DiscountType;
 use App\Enums\InvoiceItemType;
 use App\Enums\InvoiceStatus;
 use App\Enums\RequestStatus;
+use App\Enums\UserRole;
 use App\Exceptions\BillingException;
 use App\Models\AuditLog;
+use App\Models\DiscountApproval;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Models\WorkOrder;
+use App\Notifications\DiscountApprovalRequested;
 use App\Notifications\InvoiceIssued;
 use Illuminate\Support\Facades\DB;
 
@@ -100,28 +104,180 @@ class InvoiceService
      */
     public function applyDiscount(Invoice $invoice, User $actor, DiscountType $type, float $value): Invoice
     {
-        if (in_array($invoice->status, [InvoiceStatus::Paid, InvoiceStatus::Cancelled], true)) {
-            throw new BillingException("Cannot discount a {$invoice->status->value} invoice through normal operations.");
-        }
+        $this->guardDiscountable($invoice);
 
         $amount = $this->pricing->discountAmount((float) $invoice->subtotal, $type, $value, $actor);
 
         return DB::transaction(function () use ($invoice, $actor, $type, $value, $amount): Invoice {
-            $invoice->update([
-                'discount_type' => $type,
-                'discount_value' => $value,
-                'discount_amount' => $amount,
-                'total' => round((float) $invoice->subtotal - $amount, 2),
-            ]);
-
-            AuditLog::record($actor, 'invoice.discounted', $invoice->refresh(), [
-                'type' => $type->value,
-                'value' => $value,
-                'amount' => $amount,
-            ]);
+            $this->writeDiscount($invoice, $actor, $type, $value, $amount);
 
             return $invoice->refresh();
         });
+    }
+
+    /**
+     * Apply a discount directly, or queue it for manager approval.
+     *
+     * Returns 'applied' when the discount took effect immediately and
+     * 'queued' when it was sent to managers.
+     *
+     * @throws BillingException
+     */
+    public function applyDiscountOrQueue(Invoice $invoice, User $actor, DiscountType $type, float $value): string
+    {
+        if ($this->needsManagerApproval($invoice, $type, $value) && $actor->role !== UserRole::Manager) {
+            $this->requestDiscountApproval($invoice, $actor, $type, $value);
+
+            return 'queued';
+        }
+
+        $this->applyDiscount($invoice, $actor, $type, $value);
+
+        return 'applied';
+    }
+
+    /**
+     * Determine whether the discount needs manager approval first.
+     */
+    public function needsManagerApproval(Invoice $invoice, DiscountType $type, float $value): bool
+    {
+        return $this->pricing->requiresManagerApproval($type, $value);
+    }
+
+    /**
+     * Queue a high-value discount for manager approval and notify managers.
+     *
+     * @throws BillingException
+     */
+    public function requestDiscountApproval(Invoice $invoice, User $staff, DiscountType $type, float $value): DiscountApproval
+    {
+        $this->guardDiscountable($invoice);
+
+        $this->pricing->computeAmount((float) $invoice->subtotal, $type, $value);
+
+        return DB::transaction(function () use ($invoice, $staff, $type, $value): DiscountApproval {
+            $approval = DiscountApproval::create([
+                'invoice_id' => $invoice->id,
+                'discount_type' => $type,
+                'discount_value' => $value,
+                'status' => DiscountApprovalStatus::Pending,
+                'requested_by' => $staff->id,
+            ]);
+
+            User::where('role', UserRole::Manager)->where('is_active', true)->each(
+                fn (User $manager): mixed => $manager->notify(new DiscountApprovalRequested($approval))
+            );
+
+            AuditLog::record($staff, 'discount.approval_requested', $invoice, [
+                'type' => $type->value,
+                'value' => $value,
+            ]);
+
+            return $approval;
+        });
+    }
+
+    /**
+     * Approve a queued discount (managers only) and apply it.
+     *
+     * @throws BillingException
+     */
+    public function approveDiscountRequest(DiscountApproval $approval, User $manager): Invoice
+    {
+        $this->guardManager($manager);
+
+        if (! $approval->isPending()) {
+            throw new BillingException('This discount request has already been decided.');
+        }
+
+        $invoice = $approval->invoice;
+        $this->guardDiscountable($invoice);
+
+        $type = $approval->discount_type;
+        $value = (float) $approval->discount_value;
+        $amount = $this->pricing->computeAmount((float) $invoice->subtotal, $type, $value);
+
+        return DB::transaction(function () use ($approval, $manager, $invoice, $type, $value, $amount): Invoice {
+            $approval->update([
+                'status' => DiscountApprovalStatus::Approved,
+                'decided_by' => $manager->id,
+                'decided_at' => now(),
+            ]);
+
+            $this->writeDiscount($invoice, $manager, $type, $value, $amount);
+
+            return $invoice->refresh();
+        });
+    }
+
+    /**
+     * Reject a queued discount (managers only).
+     *
+     * @throws BillingException
+     */
+    public function rejectDiscountRequest(DiscountApproval $approval, User $manager): DiscountApproval
+    {
+        $this->guardManager($manager);
+
+        if (! $approval->isPending()) {
+            throw new BillingException('This discount request has already been decided.');
+        }
+
+        $approval->update([
+            'status' => DiscountApprovalStatus::Rejected,
+            'decided_by' => $manager->id,
+            'decided_at' => now(),
+        ]);
+
+        AuditLog::record($manager, 'discount.approval_rejected', $approval->invoice, [
+            'type' => $approval->discount_type->value,
+            'value' => (float) $approval->discount_value,
+        ]);
+
+        return $approval->refresh();
+    }
+
+    /**
+     * Guard that the invoice can still be discounted.
+     *
+     * @throws BillingException
+     */
+    private function guardDiscountable(Invoice $invoice): void
+    {
+        if (in_array($invoice->status, [InvoiceStatus::Paid, InvoiceStatus::Cancelled], true)) {
+            throw new BillingException("Cannot discount a {$invoice->status->value} invoice through normal operations.");
+        }
+    }
+
+    /**
+     * Guard that the actor is a manager.
+     *
+     * @throws BillingException
+     */
+    private function guardManager(User $actor): void
+    {
+        if ($actor->role !== UserRole::Manager) {
+            throw new BillingException('Only managers can decide discount approvals.');
+        }
+    }
+
+    /**
+     * Write discount columns and audit the change.
+     */
+    private function writeDiscount(Invoice $invoice, User $actor, DiscountType $type, float $value, float $amount): void
+    {
+        $invoice->update([
+            'discount_type' => $type,
+            'discount_value' => $value,
+            'discount_amount' => $amount,
+            'total' => round((float) $invoice->subtotal - $amount, 2),
+        ]);
+
+        AuditLog::record($actor, 'invoice.discounted', $invoice->refresh(), [
+            'type' => $type->value,
+            'value' => $value,
+            'amount' => $amount,
+        ]);
     }
 
     /**

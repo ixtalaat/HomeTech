@@ -106,14 +106,14 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Apply a discount to the invoice.
+     * Apply a discount to the invoice, or queue it for manager approval.
      */
     public function discount(ApplyDiscountRequest $request, Invoice $invoice): RedirectResponse
     {
         try {
             $validated = $request->validated();
 
-            $this->invoices->applyDiscount(
+            $outcome = $this->invoices->applyDiscountOrQueue(
                 $invoice,
                 $request->user(),
                 DiscountType::from($validated['discount_type']),
@@ -123,7 +123,9 @@ class InvoiceController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', 'Discount applied successfully.');
+        return back()->with('success', $outcome === 'queued'
+            ? 'Discount sent to managers for approval.'
+            : 'Discount applied successfully.');
     }
 
     /**

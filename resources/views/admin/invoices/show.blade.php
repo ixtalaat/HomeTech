@@ -89,7 +89,7 @@
             @if(! in_array($invoice->status, [\App\Enums\InvoiceStatus::Paid, \App\Enums\InvoiceStatus::Cancelled], true))
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <h3 class="text-sm font-extrabold text-slate-900">Apply Discount</h3>
-                    <p class="mt-1 text-xs text-slate-500">Discounts above 20% or 500 EGP require a manager.</p>
+                    <p class="mt-1 text-xs text-slate-500">Discounts above 20% or 500 EGP require a manager — yours will be queued for approval.</p>
                     <form method="POST" action="{{ route('admin.invoices.discount', $invoice) }}" class="mt-3 space-y-3">
                         @csrf
                         @method('PATCH')

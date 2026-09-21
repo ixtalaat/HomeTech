@@ -4,6 +4,7 @@ use App\Http\Controllers\AdditionalWorkController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DiscountApprovalController;
 use App\Http\Controllers\Admin\InventoryItemController;
 use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\MaintenanceRequestController as AdminMaintenanceRequestController;
@@ -35,13 +36,13 @@ Route::get('/services/{slug}', [ServiceBrowseController::class, 'show'])->name('
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('throttle:30,1')->name('register.store');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('throttle:auth')->name('register.store');
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:30,1')->name('login.store');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:auth')->name('login.store');
     Route::get('/forgot-password', [PasswordResetController::class, 'request'])->name('password.request');
-    Route::post('/forgot-password', [PasswordResetController::class, 'email'])->middleware('throttle:10,1')->name('password.email');
+    Route::post('/forgot-password', [PasswordResetController::class, 'email'])->middleware('throttle:password')->name('password.email');
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'reset'])->name('password.reset');
-    Route::post('/reset-password', [PasswordResetController::class, 'update'])->middleware('throttle:10,1')->name('password.store');
+    Route::post('/reset-password', [PasswordResetController::class, 'update'])->middleware('throttle:password')->name('password.store');
 });
 
 Route::middleware('auth')->group(function (): void {
@@ -140,6 +141,10 @@ Route::middleware(['auth', 'role:admin,manager'])
         Route::patch('invoices/{invoice}/cancel', [AdminInvoiceController::class, 'cancel'])->name('invoices.cancel');
         Route::patch('invoices/{invoice}/close', [AdminInvoiceController::class, 'close'])->name('invoices.close');
         Route::resource('invoices', AdminInvoiceController::class)->only(['index', 'show']);
+
+        Route::get('discount-approvals', [DiscountApprovalController::class, 'index'])->name('discount-approvals.index');
+        Route::patch('discount-approvals/{discountApproval}/approve', [DiscountApprovalController::class, 'approve'])->name('discount-approvals.approve');
+        Route::patch('discount-approvals/{discountApproval}/reject', [DiscountApprovalController::class, 'reject'])->name('discount-approvals.reject');
 
         Route::resource('reviews', AdminReviewController::class)->only(['index']);
     });

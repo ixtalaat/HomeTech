@@ -39,6 +39,22 @@ class PricingService
      */
     public function discountAmount(float $subtotal, DiscountType $type, float $value, User $actor): float
     {
+        $amount = $this->computeAmount($subtotal, $type, $value);
+
+        if ($this->requiresManagerApproval($type, $value) && $actor->role !== UserRole::Manager) {
+            throw new BillingException('This discount requires manager approval.');
+        }
+
+        return $amount;
+    }
+
+    /**
+     * Compute a discount amount with math-only guards (no approval gate).
+     *
+     * @throws BillingException
+     */
+    public function computeAmount(float $subtotal, DiscountType $type, float $value): float
+    {
         if ($value < 0) {
             throw new BillingException('Discount value cannot be negative.');
         }
@@ -53,10 +69,6 @@ class PricingService
 
         if ($amount > $subtotal) {
             throw new BillingException('Discount cannot make the invoice total negative.');
-        }
-
-        if ($this->requiresManagerApproval($type, $value) && $actor->role !== UserRole::Manager) {
-            throw new BillingException('This discount requires manager approval.');
         }
 
         return $amount;

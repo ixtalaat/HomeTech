@@ -111,13 +111,14 @@ it('routes card payments through Stripe and records cash directly', function () 
 
     expect(Payment::count())->toBe(0);
 
-    // Cash → recorded immediately.
+    // Cash → recorded immediately as unconfirmed.
     $this->actingAs($customer)->post(route('invoices.pay', $invoice), [
         'amount' => 100.00,
         'method' => 'cash',
     ])->assertRedirect();
 
-    expect($invoice->refresh()->status)->toBe(InvoiceStatus::PartiallyPaid);
+    expect($invoice->refresh()->status)->toBe(InvoiceStatus::Issued)
+        ->and($invoice->payments()->whereNull('confirmed_at')->count())->toBe(1);
 });
 
 it('settles paid sessions idempotently and refuses the rest', function () {

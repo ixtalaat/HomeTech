@@ -61,7 +61,10 @@
                     @forelse ($invoice->payments as $payment)
                         <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
                             <span class="font-bold text-slate-900">{{ number_format($payment->amount, 2) }} EGP</span>
-                            <span class="text-xs text-slate-400">{{ $payment->method->label() }} · {{ $payment->paid_at?->format('d M Y') }}</span>
+                            <span class="text-xs text-slate-400">
+                                {{ $payment->method->label() }} · {{ $payment->paid_at?->format('d M Y') }}
+                                · {{ $payment->confirmed_at ? 'Confirmed' : 'Awaiting confirmation' }}
+                            </span>
                         </li>
                     @empty
                         <p class="text-sm text-slate-400">No payments yet.</p>

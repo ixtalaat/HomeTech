@@ -22,6 +22,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PhoneVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceBrowseController;
@@ -85,6 +86,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+
+    Route::post('phone/send-code', [PhoneVerificationController::class, 'send'])->name('phone.send-code');
+    Route::post('phone/verify', [PhoneVerificationController::class, 'verify'])->name('phone.verify');
 
     Route::get('files/{path}', [FileController::class, 'show'])->where('path', '.*')->name('files.show');
 });
@@ -156,6 +160,7 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
         Route::patch('invoices/{invoice}/issue', [AdminInvoiceController::class, 'issue'])->name('invoices.issue');
         Route::patch('invoices/{invoice}/discount', [AdminInvoiceController::class, 'discount'])->name('invoices.discount');
         Route::post('invoices/{invoice}/payments', [AdminInvoiceController::class, 'recordPayment'])->name('invoices.payments');
+        Route::patch('payments/{payment}/confirm', [AdminInvoiceController::class, 'confirmPayment'])->name('payments.confirm');
         Route::patch('invoices/{invoice}/cancel', [AdminInvoiceController::class, 'cancel'])->name('invoices.cancel');
         Route::patch('invoices/{invoice}/close', [AdminInvoiceController::class, 'close'])->name('invoices.close');
         Route::resource('invoices', AdminInvoiceController::class)->only(['index', 'show']);

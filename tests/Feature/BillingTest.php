@@ -135,6 +135,14 @@ it('lets owners pay their own invoices', function () {
         'method' => 'cash',
     ])->assertRedirect();
 
+    // Customer cash claims await staff confirmation and move nothing yet.
+    expect($invoice->refresh()->status)->toBe(InvoiceStatus::Issued)
+        ->and($invoice->payments()->whereNull('confirmed_at')->count())->toBe(1);
+
+    $this->actingAs($admin)->patch(
+        route('admin.payments.confirm', $invoice->payments()->first())
+    )->assertRedirect();
+
     expect($invoice->refresh()->status)->toBe(InvoiceStatus::Paid);
 });
 
@@ -154,6 +162,30 @@ it('closes paid invoices and cancels unpaid ones', function () {
     // Paid invoices cannot be cancelled or discounted.
     expect(fn () => $service->cancelInvoice($paid->refresh(), $admin))->toThrow(BillingException::class);
     expect(fn () => $service->applyDiscount($paid->refresh(), User::factory()->create(['role' => UserRole::Manager]), DiscountType::Fixed, 10.00))
+        ->toThrow(BillingException::class);
+});
+
+it('forbids non-staff confirmation and double confirmation', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $customer = User::factory()->create(['role' => UserRole::Customer]);
+    $workOrder = completedWorkOrderWithCharges();
+    $invoice = app(InvoiceService::class)->generate($workOrder, $admin);
+    app(InvoiceService::class)->issue($invoice->refresh(), $admin);
+
+    $payment = app(PaymentService::class)->pay(
+        $invoice->refresh(),
+        50.00,
+        PaymentMethod::Cash,
+        $invoice->user
+    );
+
+    expect($payment->confirmed_at)->toBeNull();
+
+    $this->actingAs($customer)->patch(route('admin.payments.confirm', $payment))->assertForbidden();
+
+    $this->actingAs($admin)->patch(route('admin.payments.confirm', $payment))->assertRedirect();
+
+    expect(fn () => app(PaymentService::class)->confirm($payment->refresh(), $admin))
         ->toThrow(BillingException::class);
 });
 

@@ -109,7 +109,8 @@ class StripeService
                     round(((float) ($session->amount_total ?? 0)) / 100, 2),
                     PaymentMethod::Card,
                     $actor,
-                    $session->id
+                    $session->id,
+                    true
                 );
             } catch (BillingException $exception) {
                 throw new StripeException($exception->getMessage());

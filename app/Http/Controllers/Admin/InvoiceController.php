@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ApplyDiscountRequest;
 use App\Http\Requests\Admin\RecordPaymentRequest;
 use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\WorkOrder;
 use App\Services\InvoiceService;
 use App\Services\PaymentService;
@@ -133,6 +134,8 @@ class InvoiceController extends Controller
      */
     public function recordPayment(RecordPaymentRequest $request, Invoice $invoice): RedirectResponse
     {
+        $this->authorize('manage', $invoice);
+
         try {
             $validated = $request->validated();
 
@@ -148,6 +151,22 @@ class InvoiceController extends Controller
         }
 
         return back()->with('success', 'Payment recorded successfully.');
+    }
+
+    /**
+     * Confirm a customer-recorded payment.
+     */
+    public function confirmPayment(Request $request, Payment $payment): RedirectResponse
+    {
+        $this->authorize('manage', $payment->invoice);
+
+        try {
+            $this->payments->confirm($payment, $request->user());
+        } catch (BillingException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return back()->with('success', 'Payment confirmed and applied to the balance.');
     }
 
     /**

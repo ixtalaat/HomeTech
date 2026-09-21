@@ -65,6 +65,18 @@
                                 <p class="font-bold text-slate-900">{{ number_format($payment->amount, 2) }} EGP</p>
                                 <p class="text-xs text-slate-400">{{ $payment->method->label() }} · {{ $payment->paid_at?->format('d M Y, h:i A') }} · by {{ $payment->receiver->name ?? '—' }}</p>
                             </div>
+                            <div class="flex items-center gap-2">
+                                @if($payment->confirmed_at)
+                                    <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">Confirmed</span>
+                                @else
+                                    <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">Pending</span>
+                                    <form method="POST" action="{{ route('admin.payments.confirm', $payment) }}" class="inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="rounded-lg bg-teal-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-teal-700 transition">Confirm</button>
+                                    </form>
+                                @endif
+                            </div>
                         </li>
                     @empty
                         <p class="text-sm text-slate-400">No payments recorded yet.</p>

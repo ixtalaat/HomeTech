@@ -20,6 +20,8 @@ class Payment extends Model
         'reference',
         'received_by',
         'paid_at',
+        'confirmed_at',
+        'confirmed_by',
         'notes',
     ];
 
@@ -34,6 +36,7 @@ class Payment extends Model
             'amount' => 'decimal:2',
             'method' => PaymentMethod::class,
             'paid_at' => 'datetime',
+            'confirmed_at' => 'datetime',
         ];
     }
 
@@ -55,5 +58,23 @@ class Payment extends Model
     public function receiver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'received_by');
+    }
+
+    /**
+     * Get the staff member who confirmed the payment.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function confirmer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    /**
+     * Determine whether the payment counts toward the balance.
+     */
+    public function isConfirmed(): bool
+    {
+        return $this->confirmed_at !== null;
     }
 }

@@ -34,7 +34,7 @@ class WorkOrderService
      */
     public function startVisit(MaintenanceRequest $request, User $actor): WorkOrder
     {
-        if ($request->status !== RequestStatus::Scheduled) {
+        if (! in_array($request->status, [RequestStatus::Scheduled, RequestStatus::TechnicianOnWay], true)) {
             throw new WorkOrderException("Cannot start the visit for request #{$request->id} with status '{$request->status->value}'.");
         }
 

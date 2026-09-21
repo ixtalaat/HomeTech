@@ -250,7 +250,7 @@ class MaintenanceRequestController extends Controller
     public function cancelAppointment(Request $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
     {
         abort_unless($request->user()->can('manageAppointment', $maintenanceRequest), 403);
-        abort_unless($maintenanceRequest->status === RequestStatus::Scheduled && $maintenanceRequest->appointment !== null, 404);
+        abort_unless(in_array($maintenanceRequest->status, [RequestStatus::Scheduled, RequestStatus::TechnicianOnWay], true) && $maintenanceRequest->appointment !== null, 404);
 
         $this->scheduling->cancel($maintenanceRequest->appointment, $request->user());
 

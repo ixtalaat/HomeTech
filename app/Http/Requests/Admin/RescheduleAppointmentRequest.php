@@ -19,7 +19,7 @@ class RescheduleAppointmentRequest extends FormRequest
         return $this->user() !== null
             && in_array($this->user()->role, [UserRole::Admin, UserRole::Manager], true)
             && $request instanceof MaintenanceRequest
-            && $request->status === RequestStatus::Scheduled
+            && in_array($request->status, [RequestStatus::Scheduled, RequestStatus::TechnicianOnWay], true)
             && $request->appointment !== null
             && ! $request->appointment->isCancelled();
     }

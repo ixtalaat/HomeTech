@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Notifications\AppointmentChanged;
 use App\Notifications\JobCancelled;
 use App\Notifications\JobRescheduled;
+use App\Notifications\TechnicianOnWay;
 use Illuminate\Support\Facades\DB;
 
 class SchedulingService
@@ -130,6 +131,39 @@ class SchedulingService
             );
 
             return $appointment->refresh();
+        });
+    }
+
+    /**
+     * Mark the technician as on the way, notifying the customer.
+     *
+     * @throws SchedulingConflictException
+     */
+    public function markOnWay(MaintenanceRequest $request, User $technicianUser): MaintenanceRequest
+    {
+        if ($request->status !== RequestStatus::Scheduled) {
+            throw new SchedulingConflictException('Only a scheduled job can be marked as on the way.');
+        }
+
+        if ($request->technician === null || $request->technician->user_id !== $technicianUser->id) {
+            throw new SchedulingConflictException('Only the assigned technician can mark this job as on the way.');
+        }
+
+        if ($request->appointment === null || $request->appointment->isCancelled()) {
+            throw new SchedulingConflictException('There is no active appointment for this job.');
+        }
+
+        return DB::transaction(function () use ($request, $technicianUser): MaintenanceRequest {
+            $this->transitions->transition(
+                $request->refresh(),
+                RequestStatus::TechnicianOnWay,
+                $technicianUser,
+                "Technician {$technicianUser->name} is on the way."
+            );
+
+            $request->user->notify(new TechnicianOnWay($request->refresh()));
+
+            return $request->refresh();
         });
     }
 

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TechnicianController;
 use App\Http\Controllers\Admin\WorkOrderController as AdminWorkOrderController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MaintenanceRequestController;
@@ -34,9 +35,13 @@ Route::get('/services/{slug}', [ServiceBrowseController::class, 'show'])->name('
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.store');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->middleware('throttle:30,1')->name('register.store');
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:30,1')->name('login.store');
+    Route::get('/forgot-password', [PasswordResetController::class, 'request'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'email'])->middleware('throttle:10,1')->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'reset'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'update'])->middleware('throttle:10,1')->name('password.store');
 });
 
 Route::middleware('auth')->group(function (): void {
@@ -76,6 +81,7 @@ Route::middleware(['auth', 'role:technician'])
         Route::get('jobs', [TechnicianWorkOrderController::class, 'index'])->name('jobs.index');
         Route::get('jobs/{workOrder}', [TechnicianWorkOrderController::class, 'show'])->name('jobs.show');
         Route::post('jobs/requests/{maintenanceRequest}/start', [TechnicianWorkOrderController::class, 'start'])->name('jobs.start');
+        Route::post('jobs/requests/{maintenanceRequest}/on-way', [TechnicianWorkOrderController::class, 'onWay'])->name('jobs.on-way');
         Route::patch('jobs/{workOrder}/diagnosis', [TechnicianWorkOrderController::class, 'recordDiagnosis'])->name('jobs.diagnosis');
         Route::patch('jobs/{workOrder}/notes', [TechnicianWorkOrderController::class, 'recordNotes'])->name('jobs.notes');
         Route::post('jobs/{workOrder}/labor', [TechnicianWorkOrderController::class, 'addLabor'])->name('jobs.labor');

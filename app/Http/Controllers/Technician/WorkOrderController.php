@@ -6,6 +6,7 @@ use App\Enums\RequestStatus;
 use App\Exceptions\AdditionalWorkException;
 use App\Exceptions\CompletedWorkOrderException;
 use App\Exceptions\InsufficientStockException;
+use App\Exceptions\SchedulingConflictException;
 use App\Exceptions\WorkOrderException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Technician\RecordDiagnosisRequest;
@@ -19,6 +20,7 @@ use App\Models\InventoryItem;
 use App\Models\MaintenanceRequest;
 use App\Models\WorkOrder;
 use App\Services\AdditionalWorkService;
+use App\Services\SchedulingService;
 use App\Services\WorkOrderService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -31,7 +33,8 @@ class WorkOrderController extends Controller
 
     public function __construct(
         private WorkOrderService $workOrders,
-        private AdditionalWorkService $additionalWork
+        private AdditionalWorkService $additionalWork,
+        private SchedulingService $scheduling
     ) {}
 
     /**
@@ -47,7 +50,7 @@ class WorkOrderController extends Controller
 
         $awaitingStart = MaintenanceRequest::with(['service', 'address', 'appointment'])
             ->where('technician_id', $technician->id)
-            ->where('status', RequestStatus::Scheduled)
+            ->whereIn('status', [RequestStatus::Scheduled, RequestStatus::TechnicianOnWay])
             ->whereDoesntHave('workOrder')
             ->latest()
             ->get();
@@ -95,6 +98,26 @@ class WorkOrderController extends Controller
         return redirect()
             ->route('technician.jobs.show', $workOrder)
             ->with('success', 'Visit started. The job is now in progress.');
+    }
+
+    /**
+     * Mark the technician as on the way to the job.
+     */
+    public function onWay(Request $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        abort_unless(
+            $maintenanceRequest->technician !== null
+                && $maintenanceRequest->technician->user_id === $request->user()->id,
+            404
+        );
+
+        try {
+            $this->scheduling->markOnWay($maintenanceRequest, $request->user());
+        } catch (SchedulingConflictException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return back()->with('success', 'Customer notified that you are on the way.');
     }
 
     /**

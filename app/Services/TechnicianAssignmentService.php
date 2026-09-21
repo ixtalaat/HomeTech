@@ -118,7 +118,7 @@ class TechnicianAssignmentService
      */
     public function unassign(MaintenanceRequest $request, ?User $actor = null): MaintenanceRequest
     {
-        if (! in_array($request->status, [RequestStatus::TechnicianAssigned, RequestStatus::Scheduled], true)) {
+        if (! in_array($request->status, [RequestStatus::TechnicianAssigned, RequestStatus::Scheduled, RequestStatus::TechnicianOnWay], true)) {
             throw new TechnicianAssignmentException('Only an assigned request can be unassigned.');
         }
 

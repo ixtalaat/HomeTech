@@ -186,7 +186,7 @@
                 </div>
             @endif
 
-            @if($maintenanceRequest->status === \App\Enums\RequestStatus::Scheduled && $maintenanceRequest->appointment)
+            @if(in_array($maintenanceRequest->status, [\App\Enums\RequestStatus::Scheduled, \App\Enums\RequestStatus::TechnicianOnWay], true) && $maintenanceRequest->appointment)
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <h3 class="text-sm font-extrabold text-slate-900">Appointment</h3>
                     <p class="mt-2 text-sm font-semibold text-slate-900">

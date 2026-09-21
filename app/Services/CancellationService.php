@@ -113,6 +113,7 @@ class CancellationService
             RequestStatus::Approved,
             RequestStatus::TechnicianAssigned,
             RequestStatus::Scheduled,
+            RequestStatus::TechnicianOnWay,
         ];
     }
 }

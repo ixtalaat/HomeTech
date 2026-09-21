@@ -56,7 +56,7 @@ class MaintenanceRequestPolicy
     public function manageAppointment(User $user, MaintenanceRequest $request): bool
     {
         return $this->isStaff($user)
-            && in_array($request->status, [RequestStatus::Approved, RequestStatus::TechnicianAssigned, RequestStatus::Scheduled], true);
+            && in_array($request->status, [RequestStatus::Approved, RequestStatus::TechnicianAssigned, RequestStatus::Scheduled, RequestStatus::TechnicianOnWay], true);
     }
 
     /**

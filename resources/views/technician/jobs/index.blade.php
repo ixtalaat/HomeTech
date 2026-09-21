@@ -22,6 +22,14 @@
                         @csrf
                         <button type="submit" class="primary-button w-full text-xs">Start Visit</button>
                     </form>
+                    @if($maintenanceRequest->status === \App\Enums\RequestStatus::Scheduled)
+                        <form method="POST" action="{{ route('technician.jobs.on-way', $maintenanceRequest) }}" class="mt-2">
+                            @csrf
+                            <button type="submit" class="secondary-button w-full text-xs">I'm On The Way</button>
+                        </form>
+                    @else
+                        <p class="mt-2 text-center text-xs font-bold text-teal-700">En route — customer notified</p>
+                    @endif
                 </div>
             @endforeach
         </div>

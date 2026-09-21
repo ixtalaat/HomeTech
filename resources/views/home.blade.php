@@ -16,10 +16,18 @@
 <body class="bg-slate-50 text-slate-900 antialiased">
     <header class="relative z-10 border-b border-slate-200/80 bg-white/90 px-5 py-6 backdrop-blur sm:px-8 lg:px-12"><div class="mx-auto flex max-w-7xl items-center justify-between">
         <a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo /></a>
-        <nav class="flex items-center gap-3 text-sm font-bold">
+        <nav class="flex items-center gap-3 text-sm font-bold" aria-label="Home navigation">
             <a href="{{ route('services.index') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700">Browse Services</a>
-            <a href="{{ route('login') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950">Sign in</a>
-            <a href="{{ route('register') }}" class="primary-button">Get started <span aria-hidden="true">→</span></a>
+            @auth
+                <a href="{{ route('dashboard') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950">Dashboard</a>
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="primary-button">Log out <span aria-hidden="true">→</span></button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950">Sign in</a>
+                <a href="{{ route('register') }}" class="primary-button">Get started <span aria-hidden="true">→</span></a>
+            @endauth
         </nav></div>
     </header>
     <main class="relative overflow-hidden bg-slate-50">
@@ -37,8 +45,9 @@
                     A better home starts with <span class="text-teal-600">better care.</span></h1>
                 <p class="mt-7 max-w-xl text-lg leading-8 text-slate-600">Book trusted maintenance, keep track of every
                     visit, and get back to enjoying your home — without the hassle.</p>
-                <div class="mt-9 flex-col gap-3 sm:flex-row"><a href="{{ route('register') }}"
-                        class="primary-button px-6 py-3.5">Create a free account <span aria-hidden="true">→</span></a><a
+                <div class="mt-9 flex-col gap-3 sm:flex-row">@auth<a href="{{ route('dashboard') }}"
+                        class="primary-button px-6 py-3.5">Go to dashboard <span aria-hidden="true">→</span></a>@else<a href="{{ route('register') }}"
+                        class="primary-button px-6 py-3.5">Create a free account <span aria-hidden="true">→</span></a>@endauth<a
                         href="#how-it-works"
                         class="inline-flex items-center justify-center rounded-xl border-slate-300 bg-white px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-teal-300 hover:bg-teal-50">How
                         it works</a></div>

@@ -22,6 +22,7 @@ class Technician extends Model
      */
     protected $fillable = [
         'user_id',
+        'branch_id',
         'phone',
         'emergency_contact',
         'is_active',
@@ -60,6 +61,26 @@ class Technician extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(ServiceCategory::class, 'category_technician')->withTimestamps();
+    }
+
+    /**
+     * Get the branch the technician belongs to.
+     *
+     * @return BelongsTo<Branch, $this>
+     */
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    /**
+     * Get the weekly work schedule rows for the technician.
+     *
+     * @return HasMany<TechnicianSchedule, $this>
+     */
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(TechnicianSchedule::class);
     }
 
     /**

@@ -5,11 +5,13 @@ namespace Database\Seeders;
 use App\Enums\RequestStatus;
 use App\Enums\UserRole;
 use App\Models\Address;
+use App\Models\Branch;
 use App\Models\InventoryItem;
 use App\Models\Invoice;
 use App\Models\MaintenanceRequest;
 use App\Models\Service;
 use App\Models\Technician;
+use App\Models\TechnicianSchedule;
 use App\Models\User;
 use App\Services\InventoryService;
 use App\Services\InvoiceService;
@@ -27,6 +29,8 @@ class DemoSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->backfillBranchesAndSchedules();
+
         $inventory = app(InventoryService::class);
         $manager = User::where('role', UserRole::Manager)->first()
             ?? User::where('role', UserRole::Admin)->first();
@@ -92,6 +96,27 @@ class DemoSeeder extends Seeder
         }
 
         $this->stageShowcaseJob($customer, $address);
+    }
+
+    /**
+     * Link legacy demo technicians to the Cairo branch and give every
+     * technician without one the default weekly schedule, so automatic
+     * assignment has coverage on reseeded environments.
+     */
+    private function backfillBranchesAndSchedules(): void
+    {
+        $branch = Branch::firstOrCreate(
+            ['name' => 'Cairo'],
+            ['priority' => 10, 'is_active' => true]
+        );
+
+        foreach (Technician::whereNull('branch_id')->get() as $technician) {
+            $technician->update(['branch_id' => $branch->id]);
+        }
+
+        foreach (Technician::whereDoesntHave('schedules')->get() as $technician) {
+            $technician->schedules()->createMany(TechnicianSchedule::defaultWeek());
+        }
     }
 
     /**

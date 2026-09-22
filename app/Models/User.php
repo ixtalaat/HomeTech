@@ -112,6 +112,29 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the branch this user manages, if any.
+     *
+     * @return HasOne<Branch, $this>
+     */
+    public function managedBranch(): HasOne
+    {
+        return $this->hasOne(Branch::class, 'manager_user_id');
+    }
+
+    /**
+     * Determine whether the user is confined to branch scope.
+     *
+     * Managers are one role: assignment decides scope. A manager running an
+     * active branch works inside their branch area only.
+     */
+    public function isBranchScoped(): bool
+    {
+        return $this->role === UserRole::Manager
+            && $this->managedBranch !== null
+            && $this->managedBranch->is_active;
+    }
+
+    /**
      * Scope a query to only include customers.
      *
      * @param  Builder<$this>  $query

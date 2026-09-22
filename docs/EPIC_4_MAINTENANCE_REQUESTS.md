@@ -94,7 +94,7 @@ Single choke point for all status changes (mirrors the `AddressService` pattern)
 ### Admin / Manager Routes (`auth` + `role:admin,manager`, `admin.` prefix):
 - `GET /admin/requests` (`admin.requests.index`) — List with status filter + customer/description search.
 - `GET /admin/requests/{maintenanceRequest}` (`admin.requests.show`) — Review page: details, photos, appointment editor, review actions, history.
-- `PATCH /admin/requests/{maintenanceRequest}/approve` — Approve (+ optional note/appointment change).
+- `PATCH /admin/requests/{maintenanceRequest}/approve` — Approve (+ optional note/appointment change), then attempts automatic technician assignment: success flashes the assignee, otherwise the request stays approved/unassigned with the reason flashed (see `docs/BRANCHES_AUTO_ASSIGNMENT.md`).
 - `PATCH /admin/requests/{maintenanceRequest}/reject` — Reject (reason required).
 - `PATCH /admin/requests/{maintenanceRequest}/request-info` — Move to `info_requested` (note required).
 - `PATCH /admin/requests/{maintenanceRequest}/appointment` — Change preferred date/time (future-only, reviewable requests only).

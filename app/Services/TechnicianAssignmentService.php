@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Enums\AppointmentStatus;
 use App\Enums\RequestStatus;
 use App\Exceptions\TechnicianAssignmentException;
+use App\Models\Appointment;
+use App\Models\Branch;
+use App\Models\City;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
 use App\Models\User;
@@ -13,10 +16,17 @@ use App\Notifications\TechnicianAssignedToRequest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
 
 class TechnicianAssignmentService
 {
+    /**
+     * Maximum maintenance requests a technician handles per day (BR-011).
+     */
+    public const MAX_DAILY_REQUESTS = 2;
+
     public function __construct(
         private RequestStatusService $transitions,
         private SchedulingService $scheduling
@@ -145,19 +155,300 @@ class TechnicianAssignmentService
     /**
      * Get technicians eligible for the given request (active + skilled for its category).
      *
+     * Pass a branch to restrict the list to its technicians.
+     *
      * @return Collection<int, Technician>
      */
-    public function eligibleFor(MaintenanceRequest $request): Collection
+    public function eligibleFor(MaintenanceRequest $request, ?Branch $branch = null): Collection
     {
         $categoryId = $request->service->service_category_id;
 
         return Technician::active()
+            ->when($branch !== null, fn ($query): Builder => $query->where('technicians.branch_id', $branch->id))
             ->whereHas('user', fn ($query): Builder => $query->where('is_active', true))
             ->whereHas('categories', fn ($query): Builder => $query->where('service_categories.id', $categoryId))
             ->with('user')
             ->withCount('assignedRequests')
             ->orderBy('assigned_requests_count')
             ->get();
+    }
+
+    /**
+     * Automatically assign the best available technician for an approved request.
+     *
+     * The preferred slot drives the search: city branch first, then other
+     * active branches by priority (explicit cross-branch fallback). Within a
+     * branch, technicians rank by daily load, then total workload, then id —
+     * so work spreads fairly and the pick is deterministic.
+     *
+     * Returns the assigned technician, or a human-readable reason when nobody
+     * qualifies. The request stays approved and unassigned in that case.
+     *
+     * @return array{technician: ?Technician, reason: ?string}
+     *
+     * @throws TechnicianAssignmentException
+     */
+    public function autoAssign(MaintenanceRequest $request, ?User $actor = null): array
+    {
+        if ($request->status !== RequestStatus::Approved) {
+            throw new TechnicianAssignmentException(
+                "Cannot auto-assign request #{$request->id} with status '{$request->status->value}'. Only approved requests can be assigned."
+            );
+        }
+
+        [$date, $start, $end] = $this->resolveSlot($request, []);
+
+        if ($date <= now()->format('Y-m-d')) {
+            return [
+                'technician' => null,
+                'reason' => "The preferred slot ({$date} {$start}) is in the past. Update it before assigning.",
+            ];
+        }
+
+        $city = $request->address !== null ? City::normalize((string) $request->address->city) : '';
+
+        if ($city === '') {
+            return [
+                'technician' => null,
+                'reason' => "Request #{$request->id} has no service city. Automatic assignment needs an address city.",
+            ];
+        }
+
+        $branches = $this->candidateBranches($city);
+
+        if ($branches === []) {
+            return [
+                'technician' => null,
+                'reason' => "No branch serves the city '{$city}'.",
+            ];
+        }
+
+        $skips = ['off_duty' => 0, 'outside_hours' => 0, 'conflict' => 0, 'daily_limit' => 0];
+
+        return DB::transaction(function () use ($request, $actor, $branches, $city, $date, $start, $end, &$skips): array {
+            foreach ($branches as $branch) {
+                $ranked = $this->rankedCandidates($request, $branch->id, $date, $start, $end, $skips);
+
+                if ($ranked->isEmpty()) {
+                    continue;
+                }
+
+                // Serialize concurrent assignments on the candidate rows, then
+                // re-verify under the locks with current reads before booking.
+                $locked = Technician::whereIn('id', $ranked->pluck('id'))->lockForUpdate()->orderBy('id')->get()->keyBy('id');
+
+                foreach ($ranked as $candidate) {
+                    $technician = $locked->get($candidate->id);
+
+                    if ($technician === null) {
+                        continue;
+                    }
+
+                    if ($this->dailyLoad($technician->id, $date) >= self::MAX_DAILY_REQUESTS) {
+                        $skips['daily_limit']++;
+
+                        continue;
+                    }
+
+                    if ($this->hasConflictLocked($technician->id, $date, $start, $end)) {
+                        $skips['conflict']++;
+
+                        continue;
+                    }
+
+                    try {
+                        $assigned = $this->assign($request->refresh(), $technician, $actor);
+                    } catch (TechnicianAssignmentException) {
+                        $skips['conflict']++;
+
+                        continue;
+                    }
+
+                    return ['technician' => $assigned->technician, 'reason' => null];
+                }
+            }
+
+            return ['technician' => null, 'reason' => $this->failureReason($request, $branches, $city, $date, $start, $end, $skips)];
+        });
+    }
+
+    /**
+     * Determine whether the technician can take the given slot.
+     *
+     * All four gates must hold: a working-day schedule covering the window,
+     * no overlapping appointment, and room under the daily limit.
+     */
+    public function isAvailableForSlot(Technician $technician, string $date, string $start, string $end): bool
+    {
+        $dayOfWeek = Carbon::parse($date)->dayOfWeek;
+
+        $schedule = $technician->relationLoaded('schedules')
+            ? $technician->schedules->firstWhere('day_of_week', $dayOfWeek)
+            : $technician->schedules()->where('day_of_week', $dayOfWeek)->first();
+
+        if ($schedule === null || ! $schedule->covers($start, $end)) {
+            return false;
+        }
+
+        if ($this->dailyLoad($technician->id, $date) >= self::MAX_DAILY_REQUESTS) {
+            return false;
+        }
+
+        return ! $this->scheduling->hasConflict($technician->id, $date, $start, $end);
+    }
+
+    /**
+     * Count the technician's calendar-blocking appointments on a date.
+     */
+    public function dailyLoad(int $technicianId, string $date): int
+    {
+        return Appointment::forTechnicianOn($technicianId, $date)->blocking()->count();
+    }
+
+    /**
+     * Order the branches that may serve a city: its own active branch first,
+     * then every other active branch by priority (explicit fallback).
+     *
+     * @return array<int, Branch>
+     */
+    private function candidateBranches(string $city): array
+    {
+        $home = City::where('name', $city)->first()?->branch;
+
+        if ($home !== null && ! $home->is_active) {
+            $home = null;
+        }
+
+        $fallbacks = Branch::where('is_active', true)
+            ->when($home !== null, fn ($query): Builder => $query->whereKeyNot($home->id))
+            ->orderByDesc('priority')
+            ->orderBy('id')
+            ->get()
+            ->all();
+
+        return $home !== null ? [$home, ...$fallbacks] : $fallbacks;
+    }
+
+    /**
+     * Rank skilled, in-branch technicians for the slot: daily load, then
+     * total workload, then id. Skipped technicians feed the failure reason.
+     *
+     * @param  array{off_duty: int, outside_hours: int, conflict: int, daily_limit: int}  $skips
+     * @return BaseCollection<int, Technician>
+     */
+    private function rankedCandidates(
+        MaintenanceRequest $request,
+        int $branchId,
+        string $date,
+        string $start,
+        string $end,
+        array &$skips
+    ): BaseCollection {
+        $dayOfWeek = Carbon::parse($date)->dayOfWeek;
+        $categoryId = $request->service->service_category_id;
+
+        $technicians = Technician::active()
+            ->where('technicians.branch_id', $branchId)
+            ->whereHas('user', fn ($query): Builder => $query->where('is_active', true))
+            ->whereHas('categories', fn ($query): Builder => $query->where('service_categories.id', $categoryId))
+            ->with(['user', 'schedules' => fn (HasMany $query) => $query->where('day_of_week', $dayOfWeek)])
+            ->withCount('assignedRequests')
+            ->get();
+
+        $ranked = collect();
+
+        foreach ($technicians as $technician) {
+            $schedule = $technician->schedules->firstWhere('day_of_week', $dayOfWeek);
+
+            if ($schedule === null || ! $schedule->is_working) {
+                $skips['off_duty']++;
+
+                continue;
+            }
+
+            if (! $schedule->covers($start, $end)) {
+                $skips['outside_hours']++;
+
+                continue;
+            }
+
+            if ($this->dailyLoad($technician->id, $date) >= self::MAX_DAILY_REQUESTS) {
+                $skips['daily_limit']++;
+
+                continue;
+            }
+
+            if ($this->scheduling->hasConflict($technician->id, $date, $start, $end)) {
+                $skips['conflict']++;
+
+                continue;
+            }
+
+            $ranked->push($technician);
+        }
+
+        $loads = [];
+
+        foreach ($ranked as $technician) {
+            $loads[$technician->id] = $this->dailyLoad($technician->id, $date);
+        }
+
+        return $ranked
+            ->sortBy([
+                fn (Technician $a, Technician $b): int => $loads[$a->id] <=> $loads[$b->id],
+                fn (Technician $a, Technician $b): int => $a->assigned_requests_count <=> $b->assigned_requests_count,
+                fn (Technician $a, Technician $b): int => $a->id <=> $b->id,
+            ]);
+    }
+
+    /**
+     * Overlap check with a locking read, so concurrent assignments serialize
+     * on fresh data instead of transaction snapshots.
+     */
+    private function hasConflictLocked(int $technicianId, string $date, string $start, string $end): bool
+    {
+        return Appointment::forTechnicianOn($technicianId, $date)
+            ->blocking()
+            ->overlapping($start, $end)
+            ->lockForUpdate()
+            ->exists();
+    }
+
+    /**
+     * Compose the human-readable reason shown when nobody qualifies.
+     *
+     * @param  array<int, Branch>  $branches
+     * @param  array{off_duty: int, outside_hours: int, conflict: int, daily_limit: int}  $skips
+     */
+    private function failureReason(
+        MaintenanceRequest $request,
+        array $branches,
+        string $city,
+        string $date,
+        string $start,
+        string $end,
+        array $skips
+    ): string {
+        $names = collect($branches)->map(fn (Branch $branch): string => "'{$branch->name}'")->implode(', ');
+
+        $causes = [
+            'off duty' => $skips['off_duty'],
+            'outside working hours' => $skips['outside_hours'],
+            'with conflicting appointments' => $skips['conflict'],
+            'at the daily limit of '.self::MAX_DAILY_REQUESTS => $skips['daily_limit'],
+        ];
+
+        $parts = [];
+
+        foreach ($causes as $label => $count) {
+            if ($count > 0) {
+                $parts[] = "{$count} {$label}";
+            }
+        }
+
+        $detail = $parts === [] ? 'no skilled technicians on record' : implode(', ', $parts);
+
+        return "No available technician in {$names} for {$city} on {$date} {$start}–{$end}: {$detail}.";
     }
 
     /**

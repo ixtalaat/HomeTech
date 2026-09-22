@@ -6,6 +6,7 @@ use App\Enums\InvoiceStatus;
 use App\Enums\RequestStatus;
 use App\Enums\WorkOrderStatus;
 use App\Models\Appointment;
+use App\Models\Branch;
 use App\Models\InventoryItem;
 use App\Models\InventoryMovement;
 use App\Models\Invoice;
@@ -127,6 +128,7 @@ class ReportingService
             'outstanding_total' => (float) Invoice::outstanding()->selectRaw('COALESCE(SUM(total - paid_amount), 0) as total')->value('total'),
             'low_stock_count' => InventoryItem::lowStock()->count(),
             'low_stock_items' => InventoryItem::lowStock()->with('translations')->orderBy('current_stock')->limit(5)->get(),
+            'unmanaged_branches' => Branch::whereNull('manager_user_id')->where('is_active', true)->orderBy('name')->limit(5)->get(['id', 'name']),
             'upcoming_appointments' => Appointment::with(['request.service.translations', 'request.service.category', 'technician.user'])
                 ->where('date', '>=', $today)
                 ->whereNotIn('status', ['cancelled', 'completed'])

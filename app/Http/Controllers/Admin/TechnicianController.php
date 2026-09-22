@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreTechnicianRequest;
 use App\Http\Requests\Admin\UpdateTechnicianRequest;
+use App\Models\Branch;
 use App\Models\ServiceCategory;
 use App\Models\Technician;
 use App\Services\TechnicianService;
@@ -40,8 +41,9 @@ class TechnicianController extends Controller
         $this->authorize('create', Technician::class);
 
         $categories = ServiceCategory::orderBy('name')->get();
+        $branches = Branch::where('is_active', true)->orderByDesc('priority')->orderBy('name')->get();
 
-        return view('admin.technicians.create', compact('categories'));
+        return view('admin.technicians.create', compact('categories', 'branches'));
     }
 
     /**
@@ -63,7 +65,7 @@ class TechnicianController extends Controller
     {
         $this->authorize('view', $technician);
 
-        $technician->load(['user', 'categories', 'assignedRequests' => fn ($query): HasMany => $query->latest()->limit(10)]);
+        $technician->load(['user', 'categories', 'branch', 'schedules', 'assignedRequests' => fn ($query): HasMany => $query->latest()->limit(10)]);
 
         return view('admin.technicians.show', compact('technician'));
     }
@@ -77,8 +79,9 @@ class TechnicianController extends Controller
 
         $technician->load(['user', 'categories']);
         $categories = ServiceCategory::orderBy('name')->get();
+        $branches = Branch::where('is_active', true)->orderByDesc('priority')->orderBy('name')->get();
 
-        return view('admin.technicians.edit', compact('technician', 'categories'));
+        return view('admin.technicians.edit', compact('technician', 'categories', 'branches'));
     }
 
     /**

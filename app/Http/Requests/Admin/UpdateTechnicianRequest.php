@@ -33,6 +33,7 @@ class UpdateTechnicianRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:2000'],
             'hired_at' => ['nullable', 'date'],
             'is_active' => ['sometimes', 'boolean'],
+            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
             'skills' => ['nullable', 'array'],
             'skills.*' => ['integer', 'exists:service_categories,id'],
         ];

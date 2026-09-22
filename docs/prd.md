@@ -150,6 +150,21 @@ Managers can:
 - Approve high-value adjustments or discounts.
 - Review authorized corrections to completed jobs.
 
+## 4.5 Branch Manager
+
+Each branch has at most one active Branch Manager, and a Branch Manager
+manages at most one branch at a time. Super Admins assign, change, or
+remove them per branch.
+
+Branch Managers can, strictly within their own branch:
+
+- View the branch performance dashboard.
+- Manage branch technicians and their work schedules.
+- Review maintenance requests and assign technicians.
+- View branch appointments.
+
+They cannot access other branches' data or the global admin areas.
+
 ---
 
 # 5. Core Business Concepts
@@ -162,6 +177,9 @@ The main business entities are:
 - Service
 - Technician
 - Technician Skill
+- Technician Schedule
+- Branch
+- City
 - Maintenance Request
 - Appointment
 - Work Order

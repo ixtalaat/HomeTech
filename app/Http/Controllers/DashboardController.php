@@ -22,6 +22,10 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        if ($user->isBranchScoped()) {
+            return redirect()->route('branch.dashboard');
+        }
+
         if (in_array($user->role, [UserRole::Admin, UserRole::Manager], true)) {
             return redirect()->route('admin.dashboard');
         }

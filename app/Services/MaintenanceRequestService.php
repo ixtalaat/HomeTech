@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\RequestStatus;
 use App\Models\Address;
+use App\Models\Branch;
 use App\Models\MaintenanceRequest;
 use App\Models\Service;
 use App\Models\User;
@@ -37,12 +38,19 @@ class MaintenanceRequestService
     /**
      * Paginate all requests for staff review with optional filters.
      *
+     * Pass a branch to scope the listing to its served cities.
+     *
      * @param  array{search?: ?string, status?: ?string}  $filters
      * @return LengthAwarePaginator<int, MaintenanceRequest>
      */
-    public function paginateForAdmin(array $filters): LengthAwarePaginator
+    public function paginateForAdmin(array $filters, ?Branch $branch = null): LengthAwarePaginator
     {
         $query = MaintenanceRequest::with(['user', 'service', 'address'])->latest();
+
+        if ($branch !== null) {
+            $cities = $branch->cities()->pluck('name');
+            $query->whereHas('address', fn ($address) => $address->whereIn('city', $cities->all()));
+        }
 
         if (! empty($filters['status'])) {
             $status = RequestStatus::tryFrom($filters['status']);

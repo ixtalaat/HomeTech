@@ -21,7 +21,7 @@ Controllers never query-filter, never transact, never compute money, never send 
 ```
 register/login (Auth) ──► profile, addresses
 services (public catalog) ──► requests.store → pending_review
-admin.requests.{approve} → approved
+admin.requests.{approve} → approved (+ best-effort auto-assign → technician_assigned, else stays unassigned with reason)
 admin.requests.assign → technician_assigned + appointment auto-booked → scheduled
 technician.jobs.on-way → technician_on_way ──► start → work order in_progress
 additional-work request → waiting_customer_approval → decide → in_progress
@@ -40,7 +40,8 @@ Every arrow is a `RequestStatusService::transition()` call: one choke point, ill
 | `RequestStatusService` | Transition map, history writes |
 | `MaintenanceRequestService` | Customer/admin listing, creation + photos + initial history |
 | `RequestReviewService` | approve / reject / request-info / appointment edits |
-| `TechnicianAssignmentService` | BR-001 guards, assign / reassign / unassign, `eligibleFor()` |
+| `TechnicianAssignmentService` | BR-001 guards, assign / reassign / unassign, `eligibleFor()`, auto-assign with schedules + daily limit (BR-011…BR-016, see `docs/BRANCHES_AUTO_ASSIGNMENT.md`) |
+| `BranchService` | Branch CRUD with served-city sync, manager assignment (1:1), branch ownership checks, manager-dashboard overview |
 | `SchedulingService` | BR-002 overlap detection, book / reschedule / cancel / start-guard / on-way |
 | `WorkOrderService` | Visit lifecycle, diagnosis/notes/labor/photos/materials recording, BR-007 lock, staff corrections |
 | `AdditionalWorkService` | BR-005 request/decide/perform, `billableFor()` contract for billing |
@@ -53,7 +54,7 @@ Every arrow is a `RequestStatusService::transition()` call: one choke point, ill
 | `StripeService` | Checkout sessions, idempotent settlement |
 | `PhoneVerificationService` + `WhatsAppService` | OTP codes (hashed, expiring, attempt-capped), log/twilio/meta drivers |
 | `ReportingService` | Dashboard + revenue/job/technician/inventory aggregates |
-| `CustomerService`, `TechnicianService`, `CatalogService` | Admin CRUD, filters, skill sync |
+| `CustomerService`, `TechnicianService`, `CatalogService` | Admin CRUD, filters, skill sync, branch assignment, default schedule seeding |
 
 Cross-service calls go through public methods only (e.g. assignment calls scheduling; cancellation calls invoicing). Services never touch HTTP.
 

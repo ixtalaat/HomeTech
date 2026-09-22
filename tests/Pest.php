@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Address;
+use App\Models\Branch;
 use App\Models\InventoryItem;
 use App\Models\MaintenanceRequest;
 use App\Models\Service;
@@ -8,6 +10,7 @@ use App\Models\WorkOrder;
 use App\Services\AdditionalWorkService;
 use App\Services\TechnicianAssignmentService;
 use App\Services\WorkOrderService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
@@ -127,4 +130,68 @@ function completedWorkOrderWithCharges(): WorkOrder
     $extras->decide($extra, $workOrder->request->user, true);
 
     return $services->complete($workOrder->refresh(), $techUser);
+}
+
+/**
+ * Create a branch serving one city.
+ */
+function staffedBranch(string $city = 'Riyadh', int $priority = 10): Branch
+{
+    $branch = Branch::factory()->create(['name' => $city.' Branch', 'priority' => $priority]);
+    $branch->cities()->create(['name' => $city]);
+
+    return $branch;
+}
+
+/**
+ * Create a skilled technician in the branch with a full-week schedule.
+ */
+function workingTechnician(Service $service, Branch $branch): Technician
+{
+    $technician = Technician::factory()->create(['branch_id' => $branch->id]);
+    $technician->categories()->sync([$service->service_category_id]);
+
+    aroundTheClock($technician->refresh());
+
+    return $technician->refresh();
+}
+
+/**
+ * Give the technician a 00:00–23:59 schedule every day.
+ */
+function aroundTheClock(Technician $technician): void
+{
+    $technician->schedules()->delete();
+
+    foreach (range(0, 6) as $day) {
+        $technician->schedules()->create([
+            'day_of_week' => $day,
+            'is_working' => true,
+            'start_time' => '00:00',
+            'end_time' => '23:59',
+        ]);
+    }
+}
+
+/**
+ * Create an approved request for the service in the city on next Monday 10:00.
+ */
+function mondayRequest(Service $service, string $city = 'Riyadh'): MaintenanceRequest
+{
+    $date = Carbon::parse('next monday')->format('Y-m-d');
+
+    return MaintenanceRequest::factory()->approved()->create([
+        'service_id' => $service->id,
+        'address_id' => Address::factory()->create(['city' => $city])->id,
+        'preferred_date' => $date,
+        'preferred_time' => '10:00',
+    ]);
+}
+
+/**
+ * Create a service with a fixed one-hour duration.
+ */
+function hourlyService(): Service
+{
+    return Service::factory()->create(['estimated_duration_minutes' => 60]);
 }

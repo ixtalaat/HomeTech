@@ -97,3 +97,30 @@ Pest feature tests:
   - Inactive profile and inactive user account both refused.
   - Reassign swaps technician with history; unassign returns to approved.
   - `eligibleFor()` includes only skilled + active technicians.
+
+---
+
+## 6. Branches, Schedules & Automatic Assignment
+
+Full design record: `docs/BRANCHES_AUTO_ASSIGNMENT.md`.
+
+- **Branches** (`branches`: name, priority, is_active) serve **cities** (`cities`: name unique, `branch_id`); `technicians.branch_id` is nullable for legacy rows, and only branched technicians are auto-assignable.
+- **Weekly schedules** (`technician_schedules`: `day_of_week` 0–6, `is_working`, `start_time`/`end_time`); every new technician is seeded the default week (Fri off, Sat 10:00–18:00, else 08:00–17:00), editable on `admin/technicians/{technician}/schedule/edit`.
+- **`TechnicianAssignmentService::autoAssign()`** picks by branch → schedule coverage → daily load (< 2, BR-011) → no overlap → fairness ordering, committing under row locks; failures return a reason instead of throwing.
+- Approving a request triggers `autoAssign()`; unmatched requests stay approved/unassigned (visible under Unassigned Jobs) with the reason flashed.
+
+---
+
+## 7. Branch Managers
+
+- Managers are one role: assignment decides scope. A manager running an
+  active branch is confined to `/branch/*` (`role:manager` plus the
+  `branch.scope` middleware, which redirects assigned managers out of the
+  global admin area); unassigned managers keep the legacy global staff
+  access, and admins always pass through. `User::isBranchScoped()` is the
+  single predicate behind the middleware, the dashboard landing, and the
+  sidebar visibility.
+- `branches.manager_user_id` (nullable unique) links at most one active manager per branch; `BranchService::assignManager()`/`createManager()` enforce account eligibility and the one-branch-per-manager rule for Super Admins.
+- Managers see only their branch: dashboard overview, technicians, schedules, and requests (review/assign/unassign with auto-assign on approval). Every branch controller resolves the manager's active branch and 404s foreign records.
+- Managers see only their branch: dashboard overview, technicians, schedules, and requests (review/assign/unassign with auto-assign on approval). Every branch controller resolves the manager's active branch and 404s foreign records.
+- Full rules in `docs/BRANCHES_AUTO_ASSIGNMENT.md` §8.

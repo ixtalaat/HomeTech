@@ -66,7 +66,10 @@ class MaintenanceRequestController extends Controller
     }
 
     /**
-     * Approve a pending maintenance request.
+     * Approve a pending maintenance request, then auto-assign a technician.
+     *
+     * Auto-assignment is best effort: when nobody qualifies, the request
+     * stays approved and unassigned with the reason flashed for staff.
      */
     public function approve(ReviewMaintenanceRequestRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
     {
@@ -76,9 +79,26 @@ class MaintenanceRequestController extends Controller
             return back()->with('error', $exception->getMessage());
         }
 
+        try {
+            $result = $this->assignments->autoAssign($maintenanceRequest->refresh(), $request->user());
+        } catch (TechnicianAssignmentException $exception) {
+            return redirect()
+                ->route('admin.requests.show', $maintenanceRequest)
+                ->with('success', __('Maintenance request approved successfully.'))
+                ->with('status', $exception->getMessage());
+        }
+
+        if ($result['technician'] === null) {
+            return redirect()
+                ->route('admin.requests.show', $maintenanceRequest)
+                ->with('success', __('Maintenance request approved successfully.'))
+                ->with('status', __('Automatic assignment skipped: :reason', ['reason' => $result['reason']]));
+        }
+
         return redirect()
             ->route('admin.requests.show', $maintenanceRequest)
-            ->with('success', __('Maintenance request approved successfully.'));
+            ->with('success', __('Maintenance request approved successfully.'))
+            ->with('status', __('Automatically assigned to :name.', ['name' => $result['technician']->user->name]));
     }
 
     /**

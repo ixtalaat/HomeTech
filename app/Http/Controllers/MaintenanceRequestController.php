@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Enums\RequestStatus;
 use App\Exceptions\BillingException;
+use App\Exceptions\TechnicianAssignmentException;
 use App\Http\Requests\CancelMaintenanceRequestRequest;
+use App\Http\Requests\RescheduleAppointmentRequest;
 use App\Http\Requests\StoreMaintenanceRequestRequest;
 use App\Models\MaintenanceRequest;
 use App\Services\CancellationService;
 use App\Services\MaintenanceRequestService;
+use App\Services\TechnicianAssignmentService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +23,8 @@ class MaintenanceRequestController extends Controller
 
     public function __construct(
         private MaintenanceRequestService $requests,
-        private CancellationService $cancellations
+        private CancellationService $cancellations,
+        private TechnicianAssignmentService $assignments
     ) {}
 
     /**
@@ -78,6 +82,41 @@ class MaintenanceRequestController extends Controller
         $maintenanceRequest->load(['service.category', 'address', 'appointment', 'workOrder.additionalWorkItems', 'invoice', 'cancellation', 'review', 'statusHistories']);
 
         return view('requests.show', compact('maintenanceRequest'));
+    }
+
+    /**
+     * Move the preferred slot of an approved, unassigned request and retry assignment.
+     */
+    public function reschedule(RescheduleAppointmentRequest $request, MaintenanceRequest $maintenanceRequest): RedirectResponse
+    {
+        abort_unless($maintenanceRequest->isOwnedBy($request->user()), 404);
+        abort_unless(
+            $maintenanceRequest->status === RequestStatus::Approved && $maintenanceRequest->technician_id === null,
+            403
+        );
+
+        $this->requests->rescheduleByCustomer($maintenanceRequest, $request->user(), $request->validated());
+
+        try {
+            $result = $this->assignments->autoAssign($maintenanceRequest->refresh(), $request->user());
+        } catch (TechnicianAssignmentException $exception) {
+            return redirect()
+                ->route('requests.show', $maintenanceRequest)
+                ->with('success', __('Appointment updated successfully.'))
+                ->with('error', $exception->getMessage());
+        }
+
+        if ($result['technician'] === null) {
+            return redirect()
+                ->route('requests.show', $maintenanceRequest)
+                ->with('success', __('Appointment updated successfully.'))
+                ->with('error', $result['reason']);
+        }
+
+        return redirect()
+            ->route('requests.show', $maintenanceRequest)
+            ->with('success', __('Appointment updated successfully.'))
+            ->with('status', __('Automatically assigned to :name.', ['name' => $result['technician']->user->name]));
     }
 
     /**

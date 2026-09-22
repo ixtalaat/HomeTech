@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('invoices/{invoice}/stripe/checkout', [InvoiceController::class, 'stripeCheckout'])->name('invoices.stripe.checkout');
 
     Route::post('requests/{maintenanceRequest}/cancel', [MaintenanceRequestController::class, 'cancel'])->name('requests.cancel');
+    Route::patch('requests/{maintenanceRequest}/reschedule', [MaintenanceRequestController::class, 'reschedule'])->name('requests.reschedule');
 
     Route::post('requests/{maintenanceRequest}/reviews', [ReviewController::class, 'store'])->name('requests.reviews.store');
 

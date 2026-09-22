@@ -181,10 +181,11 @@ class TechnicianAssignmentService
      * branch, technicians rank by daily load, then total workload, then id —
      * so work spreads fairly and the pick is deterministic.
      *
-     * Returns the assigned technician, or a human-readable reason when nobody
-     * qualifies. The request stays approved and unassigned in that case.
+     * Returns the assigned technician, or a machine-readable code plus a
+     * human-readable reason when nobody qualifies. The request stays
+     * approved and unassigned in that case.
      *
-     * @return array{technician: ?Technician, reason: ?string}
+     * @return array{technician: ?Technician, reason: ?string, code: string}
      *
      * @throws TechnicianAssignmentException
      */
@@ -202,6 +203,7 @@ class TechnicianAssignmentService
             return [
                 'technician' => null,
                 'reason' => "The preferred slot ({$date} {$start}) is in the past. Update it before assigning.",
+                'code' => 'past_slot',
             ];
         }
 
@@ -211,6 +213,7 @@ class TechnicianAssignmentService
             return [
                 'technician' => null,
                 'reason' => "Request #{$request->id} has no service city. Automatic assignment needs an address city.",
+                'code' => 'no_city',
             ];
         }
 
@@ -220,6 +223,7 @@ class TechnicianAssignmentService
             return [
                 'technician' => null,
                 'reason' => "No branch serves the city '{$city}'.",
+                'code' => 'no_branch',
             ];
         }
 
@@ -264,11 +268,11 @@ class TechnicianAssignmentService
                         continue;
                     }
 
-                    return ['technician' => $assigned->technician, 'reason' => null];
+                    return ['technician' => $assigned->technician, 'reason' => null, 'code' => 'assigned'];
                 }
             }
 
-            return ['technician' => null, 'reason' => $this->failureReason($request, $branches, $city, $date, $start, $end, $skips)];
+            return ['technician' => null, 'reason' => $this->failureReason($request, $branches, $city, $date, $start, $end, $skips), 'code' => 'no_match'];
         });
     }
 

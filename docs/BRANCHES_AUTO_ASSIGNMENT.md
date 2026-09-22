@@ -168,7 +168,6 @@ Ahmed works Mon–Thu + Sun 08:00–17:00, Sat 10:00–18:00, Friday off, limit 
 | #106 Monday 10:30–11:30 | overlaps #101 | Refused: conflicting (or goes to a free colleague) |
 
 ## 7. Test cases (`tests/Feature/AutoAssignmentTest.php`, `BranchManagementTest.php`)
-
 Happy-path booking; day off; outside hours; overlap pick-other/fail;
 daily limit without overlap; load fairness + deterministic ties;
 cross-branch priority fallback; unknown city; branchless technicians;
@@ -176,6 +175,22 @@ past slots; non-approved status throws; no double booking; approve-hook
 flashes (assigned + skipped); branch CRUD incl. city moves and guarded
 delete; technician branch persistence + default week; schedule replace +
 start<end validation.
+
+## 8. Customer reschedule loop
+
+`autoAssign()` returns a machine-readable `code` alongside the reason:
+`assigned`, `past_slot`, `no_city`, `no_branch`, `no_match`. When approval
+fails with `no_match` or `past_slot`, the customer is notified
+(`RescheduleNeeded`) and asked to pick another appointment time — other
+codes are staff-side problems rescheduling cannot fix, so they only flash
+for staff.
+
+Customers move the preferred slot of their own approved, unassigned
+requests (`PATCH requests/{maintenanceRequest}/reschedule`, future dates
+only; foreign requests 404, assigned ones 403). Saving retries assignment
+immediately: success assigns and books, failure keeps the new slot with the
+reason flashed — the loop closes without staff involvement. Covered in
+`tests/Feature/RescheduleFlowTest.php`.
 
 ## 8. Branch Managers
 

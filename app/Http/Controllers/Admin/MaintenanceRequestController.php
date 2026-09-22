@@ -16,6 +16,7 @@ use App\Http\Requests\Admin\ReviewMaintenanceRequestRequest;
 use App\Http\Requests\Admin\UpdateRequestAppointmentRequest;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
+use App\Notifications\RescheduleNeeded;
 use App\Services\CancellationService;
 use App\Services\MaintenanceRequestService;
 use App\Services\RequestReviewService;
@@ -89,6 +90,10 @@ class MaintenanceRequestController extends Controller
         }
 
         if ($result['technician'] === null) {
+            if (in_array($result['code'], ['no_match', 'past_slot'], true)) {
+                $maintenanceRequest->user->notify(new RescheduleNeeded($maintenanceRequest, (string) $result['reason']));
+            }
+
             return redirect()
                 ->route('admin.requests.show', $maintenanceRequest)
                 ->with('success', __('Maintenance request approved successfully.'))

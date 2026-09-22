@@ -108,6 +108,35 @@
             @endif
         </div>
 
+        @if($maintenanceRequest->status === \App\Enums\RequestStatus::Approved && $maintenanceRequest->technician_id === null)
+            <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
+                <h3 class="text-sm font-extrabold text-amber-900">{{ __('No technician was available for your slot. Pick another date or time.') }}</h3>
+                <form method="POST" action="{{ route('requests.reschedule', $maintenanceRequest) }}" class="mt-3 space-y-3">
+                    @csrf
+                    @method('PATCH')
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="preferred_date" class="form-label text-xs">{{ __('Preferred Date') }}</label>
+                            <input type="date" id="preferred_date" name="preferred_date" value="{{ old('preferred_date', $maintenanceRequest->preferred_date->format('Y-m-d')) }}" required
+                                class="form-input text-xs @error('preferred_date') border-rose-300 @enderror">
+                            @error('preferred_date')
+                                <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="preferred_time" class="form-label text-xs">{{ __('Preferred Time') }}</label>
+                            <input type="time" id="preferred_time" name="preferred_time" value="{{ old('preferred_time', $maintenanceRequest->preferred_time) }}" required dir="ltr"
+                                class="form-input text-xs @error('preferred_time') border-rose-300 @enderror">
+                            @error('preferred_time')
+                                <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <button type="submit" class="primary-button w-full text-xs">{{ __('Update Appointment') }}</button>
+                </form>
+            </div>
+        @endif
+
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 class="text-sm font-extrabold text-slate-900">{{ __('Your Review') }}</h3>
             @if($maintenanceRequest->review)

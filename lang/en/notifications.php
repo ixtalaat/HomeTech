@@ -18,5 +18,6 @@ return [
     'discount_approval_requested' => 'Discount approval needed: :value :type on invoice :number.',
     'queue_backlog_stuck' => 'Queue backlog: :count jobs pending, oldest waiting :minutes minutes.',
     'stale_assignment_nudge' => 'Request #:id approved :days days ago is still unassigned.',
+    'reschedule_needed' => 'No technician is available for request #:id. Please choose another appointment time.',
     'fallback' => 'Update',
 ];

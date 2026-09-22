@@ -9,6 +9,7 @@ use App\Http\Requests\Branch\AssignTechnicianRequest;
 use App\Http\Requests\Branch\ReviewRequest;
 use App\Models\MaintenanceRequest;
 use App\Models\Technician;
+use App\Notifications\RescheduleNeeded;
 use App\Services\BranchService;
 use App\Services\MaintenanceRequestService;
 use App\Services\RequestReviewService;
@@ -77,6 +78,10 @@ class RequestController extends BaseController
         }
 
         if ($result['technician'] === null) {
+            if (in_array($result['code'], ['no_match', 'past_slot'], true)) {
+                $maintenanceRequest->user->notify(new RescheduleNeeded($maintenanceRequest, (string) $result['reason']));
+            }
+
             return $this->approvedResponse($maintenanceRequest, __('Automatic assignment skipped: :reason', ['reason' => $result['reason']]));
         }
 

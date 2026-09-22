@@ -126,4 +126,32 @@ class MaintenanceRequestService
             return $maintenanceRequest;
         });
     }
+
+    /**
+     * Move the preferred slot of an approved, unassigned request.
+     *
+     * Owners use this after a failed automatic assignment to propose a new
+     * time; assignment itself stays with the caller so it can flash the
+     * outcome right away.
+     *
+     * @param  array{preferred_date: string, preferred_time: string}  $attributes
+     */
+    public function rescheduleByCustomer(MaintenanceRequest $request, User $user, array $attributes): MaintenanceRequest
+    {
+        return DB::transaction(function () use ($request, $user, $attributes): MaintenanceRequest {
+            $request->update([
+                'preferred_date' => $attributes['preferred_date'],
+                'preferred_time' => $attributes['preferred_time'],
+            ]);
+
+            $request->statusHistories()->create([
+                'from_status' => RequestStatus::Approved->value,
+                'status' => RequestStatus::Approved->value,
+                'changed_by' => $user->id,
+                'reason' => "Customer rescheduled to {$attributes['preferred_date']} {$attributes['preferred_time']}.",
+            ]);
+
+            return $request->refresh();
+        });
+    }
 }

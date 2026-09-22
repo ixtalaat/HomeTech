@@ -18,5 +18,6 @@ return [
     'discount_approval_requested' => 'مطلوب موافقة على خصم: :value :type للفاتورة :number.',
     'queue_backlog_stuck' => 'تكدس في الطابور: :count مهام معلقة، وأقدمها ينتظر منذ :minutes دقيقة.',
     'stale_assignment_nudge' => 'الطلب #:id تمت الموافقة عليه منذ :days أيام وما زال غير مُسند.',
+    'reschedule_needed' => 'لا يوجد فني متاح للطلب #:id. يرجى اختيار موعد آخر.',
     'fallback' => 'تحديث',
 ];

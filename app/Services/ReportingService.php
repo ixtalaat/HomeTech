@@ -12,6 +12,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\MaintenanceRequest;
 use App\Models\Payment;
+use App\Models\Service;
 use App\Models\Technician;
 use App\Models\User;
 use App\Models\WorkOrder;
@@ -125,26 +126,26 @@ class ReportingService
             'unpaid_invoices' => Invoice::outstanding()->count(),
             'outstanding_total' => (float) Invoice::outstanding()->selectRaw('COALESCE(SUM(total - paid_amount), 0) as total')->value('total'),
             'low_stock_count' => InventoryItem::lowStock()->count(),
-            'low_stock_items' => InventoryItem::lowStock()->orderBy('current_stock')->limit(5)->get(),
-            'upcoming_appointments' => Appointment::with(['request.service', 'technician.user'])
+            'low_stock_items' => InventoryItem::lowStock()->with('translations')->orderBy('current_stock')->limit(5)->get(),
+            'upcoming_appointments' => Appointment::with(['request.service.translations', 'request.service.category', 'technician.user'])
                 ->where('date', '>=', $today)
                 ->whereNotIn('status', ['cancelled', 'completed'])
                 ->orderBy('date')
                 ->orderBy('start_time')
                 ->limit(8)
                 ->get(),
-            'unassigned_jobs' => MaintenanceRequest::with(['service', 'user'])
+            'unassigned_jobs' => MaintenanceRequest::with(['service.translations', 'service.category', 'user'])
                 ->where('status', RequestStatus::Approved)
                 ->whereNull('technician_id')
                 ->latest()
                 ->limit(8)
                 ->get(),
-            'waiting_approval' => MaintenanceRequest::with(['service', 'user'])
+            'waiting_approval' => MaintenanceRequest::with(['service.translations', 'service.category', 'user'])
                 ->where('status', RequestStatus::WaitingCustomerApproval)
                 ->latest()
                 ->limit(8)
                 ->get(),
-            'recent_requests' => MaintenanceRequest::with(['service', 'user'])
+            'recent_requests' => MaintenanceRequest::with(['service.translations', 'service.category', 'user'])
                 ->latest()
                 ->limit(8)
                 ->get(),
@@ -186,7 +187,7 @@ class ReportingService
      */
     public function revenueByService(): Collection
     {
-        return InvoiceItem::selectRaw('services.name as name, COALESCE(SUM(invoice_items.total), 0) as total')
+        $rows = InvoiceItem::selectRaw('services.id as service_id, services.name as name, COALESCE(SUM(invoice_items.total), 0) as total')
             ->join('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
             ->join('maintenance_requests', 'maintenance_requests.id', '=', 'invoices.maintenance_request_id')
             ->join('services', 'services.id', '=', 'maintenance_requests.service_id')
@@ -194,6 +195,14 @@ class ReportingService
             ->groupBy('services.id', 'services.name')
             ->orderByDesc('total')
             ->get();
+
+        $services = Service::with('translations')->whereIn('id', $rows->pluck('service_id'))->get()->keyBy('id');
+
+        return $rows->map(function ($row) use ($services) {
+            $row->name = $services->get($row->service_id)?->display_name ?? $row->name;
+
+            return $row;
+        });
     }
 
     /**
@@ -244,11 +253,19 @@ class ReportingService
      */
     public function jobsByService(): Collection
     {
-        return MaintenanceRequest::selectRaw('services.name as name, COUNT(*) as total')
+        $rows = MaintenanceRequest::selectRaw('services.id as service_id, services.name as name, COUNT(*) as total')
             ->join('services', 'services.id', '=', 'maintenance_requests.service_id')
             ->groupBy('services.id', 'services.name')
             ->orderByDesc('total')
             ->get();
+
+        $services = Service::with('translations')->whereIn('id', $rows->pluck('service_id'))->get()->keyBy('id');
+
+        return $rows->map(function ($row) use ($services) {
+            $row->name = $services->get($row->service_id)?->display_name ?? $row->name;
+
+            return $row;
+        });
     }
 
     /**
@@ -301,17 +318,35 @@ class ReportingService
     public function inventoryReport(): array
     {
         return [
-            'items' => InventoryItem::orderBy('name')->get(),
-            'low_stock' => InventoryItem::lowStock()->orderBy('current_stock')->get(),
-            'most_used' => InventoryMovement::selectRaw('inventory_items.name as name, COALESCE(SUM(ABS(inventory_movements.quantity)), 0) as moved')
-                ->join('inventory_items', 'inventory_items.id', '=', 'inventory_movements.inventory_item_id')
-                ->where('inventory_movements.type', 'consumption')
-                ->groupBy('inventory_items.id', 'inventory_items.name')
-                ->orderByDesc('moved')
-                ->limit(10)
-                ->get(),
-            'recent_movements' => InventoryMovement::with('item')->latest()->limit(20)->get(),
+            'items' => InventoryItem::with('translations')->orderBy('name')->get(),
+            'low_stock' => InventoryItem::with('translations')->lowStock()->orderBy('current_stock')->get(),
+            'most_used' => $this->mostUsedMaterials(),
+            'recent_movements' => InventoryMovement::with(['item.translations'])->latest()->limit(20)->get(),
         ];
+    }
+
+    /**
+     * Most-consumed materials with translated display names.
+     *
+     * @return Collection<int, object>
+     */
+    private function mostUsedMaterials(): Collection
+    {
+        $rows = InventoryMovement::selectRaw('inventory_items.id as item_id, inventory_items.name as name, COALESCE(SUM(ABS(inventory_movements.quantity)), 0) as moved')
+            ->join('inventory_items', 'inventory_items.id', '=', 'inventory_movements.inventory_item_id')
+            ->where('inventory_movements.type', 'consumption')
+            ->groupBy('inventory_items.id', 'inventory_items.name')
+            ->orderByDesc('moved')
+            ->limit(10)
+            ->get();
+
+        $items = InventoryItem::with('translations')->whereIn('id', $rows->pluck('item_id'))->get()->keyBy('id');
+
+        return $rows->map(function ($row) use ($items) {
+            $row->name = $items->get($row->item_id)?->display_name ?? $row->name;
+
+            return $row;
+        });
     }
 
     /**

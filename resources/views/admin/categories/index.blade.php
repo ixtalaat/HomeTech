@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Service Categories'))
+
 @section('content')
 <div class="mx-auto max-w-7xl">
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -15,14 +17,14 @@
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 text-left text-sm text-slate-600">
+            <table class="min-w-full divide-y divide-slate-200 text-start text-sm text-slate-600">
                 <thead class="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-500">
                     <tr>
                         <th scope="col" class="px-6 py-4">{{ __('Category') }}</th>
                         <th scope="col" class="px-6 py-4">{{ __('Slug') }}</th>
                         <th scope="col" class="px-6 py-4">{{ __('Services Count') }}</th>
                         <th scope="col" class="px-6 py-4">{{ __('Status') }}</th>
-                        <th scope="col" class="px-6 py-4 text-right">{{ __('Actions') }}</th>
+                        <th scope="col" class="px-6 py-4 text-end">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">
@@ -31,17 +33,17 @@
                             <td class="px-6 py-4 font-bold text-slate-900">
                                 <div class="flex items-center gap-3">
                                     <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 font-bold text-teal-700">
-                                        {{ strtoupper(substr($category->name, 0, 2)) }}
+                                        {{ mb_strtoupper(mb_substr($category->display_name, 0, 2)) }}
                                     </div>
                                     <div>
                                         <p class="font-bold text-slate-900">{{ $category->display_name }}</p>
-                                        @if($category->description)
-                                            <p class="mt-0.5 max-w-sm truncate text-xs text-slate-400">{{ $category->description }}</p>
+                                        @if($category->translated('description'))
+                                            <p class="mt-0.5 max-w-sm truncate text-xs text-slate-400">{{ $category->translated('description') }}</p>
                                         @endif
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-xs font-mono text-slate-500">{{ $category->slug }}</td>
+                            <td class="px-6 py-4 text-xs font-mono text-slate-500"><span dir="ltr" class="inline-block">{{ $category->slug }}</span></td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
                                     {{ __(':count services', ['count' => $category->services_count]) }}
@@ -58,7 +60,7 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.categories.edit', $category) }}"
                                         class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">

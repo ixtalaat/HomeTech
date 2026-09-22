@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Edit Address: :title', ['title' => $address->title]))
+
 @section('content')
 <div class="mx-auto max-w-3xl">
     <div class="mb-8">

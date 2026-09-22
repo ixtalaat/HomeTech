@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Create your account'))
+
 @section('content')
     <div class="mb-8 lg:hidden"><a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo /></a></div>
     <div class="mb-8"><p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-400">{{ __('Get started') }}</p><h1 class="mt-3 font-display text-3xl font-extrabold tracking-tight">{{ __('Create your account') }}</h1><p class="mt-3 text-sm leading-6 text-slate-400">{{ __('Join HomeTech and take the stress out of home maintenance.') }}</p></div>

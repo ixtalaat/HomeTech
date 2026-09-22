@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Add New Category'))
+
 @section('content')
 <div class="mx-auto max-w-3xl">
     <div class="mb-8">
@@ -38,7 +40,7 @@
 
             <div>
                 <label for="slug" class="form-label">{{ __('Slug (Optional)') }}</label>
-                <input type="text" id="slug" name="slug" value="{{ old('slug') }}"
+                <input type="text" id="slug" name="slug" value="{{ old('slug') }}" dir="ltr"
                     class="form-input @error('slug') border-rose-300 ring-rose-100 @enderror"
                     placeholder="{{ __('e.g. air-conditioning (leave blank to auto-generate)') }}">
                 @error('slug')

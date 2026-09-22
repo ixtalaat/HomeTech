@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0f766e">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>{{ __('HomeTech — Home maintenance made simple') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,7 +89,7 @@
                     <div class="mt-6 grid grid-cols-2 gap-3">
                         <div class="rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
                             <p class="text-xs font-semibold text-slate-500">{{ __('Active Requests') }}</p>
-                            <p class="mt-2 font-display text-2xl font-extrabold text-slate-900">02 <span class="text-xs font-normal text-slate-400">Jobs</span></p>
+                            <p class="mt-2 font-display text-2xl font-extrabold text-slate-900">02 <span class="text-xs font-normal text-slate-400">{{ __('Jobs') }}</span></p>
                             <div class="mt-3 flex gap-1">
                                 <div class="h-1.5 flex-1 rounded-full bg-teal-500"></div>
                                 <div class="h-1.5 flex-1 rounded-full bg-teal-300"></div>
@@ -97,7 +99,7 @@
                         <div class="rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
                             <p class="text-xs font-semibold text-slate-500">{{ __('Next Scheduled Visit') }}</p>
                             <p class="mt-2 font-display text-2xl font-extrabold text-slate-900">{{ __('Tomorrow') }}</p>
-                            <p class="mt-1 text-xs font-medium text-teal-700">10:30 AM · Confirmed</p>
+                            <p class="mt-1 text-xs font-medium text-teal-700">10:30 {{ __('AM') }} · {{ __('Confirmed') }}</p>
                         </div>
                     </div>
 
@@ -112,12 +114,12 @@
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <p class="text-sm font-bold text-slate-900">AC Full Seasonal Service</p>
+                                        <p class="text-sm font-bold text-slate-900">{{ __('AC Full Seasonal Service') }}</p>
                                     </div>
-                                    <p class="mt-0.5 text-xs text-slate-500">Technician Ahmed M. · On the way</p>
+                                    <p class="mt-0.5 text-xs text-slate-500">{{ __('Technician Ahmed M. · On the way') }}</p>
                                 </div>
                             </div>
-                            <span class="font-display text-sm font-extrabold text-slate-900">350 EGP</span>
+                            <span class="font-display text-sm font-extrabold text-slate-900">350 {{ __('EGP') }}</span>
                         </div>
 
                         <!-- Progress Steps -->

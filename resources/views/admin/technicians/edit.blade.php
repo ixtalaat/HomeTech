@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Edit Technician: :name', ['name' => $technician->user->name]))
+
 @section('content')
 <div class="mx-auto max-w-3xl">
     <div class="mb-8">

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Customer Reviews'))
+
 @section('content')
 <div class="mx-auto max-w-7xl">
     <div class="mb-8">
@@ -43,7 +45,7 @@
                             <td class="px-6 py-4 text-xs">{{ $review->user->name ?? '—' }}</td>
                             <td class="px-6 py-4 text-xs">
                                 <a href="{{ route('admin.requests.show', $review->maintenance_request_id) }}" class="font-bold text-teal-700 hover:underline">
-                                    #{{ $review->maintenance_request_id }} · {{ $review->request->service->name ?? '' }}
+                                    #{{ $review->maintenance_request_id }} · {{ $review->request->service->display_name ?? '' }}
                                 </a>
                             </td>
                         </tr>

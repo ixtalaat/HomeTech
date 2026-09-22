@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('New Maintenance Request'))
+
 @section('content')
 <div class="mx-auto max-w-3xl">
     <div class="mb-8">

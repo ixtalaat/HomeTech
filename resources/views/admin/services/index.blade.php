@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Services Management'))
+
 @section('content')
 <div class="mx-auto max-w-7xl">
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -33,7 +35,7 @@
                     <option value="">{{ __('All Categories') }}</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
+                            {{ $category->display_name }}
                         </option>
                     @endforeach
                 </select>
@@ -60,7 +62,7 @@
     <!-- Table -->
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 text-left text-sm text-slate-600">
+            <table class="min-w-full divide-y divide-slate-200 text-start text-sm text-slate-600">
                 <thead class="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-500">
                     <tr>
                         <th scope="col" class="px-6 py-4">{{ __('Service') }}</th>
@@ -68,7 +70,7 @@
                         <th scope="col" class="px-6 py-4">{{ __('Base Price') }}</th>
                         <th scope="col" class="px-6 py-4">{{ __('Est. Duration') }}</th>
                         <th scope="col" class="px-6 py-4">{{ __('Status') }}</th>
-                        <th scope="col" class="px-6 py-4 text-right">{{ __('Actions') }}</th>
+                        <th scope="col" class="px-6 py-4 text-end">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">
@@ -76,8 +78,8 @@
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-6 py-4">
                                 <p class="font-bold text-slate-900">{{ $service->display_name }}</p>
-                                @if($service->description)
-                                    <p class="mt-0.5 max-w-xs truncate text-xs text-slate-400">{{ $service->description }}</p>
+                                @if($service->translated('description'))
+                                    <p class="mt-0.5 max-w-xs truncate text-xs text-slate-400">{{ $service->translated('description') }}</p>
                                 @endif
                             </td>
                             <td class="px-6 py-4">
@@ -103,7 +105,7 @@
                                     </button>
                                 </form>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.services.edit', $service) }}"
                                         class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', $invoice->number)
+
 @section('content')
 <div class="mx-auto max-w-5xl">
     <div class="mb-8">

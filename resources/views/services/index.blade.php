@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0f766e">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>{{ __('Available Services — HomeTech') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,7 +97,7 @@
                 @if($selectedCategory)
                     <div class="mb-8">
                         <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $selectedCategory->display_name }}</h2>
-                        @if($selectedCategory->description)
+                        @if($selectedCategory->translated('description'))
                             <p class="mt-1 text-sm text-slate-500 max-w-2xl">{{ $selectedCategory->translated('description') }}</p>
                         @endif
                     </div>
@@ -119,7 +121,7 @@
                             <h3 class="mt-4 font-display text-lg font-bold text-slate-900">{{ $service->display_name }}</h3>
                             
                             <p class="mt-2 flex-1 text-sm leading-6 text-slate-500 line-clamp-3">
-                                {{ $service->description ?? __('Professional maintenance and diagnostics by qualified technicians.') }}
+                                {{ $service->translated('description') ?? __('Professional maintenance and diagnostics by qualified technicians.') }}
                             </p>
 
                             <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">

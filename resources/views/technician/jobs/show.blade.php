@@ -1,5 +1,7 @@
 ﻿@extends('layouts.app')
 
+@section('title', __('Job #:id', ['id' => $workOrder->id]))
+
 @section('content')
 <div class="mx-auto max-w-5xl">
     <div class="mb-8">

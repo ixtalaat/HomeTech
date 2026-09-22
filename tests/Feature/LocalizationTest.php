@@ -11,6 +11,17 @@ it('switches between English and Arabic', function () {
     $this->get(route('locale.switch', 'fr'))->assertNotFound();
 });
 
+it('persists the switched locale across requests like a browser click', function () {
+    $customer = User::factory()->create(['role' => UserRole::Customer]);
+
+    $this->actingAs($customer)->get(route('locale.switch', 'ar'))->assertRedirect();
+
+    $this->actingAs($customer)->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('dir="rtl"', false)
+        ->assertSee('طلباتي', false);
+});
+
 it('renders Arabic RTL layout with translated nav', function () {
     $customer = User::factory()->create(['role' => UserRole::Customer]);
 

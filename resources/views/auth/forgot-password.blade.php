@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', __('Forgot your password?'))
+
 @section('content')
     <div class="mb-8 lg:hidden"><a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo /></a></div>
     <div class="mb-9">

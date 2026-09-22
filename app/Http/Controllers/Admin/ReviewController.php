@@ -17,7 +17,7 @@ class ReviewController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Review::with(['user', 'request.service'])->latest();
+        $query = Review::with(['user', 'request.service.translations', 'request.service.category'])->latest();
 
         if ($request->filled('rating')) {
             $query->where('rating', $request->integer('rating'));

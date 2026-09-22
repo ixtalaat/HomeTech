@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Edit Category: :name', ['name' => $category->display_name]))
+
 @section('content')
 <div class="mx-auto max-w-3xl">
     <div class="mb-8">
@@ -37,7 +39,7 @@
 
             <div>
                 <label for="slug" class="form-label">{{ __('Slug') }}</label>
-                <input type="text" id="slug" name="slug" value="{{ old('slug', $category->slug) }}"
+                <input type="text" id="slug" name="slug" value="{{ old('slug', $category->slug) }}" dir="ltr"
                     class="form-input @error('slug') border-rose-300 ring-rose-100 @enderror">
                 @error('slug')
                     <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>

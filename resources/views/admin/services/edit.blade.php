@@ -1,5 +1,7 @@
 ﻿@extends('layouts.app')
 
+@section('title', __('Edit Service: :name', ['name' => $service->display_name]))
+
 @section('content')
 <div class="mx-auto max-w-3xl">
     <div class="mb-8">
@@ -20,10 +22,10 @@
                 <label for="service_category_id" class="form-label">{{ __('Service Category') }} <span class="text-rose-500">*</span></label>
                 <select id="service_category_id" name="service_category_id" required
                     class="form-input @error('service_category_id') border-rose-300 ring-rose-100 @enderror">
-                    <option value="">Select Category</option>
+                    <option value="">{{ __('Select Category') }}</option>
                     @foreach ($categories as $cat)
                         <option value="{{ $cat->id }}" {{ old('service_category_id', $service->service_category_id) == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}
+                            {{ $cat->display_name }}
                         </option>
                     @endforeach
                 </select>
@@ -52,7 +54,7 @@
 
             <div>
                 <label for="slug" class="form-label">{{ __('Slug') }}</label>
-                <input type="text" id="slug" name="slug" value="{{ old('slug', $service->slug) }}"
+                <input type="text" id="slug" name="slug" value="{{ old('slug', $service->slug) }}" dir="ltr"
                     class="form-input @error('slug') border-rose-300 ring-rose-100 @enderror">
                 @error('slug')
                     <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>

@@ -28,13 +28,14 @@ class InventoryItemController extends Controller
     {
         $this->authorize('viewAny', InventoryItem::class);
 
-        $query = InventoryItem::latest();
+        $query = InventoryItem::with('translations')->latest();
 
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($inner) use ($search): void {
                 $inner->where('name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhereHas('translations', fn ($translationQuery) => $translationQuery->where('name', 'like', "%{$search}%"));
             });
         }
 
@@ -43,7 +44,7 @@ class InventoryItemController extends Controller
         }
 
         $items = $query->paginate(15)->withQueryString();
-        $lowStockItems = InventoryItem::lowStock()->orderBy('current_stock')->limit(10)->get();
+        $lowStockItems = InventoryItem::with('translations')->lowStock()->orderBy('current_stock')->limit(10)->get();
 
         return view('admin.inventory.index', compact('items', 'lowStockItems'));
     }
@@ -77,7 +78,7 @@ class InventoryItemController extends Controller
     {
         $this->authorize('view', $inventoryItem);
 
-        $inventoryItem->load(['movements' => fn ($query): HasMany => $query->latest()->limit(50)]);
+        $inventoryItem->load(['translations', 'movements' => fn ($query): HasMany => $query->latest()->limit(50)]);
 
         return view('admin.inventory.show', compact('inventoryItem'));
     }

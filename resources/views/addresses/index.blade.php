@@ -1,10 +1,12 @@
 @extends('layouts.app')
 
+@section('title', __('My addresses'))
+
 @section('content')
 <div class="mx-auto max-w-5xl">
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ __('My Addresses') }}</h2>
+            <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ __('My addresses') }}</h2>
             <p class="mt-1 text-sm text-slate-500">{{ __('Manage your service addresses. Maintenance requests must use one of your own addresses.') }}</p>
         </div>
         <a href="{{ route('addresses.create') }}" class="primary-button">

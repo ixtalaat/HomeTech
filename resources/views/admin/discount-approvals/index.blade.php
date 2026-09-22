@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Discount Approvals'))
+
 @section('content')
 <div class="mx-auto max-w-5xl">
     <div class="mb-8">

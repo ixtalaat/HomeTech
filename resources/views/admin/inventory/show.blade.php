@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', $inventoryItem->display_name)
+
 @section('content')
 <div class="mx-auto max-w-4xl">
     <div class="mb-8">

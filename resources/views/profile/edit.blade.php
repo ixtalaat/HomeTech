@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Profile settings'))
+
 @php($heading = 'Your profile')
 
 @section('content')

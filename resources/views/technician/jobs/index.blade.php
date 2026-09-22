@@ -1,9 +1,11 @@
 @extends('layouts.app')
 
+@section('title', __('My jobs'))
+
 @section('content')
 <div class="mx-auto max-w-7xl">
     <div class="mb-8">
-        <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ __('My Jobs') }}</h2>
+        <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ __('My jobs') }}</h2>
         <p class="mt-1 text-sm text-slate-500">{{ __('Start visits and document diagnosis, labor, materials, and notes.') }}</p>
     </div>
 

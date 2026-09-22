@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Add New Service'))
+
 @section('content')
 <div class="mx-auto max-w-3xl">
     <div class="mb-8">
@@ -22,7 +24,7 @@
                     <option value="">{{ __('Select Category') }}</option>
                     @foreach ($categories as $cat)
                         <option value="{{ $cat->id }}" {{ old('service_category_id') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}
+                            {{ $cat->display_name }}
                         </option>
                     @endforeach
                 </select>
@@ -52,7 +54,7 @@
 
             <div>
                 <label for="slug" class="form-label">{{ __('Slug (Optional)') }}</label>
-                <input type="text" id="slug" name="slug" value="{{ old('slug') }}"
+                <input type="text" id="slug" name="slug" value="{{ old('slug') }}" dir="ltr"
                     class="form-input @error('slug') border-rose-300 ring-rose-100 @enderror"
                     placeholder="{{ __('e.g. ac-filter-wash (leave blank to auto-generate)') }}">
                 @error('slug')

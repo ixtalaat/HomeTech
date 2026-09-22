@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Dashboard'))
+
 @php($heading = __('Good morning, :name', ['name' => auth()->user()->name]))
 
 @section('content')

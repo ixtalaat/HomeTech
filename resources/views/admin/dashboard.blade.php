@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', __('Operations Dashboard'))
+
 @section('content')
 <div class="mx-auto max-w-7xl">
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -70,7 +72,7 @@
                 <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Low-Stock Items') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold {{ $low_stock_count > 0 ? 'text-amber-600' : 'text-slate-900' }}">{{ $low_stock_count }}</span>
                 @if($low_stock_items->isNotEmpty())
-                    <span class="mt-0.5 block text-xs text-slate-500">{{ $low_stock_items->pluck('name')->join(', ') }}</span>
+                    <span class="mt-0.5 block text-xs text-slate-500">{{ $low_stock_items->map(fn ($lowItem) => $lowItem->display_name)->join(', ') }}</span>
                 @endif
             </span>
         </a>

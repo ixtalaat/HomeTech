@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\InvoiceStatus;
 use App\Enums\RequestStatus;
 use App\Enums\UserRole;
 use App\Models\Address;
@@ -43,6 +42,8 @@ class DemoSeeder extends Seeder
                     'unit_cost' => $material['cost'],
                 ]
             );
+
+            $item->saveTranslations(['ar' => ['name' => $material['name_ar']]]);
 
             if ($item->current_stock < $material['stock']) {
                 $inventory->purchase($item->refresh(), $material['stock'] - $item->current_stock, $manager, 'Demo stock.');
@@ -162,11 +163,16 @@ class DemoSeeder extends Seeder
      */
     private function stageCompletedJob(User $customer, Address $address, User $admin, Technician $electrician): void
     {
-        $hasUnpaidInvoice = Invoice::where('user_id', $customer->id)
-            ->whereIn('status', [InvoiceStatus::Issued, InvoiceStatus::PartiallyPaid])
+        $hasFinishedJob = MaintenanceRequest::where('user_id', $customer->id)
+            ->whereIn('status', [
+                RequestStatus::Completed,
+                RequestStatus::Invoiced,
+                RequestStatus::Paid,
+                RequestStatus::Closed,
+            ])
             ->exists();
 
-        if ($hasUnpaidInvoice) {
+        if ($hasFinishedJob) {
             return;
         }
 
@@ -200,16 +206,16 @@ class DemoSeeder extends Seeder
     /**
      * Showcase materials with opening stock levels.
      *
-     * @return array<int, array{name: string, sku: string, cost: float, stock: int}>
+     * @return array<int, array{name: string, name_ar: string, sku: string, cost: float, stock: int}>
      */
     private function materials(): array
     {
         return [
-            ['name' => 'Capacitor', 'sku' => 'SKU-CAP', 'cost' => 150.00, 'stock' => 25],
-            ['name' => 'Copper Connector', 'sku' => 'SKU-COP', 'cost' => 25.00, 'stock' => 100],
-            ['name' => 'Water Pipe (1m)', 'sku' => 'SKU-PIP', 'cost' => 80.00, 'stock' => 40],
-            ['name' => 'Faucet Cartridge', 'sku' => 'SKU-FAU', 'cost' => 120.00, 'stock' => 3],
-            ['name' => 'LED Panel', 'sku' => 'SKU-LED', 'cost' => 200.00, 'stock' => 15],
+            ['name' => 'Capacitor', 'name_ar' => 'مكثف', 'sku' => 'SKU-CAP', 'cost' => 150.00, 'stock' => 25],
+            ['name' => 'Copper Connector', 'name_ar' => 'وصلة نحاس', 'sku' => 'SKU-COP', 'cost' => 25.00, 'stock' => 100],
+            ['name' => 'Water Pipe (1m)', 'name_ar' => 'ماسورة مياه (1م)', 'sku' => 'SKU-PIP', 'cost' => 80.00, 'stock' => 40],
+            ['name' => 'Faucet Cartridge', 'name_ar' => 'قلب خلاط', 'sku' => 'SKU-FAU', 'cost' => 120.00, 'stock' => 3],
+            ['name' => 'LED Panel', 'name_ar' => 'لوح ليد', 'sku' => 'SKU-LED', 'cost' => 200.00, 'stock' => 15],
         ];
     }
 }

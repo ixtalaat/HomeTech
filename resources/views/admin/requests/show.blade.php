@@ -1,5 +1,7 @@
 ﻿@extends('layouts.app')
 
+@section('title', __('Request #:id', ['id' => $maintenanceRequest->id]))
+
 @section('content')
 <div class="mx-auto max-w-5xl">
     <div class="mb-8">

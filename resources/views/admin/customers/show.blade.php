@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', $customer->name)
+
 @section('content')
 <div class="mx-auto max-w-4xl">
     <div class="mb-8">

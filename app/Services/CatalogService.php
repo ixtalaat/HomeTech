@@ -19,7 +19,7 @@ class CatalogService
      */
     public function paginateServices(array $filters): LengthAwarePaginator
     {
-        $query = Service::with('category')->latest();
+        $query = Service::with(['category', 'translations', 'category.translations'])->latest();
 
         if (! empty($filters['category_id'])) {
             $query->where('service_category_id', $filters['category_id']);
@@ -30,7 +30,11 @@ class CatalogService
         }
 
         if (! empty($filters['search'])) {
-            $query->where('name', 'like', "%{$filters['search']}%");
+            $query->where(function ($inner) use ($filters): void {
+                $inner->where('name', 'like', "%{$filters['search']}%")
+                    ->orWhere('description', 'like', "%{$filters['search']}%")
+                    ->orWhereHas('translations', fn ($translationQuery) => $translationQuery->where('name', 'like', "%{$filters['search']}%"));
+            });
         }
 
         return $query->paginate(15)->withQueryString();
@@ -79,7 +83,7 @@ class CatalogService
      */
     public function paginateCategories(): LengthAwarePaginator
     {
-        return ServiceCategory::withCount('services')->latest()->paginate(15);
+        return ServiceCategory::with('translations')->withCount('services')->latest()->paginate(15);
     }
 
     /**
@@ -130,6 +134,7 @@ class CatalogService
     public function browse(?string $categorySlug, ?string $search): array
     {
         $categories = ServiceCategory::active()
+            ->with('translations')
             ->withCount(['services' => fn ($query): Builder => $query->active()])
             ->orderBy('name')
             ->get();
@@ -137,10 +142,10 @@ class CatalogService
         $selectedCategory = null;
         $servicesQuery = Service::active()
             ->whereHas('category', fn ($query): Builder => $query->active())
-            ->with('category');
+            ->with(['category', 'translations', 'category.translations']);
 
         if (! empty($categorySlug)) {
-            $selectedCategory = ServiceCategory::active()->where('slug', $categorySlug)->first();
+            $selectedCategory = ServiceCategory::active()->with('translations')->where('slug', $categorySlug)->first();
 
             if ($selectedCategory !== null) {
                 $servicesQuery->where('service_category_id', $selectedCategory->id);
@@ -171,11 +176,12 @@ class CatalogService
     {
         $service = Service::active()
             ->whereHas('category', fn ($query): Builder => $query->active())
-            ->with('category')
+            ->with(['category', 'translations', 'category.translations'])
             ->where('slug', $slug)
             ->firstOrFail();
 
         $relatedServices = Service::active()
+            ->with('translations')
             ->where('service_category_id', $service->service_category_id)
             ->where('id', '!=', $service->id)
             ->limit(3)
@@ -191,7 +197,7 @@ class CatalogService
      */
     public function orderedCategories(): Collection
     {
-        return ServiceCategory::orderBy('name')->get();
+        return ServiceCategory::with('translations')->orderBy('name')->get();
     }
 
     /**

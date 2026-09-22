@@ -6,6 +6,9 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 /**
  * Toast a message (success green, error rose, info slate).
+ *
+ * Bottom corner, mirroring the reading direction: bottom-right in
+ * English, bottom-left in Arabic (the <html> dir is set server-side).
  */
 function toast(message, type = 'info') {
     const styles = {
@@ -13,13 +16,14 @@ function toast(message, type = 'info') {
         error: 'linear-gradient(to right, #e11d48, #be123c)',
         info: 'linear-gradient(to right, #334155, #0f172a)',
     };
+    const isRtl = document.documentElement.dir === 'rtl';
 
     Toastify({
         text: message,
         duration: 4500,
         close: true,
-        gravity: 'top',
-        position: 'right',
+        gravity: 'bottom',
+        position: isRtl ? 'left' : 'right',
         stopOnFocus: true,
         style: { background: styles[type] ?? styles.info, borderRadius: '0.875rem' },
     }).showToast();

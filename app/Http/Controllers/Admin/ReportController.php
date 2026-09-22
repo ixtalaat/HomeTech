@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\ReportingService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ReportController extends Controller
@@ -44,6 +45,17 @@ class ReportController extends Controller
         return view('admin.reports.technicians', [
             'technicians' => $this->reports->technicianStats(),
         ]);
+    }
+
+    /**
+     * Display the dispatcher calendar.
+     */
+    public function calendar(Request $request): View
+    {
+        return view('admin.reports.calendar', $this->reports->calendarWeek(
+            $request->query('week'),
+            $request->query('branch_id') !== null ? (int) $request->query('branch_id') : null,
+        ));
     }
 
     /**

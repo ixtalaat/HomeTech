@@ -119,6 +119,11 @@
                         <span>{{ __('Revenue') }}</span>
                     </a>
 
+                    <a href="{{ route('admin.reports.calendar') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.reports.calendar') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <span>{{ __('Calendar') }}</span>
+                    </a>
+
                     <a href="{{ route('admin.reports.jobs') }}"
                         class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.reports.jobs') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                         <span>{{ __('Jobs') }}</span>

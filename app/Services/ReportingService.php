@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\AppointmentStatus;
 use App\Enums\InvoiceStatus;
 use App\Enums\RequestStatus;
 use App\Enums\WorkOrderStatus;
@@ -18,6 +19,7 @@ use App\Models\Technician;
 use App\Models\User;
 use App\Models\WorkOrder;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -349,6 +351,45 @@ class ReportingService
 
             return $row;
         });
+    }
+
+    /**
+     * Dispatcher week view: active technicians with their bookings per day.
+     *
+     * @return array{days: Collection<int, Carbon>, technicians: Collection<int, Technician>, bookings: Collection<int, Collection<string, Collection<int, Appointment>>>, branches: Collection<int, Branch>, branchId: ?int, weekOffset: int}
+     */
+    public function calendarWeek(?string $week = null, ?int $branchId = null): array
+    {
+        $offset = max(-4, min(8, (int) ($week ?? 0)));
+        $monday = now()->startOfWeek(1)->addWeeks($offset)->startOfDay();
+
+        $days = collect(range(0, 6))->map(fn (int $index) => $monday->copy()->addDays($index));
+
+        $technicians = Technician::active()
+            ->with('user')
+            ->when($branchId !== null, fn ($query) => $query->where('branch_id', $branchId))
+            ->orderBy('id')
+            ->get();
+
+        $bookings = Appointment::with(['request.service'])
+            ->whereIn('technician_id', $technicians->pluck('id'))
+            ->whereBetween('date', [$days->first()->format('Y-m-d'), $days->last()->format('Y-m-d')])
+            ->where('status', '!=', AppointmentStatus::Cancelled)
+            ->orderBy('start_time')
+            ->get()
+            ->groupBy([
+                fn (Appointment $appointment): int => $appointment->technician_id,
+                fn (Appointment $appointment): string => $appointment->date->format('Y-m-d'),
+            ]);
+
+        return [
+            'days' => $days,
+            'technicians' => $technicians,
+            'bookings' => $bookings,
+            'branches' => Branch::where('is_active', true)->orderByDesc('priority')->orderBy('name')->get(),
+            'branchId' => $branchId,
+            'weekOffset' => $offset,
+        ];
     }
 
     /**

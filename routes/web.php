@@ -161,6 +161,7 @@ Route::middleware(['auth', 'verified', 'role:admin,manager', 'branch.scope'])
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('reports/revenue', [ReportController::class, 'revenue'])->name('reports.revenue');
+        Route::get('reports/calendar', [ReportController::class, 'calendar'])->name('reports.calendar');
         Route::get('reports/jobs', [ReportController::class, 'jobs'])->name('reports.jobs');
         Route::get('reports/technicians', [ReportController::class, 'technicians'])->name('reports.technicians');
         Route::get('reports/inventory', [ReportController::class, 'inventory'])->name('reports.inventory');

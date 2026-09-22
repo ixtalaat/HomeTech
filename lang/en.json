@@ -892,5 +892,10 @@
     "New Password (leave blank to keep)": "New Password (leave blank to keep)",
     "Back to managers": "Back to managers",
     "Manager updated successfully.": "Manager updated successfully.",
-    "This branch already has a manager.": "This branch already has a manager."
+    "This branch already has a manager.": "This branch already has a manager.",
+    "Calendar": "Calendar",
+    "Previous week": "Previous week",
+    "Next week": "Next week",
+    "This week": "This week",
+    "All branches": "All branches"
 }

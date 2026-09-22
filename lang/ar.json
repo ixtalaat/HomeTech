@@ -902,5 +902,10 @@
     "New Password (leave blank to keep)": "كلمة مرور جديدة (اتركها فارغة للإبقاء)",
     "Back to managers": "عودة إلى المديرين",
     "Manager updated successfully.": "تم تحديث المدير بنجاح.",
-    "This branch already has a manager.": "هذا الفرع لديه مدير بالفعل."
+    "This branch already has a manager.": "هذا الفرع لديه مدير بالفعل.",
+    "Calendar": "التقويم",
+    "Previous week": "الأسبوع السابق",
+    "Next week": "الأسبوع التالي",
+    "This week": "هذا الأسبوع",
+    "All branches": "كل الفروع"
 }

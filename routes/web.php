@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AdditionalWorkController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\BranchManagerController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DiscountApprovalController;
@@ -13,11 +15,16 @@ use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TechnicianController;
+use App\Http\Controllers\Admin\TechnicianScheduleController;
 use App\Http\Controllers\Admin\WorkOrderController as AdminWorkOrderController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Branch\DashboardController as BranchDashboardController;
+use App\Http\Controllers\Branch\RequestController as BranchRequestController;
+use App\Http\Controllers\Branch\TechnicianController as BranchTechnicianController;
+use App\Http\Controllers\Branch\TechnicianScheduleController as BranchScheduleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\InvoiceController;
@@ -111,8 +118,7 @@ Route::middleware('auth')->group(function (): void {
 });
 
 Route::middleware(['auth', 'verified', 'role:technician'])
-    ->prefix('technician')
-    ->name('technician.')
+    ->prefix('technician')->name('technician.')
     ->group(function (): void {
         Route::get('jobs', [TechnicianWorkOrderController::class, 'index'])->name('jobs.index');
         Route::get('jobs/{workOrder}', [TechnicianWorkOrderController::class, 'show'])->name('jobs.show');
@@ -128,7 +134,27 @@ Route::middleware(['auth', 'verified', 'role:technician'])
         Route::patch('jobs/{workOrder}/complete', [TechnicianWorkOrderController::class, 'complete'])->name('jobs.complete');
     });
 
-Route::middleware(['auth', 'verified', 'role:admin,manager'])
+Route::middleware(['auth', 'verified', 'role:manager'])
+    ->prefix('branch')
+    ->name('branch.')
+    ->group(function (): void {
+        Route::get('/', [BranchDashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('technicians', [BranchTechnicianController::class, 'index'])->name('technicians.index');
+        Route::get('technicians/{technician}', [BranchTechnicianController::class, 'show'])->name('technicians.show');
+        Route::get('technicians/{technician}/schedule/edit', [BranchScheduleController::class, 'edit'])->name('technicians.schedule.edit');
+        Route::put('technicians/{technician}/schedule', [BranchScheduleController::class, 'update'])->name('technicians.schedule.update');
+
+        Route::get('requests', [BranchRequestController::class, 'index'])->name('requests.index');
+        Route::get('requests/{maintenanceRequest}', [BranchRequestController::class, 'show'])->name('requests.show');
+        Route::patch('requests/{maintenanceRequest}/approve', [BranchRequestController::class, 'approve'])->name('requests.approve');
+        Route::patch('requests/{maintenanceRequest}/reject', [BranchRequestController::class, 'reject'])->name('requests.reject');
+        Route::patch('requests/{maintenanceRequest}/request-info', [BranchRequestController::class, 'requestInfo'])->name('requests.request-info');
+        Route::patch('requests/{maintenanceRequest}/assign', [BranchRequestController::class, 'assign'])->name('requests.assign');
+        Route::patch('requests/{maintenanceRequest}/unassign', [BranchRequestController::class, 'unassign'])->name('requests.unassign');
+    });
+
+Route::middleware(['auth', 'verified', 'role:admin,manager', 'branch.scope'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function (): void {
@@ -140,6 +166,12 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
         Route::get('reports/inventory', [ReportController::class, 'inventory'])->name('reports.inventory');
 
         Route::resource('categories', ServiceCategoryController::class);
+        Route::resource('branches', BranchController::class)->except(['show']);
+        Route::get('managers', [BranchManagerController::class, 'index'])->name('managers.index');
+        Route::get('managers/{manager}/edit', [BranchManagerController::class, 'edit'])->name('managers.edit');
+        Route::put('managers/{manager}', [BranchManagerController::class, 'update'])->name('managers.update');
+        Route::patch('managers/{manager}/toggle-status', [BranchManagerController::class, 'toggleStatus'])->name('managers.toggle-status');
+        Route::patch('managers/{manager}/unassign', [BranchManagerController::class, 'unassign'])->name('managers.unassign');
         Route::patch('services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');
         Route::resource('services', ServiceController::class);
 
@@ -162,6 +194,8 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])
 
         Route::patch('technicians/{technician}/toggle-status', [TechnicianController::class, 'toggleStatus'])->name('technicians.toggle-status');
         Route::resource('technicians', TechnicianController::class);
+        Route::get('technicians/{technician}/schedule/edit', [TechnicianScheduleController::class, 'edit'])->name('technicians.schedule.edit');
+        Route::put('technicians/{technician}/schedule', [TechnicianScheduleController::class, 'update'])->name('technicians.schedule.update');
 
         Route::get('work-orders/{workOrder}', [AdminWorkOrderController::class, 'show'])->name('work-orders.show');
         Route::patch('work-orders/{workOrder}/correct', [AdminWorkOrderController::class, 'correct'])->name('work-orders.correct');

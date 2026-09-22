@@ -17,6 +17,20 @@
         </div>
     </div>
 
+    @if($unmanaged_branches->isNotEmpty())
+        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+            <h3 class="text-sm font-extrabold text-amber-900">⚠ {{ __('Branches without a manager (:count)', ['count' => $unmanaged_branches->count()]) }}</h3>
+            <div class="mt-3 flex flex-wrap gap-2">
+                @foreach ($unmanaged_branches as $branch)
+                    <a href="{{ route('admin.branches.edit', $branch) }}"
+                        class="rounded-xl bg-white/70 px-3 py-2 text-xs font-bold text-slate-900 hover:text-teal-700">
+                        {{ $branch->name }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <a href="{{ route('admin.requests.index') }}" class="stat-card transition hover:border-teal-200 hover:shadow-md" aria-label="{{ __('View today\'s jobs') }}">
             <span class="stat-icon bg-teal-50 text-teal-600" aria-hidden="true">

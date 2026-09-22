@@ -39,7 +39,7 @@
                     <span>{{ __('Browse Services') }}</span>
                 </a>
 
-                @if(auth()->user() && in_array(auth()->user()->role, [\App\Enums\UserRole::Admin, \App\Enums\UserRole::Manager], true))
+                @if(auth()->user() && in_array(auth()->user()->role, [\App\Enums\UserRole::Admin, \App\Enums\UserRole::Manager], true) && ! auth()->user()->isBranchScoped())
                     <div class="pt-4 pb-1">
                         <p class="px-4 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">{{ __('Admin Management') }}</p>
                     </div>
@@ -54,6 +54,12 @@
                         class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.categories.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
                         <span>{{ __('Categories') }}</span>
+                    </a>
+
+                    <a href="{{ route('admin.branches.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.branches.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                        <span>{{ __('Branches') }}</span>
                     </a>
 
                     <a href="{{ route('admin.customers.index') }}"
@@ -72,6 +78,12 @@
                         class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.technicians.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                         <span>{{ __('Technicians') }}</span>
+                    </a>
+
+                    <a href="{{ route('admin.managers.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.managers.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 8.5a3 3 0 1 0-2.2-5"/><path d="M17.5 20a5.5 5.5 0 0 0-4-5.2"/></svg>
+                        <span>{{ __('Managers') }}</span>
                     </a>
 
                     <a href="{{ route('admin.inventory.index') }}"
@@ -120,6 +132,30 @@
                     <a href="{{ route('admin.reports.inventory') }}"
                         class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('admin.reports.inventory') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
                         <span>{{ __('Inventory') }}</span>
+                    </a>
+                @endif
+
+                @if(auth()->user() && auth()->user()->role === \App\Enums\UserRole::Manager && auth()->user()->isBranchScoped())
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">{{ __('Branch Management') }}</p>
+                    </div>
+
+                    <a href="{{ route('branch.dashboard') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('branch.dashboard') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9Z"/><path d="M9 21v-6h6v6"/></svg>
+                        <span>{{ __('Overview') }}</span>
+                    </a>
+
+                    <a href="{{ route('branch.technicians.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('branch.technicians.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+                        <span>{{ __('Technicians') }}</span>
+                    </a>
+
+                    <a href="{{ route('branch.requests.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ request()->routeIs('branch.requests.*') ? 'bg-teal-50 text-teal-700 font-bold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                        <span>{{ __('Requests') }}</span>
                     </a>
                 @endif
 

@@ -55,6 +55,21 @@
             </div>
 
             <div>
+                <label for="branch_id" class="form-label">{{ __('Branch') }}</label>
+                <select id="branch_id" name="branch_id" class="form-input @error('branch_id') border-rose-300 @enderror">
+                    <option value="">{{ __('No branch') }}</option>
+                    @foreach ($branches as $branch)
+                        <option value="{{ $branch->id }}" {{ (string) old('branch_id', $technician->branch_id ?? '') === (string) $branch->id ? 'selected' : '' }}>
+                            {{ $branch->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('branch_id')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
                 <label for="notes" class="form-label">{{ __('Notes') }}</label>
                 <textarea id="notes" name="notes" rows="3" class="form-input @error('notes') border-rose-300 @enderror">{{ old('notes', $technician->notes) }}</textarea>
                 @error('notes')

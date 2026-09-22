@@ -19,11 +19,14 @@ class SetLocale
     /**
      * Handle an incoming request.
      *
+     * Session wins when present; otherwise the persistent locale cookie
+     * applies, so the choice survives logout and session invalidation.
+     *
      * @param  Closure(Request): Response  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->session()->get('locale', config('app.locale', 'en'));
+        $locale = $request->session()->get('locale', $request->cookie('locale', config('app.locale', 'en')));
 
         if (! in_array($locale, self::LOCALES, true)) {
             $locale = 'en';

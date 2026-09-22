@@ -61,3 +61,17 @@ it('shows Arabic validation messages in Arabic locale', function () {
 
     $response->assertSessionHasErrors('email');
 });
+
+it('persists the locale in a cookie that survives logout', function () {
+    $customer = User::factory()->create(['role' => UserRole::Customer]);
+
+    $this->actingAs($customer)->get(route('locale.switch', 'ar'))
+        ->assertRedirect()
+        ->assertCookie('locale', 'ar');
+
+    // Fresh session (as after logout) with only the cookie still renders Arabic.
+    $this->actingAs($customer)->withCookies(['locale' => 'ar'])->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('dir="rtl"', false)
+        ->assertSee('طلباتي', false);
+});

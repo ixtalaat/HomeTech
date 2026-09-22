@@ -28,6 +28,7 @@ use App\Http\Controllers\PhoneVerificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceBrowseController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\Technician\WorkOrderController as TechnicianWorkOrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +89,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+
+    Route::get('support', [SupportController::class, 'create'])->name('support.create');
+    Route::post('support', [SupportController::class, 'store'])->middleware('throttle:10,1')->name('support.store');
 
     Route::post('phone/send-code', [PhoneVerificationController::class, 'send'])->name('phone.send-code');
     Route::post('phone/verify', [PhoneVerificationController::class, 'verify'])->name('phone.verify');

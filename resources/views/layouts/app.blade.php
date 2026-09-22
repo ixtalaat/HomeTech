@@ -5,7 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? config('app.name', 'HomeTech') }}</title>
+    <meta name="theme-color" content="#0f766e">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <title>@hasSection('title')@yield('title') — {{ __('HomeTech') }}@else{{ $title ?? config('app.name', 'HomeTech') }}@endif</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -95,7 +97,7 @@
                     </a>
 
                     <div class="pt-4 pb-1">
-                        <p class="px-4 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Reports</p>
+                        <p class="px-4 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">{{ __('Reports') }}</p>
                     </div>
 
                     <a href="{{ route('admin.reports.revenue') }}"
@@ -155,10 +157,21 @@
                     <span>{{ __('My profile') }}</span>
                 </a>
             </nav>
-            <div class="mt-auto rounded-2xl bg-slate-900 p-5 text-white">
-                <p class="text-sm font-bold">{{ __('Need a hand?') }}</p>
-                <p class="mt-2 text-xs leading-5 text-slate-300">{{ __('Our support team is ready to help with your next service.') }}</p>
-                <a href="mailto:support@hometech.test" class="mt-4 inline-flex text-xs font-bold text-teal-300">{{ __('Contact support →') }}</a>
+            <div class="relative mt-auto overflow-hidden rounded-2xl bg-slate-900 p-5 text-white">
+                <div class="pointer-events-none absolute -top-12 left-1/2 h-28 w-44 -translate-x-1/2 rounded-full bg-teal-500/25 blur-2xl" aria-hidden="true"></div>
+                <div class="relative flex items-center gap-3">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-teal-300">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2.8" y="13.5" width="4" height="6.5" rx="2"/><rect x="17.2" y="13.5" width="4" height="6.5" rx="2"/><path d="M19.5 20a4.5 4.5 0 0 1-4.5 3H13"/></svg>
+                    </span>
+                    <div>
+                        <p class="text-sm font-bold">{{ __('Need a hand?') }}</p>
+                        <p class="mt-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-300">
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>{{ __('Support is online') }}
+                        </p>
+                    </div>
+                </div>
+                <p class="relative mt-3 text-xs leading-5 text-slate-300 text-balance">{{ __('Our support team is ready to help with your next service.') }}</p>
+                <a href="{{ route('support.create') }}" class="relative mt-4 inline-flex w-full items-center justify-center rounded-xl bg-teal-500 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-teal-400">{{ __('Contact support →') }}</a>
             </div>
         </aside>
         <main id="main-content" class="min-w-0 flex-1" tabindex="-1">

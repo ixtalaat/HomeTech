@@ -15,6 +15,7 @@ it('shows the contact support page', function () {
 
 it('sends the message to the admin by mail', function () {
     Mail::fake();
+    config(['support.email' => null]);
 
     $admin = User::factory()->create(['role' => UserRole::Admin, 'email' => 'admin@hometech.test']);
     $customer = User::factory()->create(['role' => UserRole::Customer]);
@@ -25,6 +26,20 @@ it('sends the message to the admin by mail', function () {
     ])->assertRedirect(route('support.create'));
 
     Mail::assertSent(SupportMessage::class, fn (SupportMessage $mail): bool => $mail->hasTo($admin->email));
+});
+
+it('sends to the configured support inbox when set', function () {
+    Mail::fake();
+    config(['support.email' => 'help@hometech.test']);
+
+    $customer = User::factory()->create(['role' => UserRole::Customer]);
+
+    $this->actingAs($customer)->post(route('support.store'), [
+        'subject' => 'Question about my invoice',
+        'message' => 'The total looks wrong, please review it.',
+    ])->assertRedirect(route('support.create'));
+
+    Mail::assertSent(SupportMessage::class, fn (SupportMessage $mail): bool => $mail->hasTo('help@hometech.test'));
 });
 
 it('requires a subject and a message', function () {

@@ -213,6 +213,25 @@ class BranchService
     }
 
     /**
+     * Resolve the active manager responsible for a city, if any.
+     */
+    public function managerForCity(string $city): ?User
+    {
+        $city = City::normalize($city);
+
+        if ($city === '') {
+            return null;
+        }
+
+        return User::where('role', UserRole::Manager)
+            ->where('is_active', true)
+            ->whereHas('managedBranch', fn ($branch) => $branch
+                ->where('is_active', true)
+                ->whereHas('cities', fn ($cities) => $cities->where('name', $city)))
+            ->first();
+    }
+
+    /**
      * Branch performance overview for the manager dashboard.
      *
      * @return array<string, mixed>

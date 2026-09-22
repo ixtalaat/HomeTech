@@ -16,5 +16,7 @@ return [
     'additional_work_rejected' => 'رفض العميل العمل الإضافي \':description\' للطلب #:id.',
     'technician_on_way' => ':technician في الطريق لطلبك #:id.',
     'discount_approval_requested' => 'مطلوب موافقة على خصم: :value :type للفاتورة :number.',
+    'queue_backlog_stuck' => 'تكدس في الطابور: :count مهام معلقة، وأقدمها ينتظر منذ :minutes دقيقة.',
+    'stale_assignment_nudge' => 'الطلب #:id تمت الموافقة عليه منذ :days أيام وما زال غير مُسند.',
     'fallback' => 'تحديث',
 ];

@@ -16,5 +16,7 @@ return [
     'additional_work_rejected' => 'The customer rejected the additional work \':description\' for request #:id.',
     'technician_on_way' => ':technician is on the way for your request #:id.',
     'discount_approval_requested' => 'Discount approval needed: :value :type on invoice :number.',
+    'queue_backlog_stuck' => 'Queue backlog: :count jobs pending, oldest waiting :minutes minutes.',
+    'stale_assignment_nudge' => 'Request #:id approved :days days ago is still unassigned.',
     'fallback' => 'Update',
 ];

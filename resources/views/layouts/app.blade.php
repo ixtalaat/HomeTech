@@ -7,6 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0f766e">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <script defer src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js"></script>
     <title>@hasSection('title')@yield('title') — {{ __('HomeTech') }}@else{{ $title ?? config('app.name', 'HomeTech') }}@endif</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -245,6 +247,40 @@
             </nav>
         </main>
     </div>
+    <script>
+        // Foreground push messages: show them as a toast while the app is open.
+        window.addEventListener('load', () => {
+            if (typeof firebase === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
+                return;
+            }
+
+            fetch('{{ route('firebase.config') }}', { headers: { Accept: 'application/json' } })
+                .then((response) => response.json())
+                .then((config) => {
+                    if (!config.apiKey) {
+                        return;
+                    }
+
+                    const app = firebase.apps.length ? firebase.app() : firebase.initializeApp({
+                        apiKey: config.apiKey,
+                        authDomain: config.authDomain,
+                        projectId: config.projectId,
+                        messagingSenderId: config.senderId,
+                        appId: config.appId,
+                    });
+
+                    firebase.messaging(app).onMessage((payload) => {
+                        const text = (payload.notification && (payload.notification.body || payload.notification.title)) || '';
+
+                        if (text && window.toast) {
+                            window.toast(text, 'info');
+                        }
+                    });
+                })
+                .catch(() => {});
+        });
+    </script>
+    @stack('scripts')
 </body>
 
 </html>

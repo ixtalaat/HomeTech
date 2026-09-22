@@ -818,5 +818,9 @@
     "Write the details so our team can help faster…": "Write the details so our team can help faster…",
     "Send message": "Send message",
     "Your message has been sent. Our team will reply soon.": "Your message has been sent. Our team will reply soon.",
-    "Support is currently unavailable. Please try again later.": "Support is currently unavailable. Please try again later."
+    "Support is currently unavailable. Please try again later.": "Support is currently unavailable. Please try again later.",
+    "Enable push notifications": "Enable push notifications",
+    "Push notifications enabled": "Push notifications enabled",
+    "Push notifications blocked or unavailable": "Push notifications blocked or unavailable",
+    "Browser notifications are not supported here": "Browser notifications are not supported here"
 }

@@ -102,6 +102,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the push notification device tokens for the user.
+     *
+     * @return HasMany<FcmToken, $this>
+     */
+    public function fcmTokens(): HasMany
+    {
+        return $this->hasMany(FcmToken::class);
+    }
+
+    /**
      * Scope a query to only include customers.
      *
      * @param  Builder<$this>  $query

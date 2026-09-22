@@ -26,6 +26,7 @@ use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PhoneVerificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PushTokenController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceBrowseController;
 use App\Http\Controllers\SupportController;
@@ -41,6 +42,9 @@ Route::get('/services', [ServiceBrowseController::class, 'index'])->name('servic
 Route::get('/services/{slug}', [ServiceBrowseController::class, 'show'])->name('services.show');
 
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
+
+// Public Firebase web-push configuration (client identifiers only, no secrets).
+Route::get('/firebase-config', [PushTokenController::class, 'config'])->name('firebase.config');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
@@ -92,6 +96,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     Route::get('support', [SupportController::class, 'create'])->name('support.create');
     Route::post('support', [SupportController::class, 'store'])->middleware('throttle:10,1')->name('support.store');
+
+    Route::post('push-tokens', [PushTokenController::class, 'store'])->middleware('throttle:30,1')->name('push-tokens.store');
+    Route::delete('push-tokens', [PushTokenController::class, 'destroy'])->name('push-tokens.destroy');
 
     Route::post('phone/send-code', [PhoneVerificationController::class, 'send'])->name('phone.send-code');
     Route::post('phone/verify', [PhoneVerificationController::class, 'verify'])->name('phone.verify');

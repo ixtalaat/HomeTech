@@ -828,5 +828,9 @@
     "Write the details so our team can help faster…": "اكتب التفاصيل ليساعدك فريقنا بشكل أسرع…",
     "Send message": "إرسال الرسالة",
     "Your message has been sent. Our team will reply soon.": "تم إرسال رسالتك. سيرد عليك فريقنا قريبًا.",
-    "Support is currently unavailable. Please try again later.": "الدعم غير متاح حاليًا. حاول مجددًا لاحقًا."
+    "Support is currently unavailable. Please try again later.": "الدعم غير متاح حاليًا. حاول مجددًا لاحقًا.",
+    "Enable push notifications": "تفعيل إشعارات المتصفح",
+    "Push notifications enabled": "تم تفعيل إشعارات المتصفح",
+    "Push notifications blocked or unavailable": "إشعارات المتصفح محظورة أو غير متاحة",
+    "Browser notifications are not supported here": "المتصفح لا يدعم الإشعارات هنا"
 }

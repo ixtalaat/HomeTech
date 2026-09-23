@@ -12,7 +12,7 @@
         <a href="{{ route('branch.requests.index') }}" class="secondary-button text-xs">{{ __('View Requests') }}</a>
     </div>
 
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-5">
         <div class="stat-card">
             <span class="stat-icon bg-teal-50 text-teal-600" aria-hidden="true">
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
@@ -47,6 +47,16 @@
             <span>
                 <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Unassigned Jobs') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold text-slate-900">{{ $unassigned_approved }}</span>
+            </span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon bg-emerald-50 text-emerald-600" aria-hidden="true">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.75 9.25a.75.75 0 011.5 0v2.5h2.5a.75.75 0 010 1.5h-3.25a.75.75 0 01-.75-.75v-3.25z" clip-rule="evenodd" /></svg>
+            </span>
+            <span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('30-Day Revenue') }}</span>
+                <span class="mt-0.5 block font-display text-3xl font-extrabold text-emerald-600">{{ number_format($revenue_30d, 2) }}</span>
+                <span class="mt-0.5 block text-xs font-semibold text-slate-500">{{ __('EGP collected') }}</span>
             </span>
         </div>
     </div>

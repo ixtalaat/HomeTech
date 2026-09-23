@@ -1,9 +1,13 @@
 <?php
 
+use App\Enums\PaymentMethod;
 use App\Enums\RequestStatus;
 use App\Enums\UserRole;
 use App\Models\Branch;
 use App\Models\User;
+use App\Services\BranchService;
+use App\Services\InvoiceService;
+use App\Services\PaymentService;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -246,6 +250,26 @@ it('confines assigned managers to their branch area', function () {
     $this->actingAs($plain)->get(route('branch.dashboard'))->assertNotFound();
 });
 
+it('shows branch revenue from paid invoices', function () {
+    ['branch' => $branch] = managedBranch('Riyadh');
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $workOrder = completedWorkOrderWithCharges();
+    $workOrder->request->address->update(['city' => 'Riyadh']);
+    $invoice = app(InvoiceService::class)->generate($workOrder, $admin);
+    app(InvoiceService::class)->issue($invoice->refresh(), $admin);
+    app(PaymentService::class)->pay($invoice->refresh(), (float) $invoice->refresh()->total, PaymentMethod::Cash, $admin);
+
+    $overview = app(BranchService::class)->overview($branch->refresh());
+
+    expect($overview['revenue_30d'])->toBe((float) $invoice->refresh()->total);
+
+    // Other branches stay excluded.
+    $other = staffedBranch('Jeddah');
+    $otherOverview = app(BranchService::class)->overview($other);
+
+    expect($otherOverview['revenue_30d'])->toBe(0.0);
+});
 it('flags branches without a manager on the admin dashboard', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
     $branch = Branch::factory()->create(['name' => 'Tabuk']);

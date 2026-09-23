@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Enums\AppointmentStatus;
+use App\Enums\InvoiceStatus;
 use App\Enums\RequestStatus;
 use App\Enums\UserRole;
 use App\Exceptions\BranchException;
 use App\Models\Appointment;
 use App\Models\Branch;
 use App\Models\City;
+use App\Models\Invoice;
 use App\Models\MaintenanceRequest;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -251,6 +253,10 @@ class BranchService
             'unassigned_approved' => MaintenanceRequest::where('status', RequestStatus::Approved)->whereNull('technician_id')->where(fn ($query) => $inBranch($query))->count(),
             'active_jobs' => MaintenanceRequest::whereIn('status', [RequestStatus::TechnicianAssigned, RequestStatus::Scheduled, RequestStatus::TechnicianOnWay, RequestStatus::InProgress])->where(fn ($query) => $inBranch($query))->count(),
             'todays_appointments' => Appointment::where('date', $today)->whereIn('technician_id', $technicianIds)->where('status', '!=', AppointmentStatus::Cancelled)->orderBy('start_time')->limit(8)->get(),
+            'revenue_30d' => (float) Invoice::whereNotIn('status', [InvoiceStatus::Cancelled])
+                ->where('created_at', '>=', now()->subDays(30))
+                ->whereHas('request.address', fn ($address) => $address->whereIn('city', $cityNames->all()))
+                ->sum('paid_amount'),
             'recent_requests' => MaintenanceRequest::with(['user', 'service'])->where(fn ($query) => $inBranch($query))->latest()->limit(8)->get(),
         ];
     }

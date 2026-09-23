@@ -912,5 +912,10 @@
     "Off duty": "خارج الخدمة",
     "Outside working hours": "خارج ساعات العمل",
     "At daily limit": "بلغ الحد اليومي",
-    "Time conflict": "تعارض في الموعد"
+    "Time conflict": "تعارض في الموعد",
+    "is on the way to you": "في الطريق إليك",
+    "Visit today at :time": "الزيارة اليوم الساعة :time",
+    "Work is in progress on your request.": "العمل جارٍ على طلبك.",
+    "30-Day Revenue": "إيرادات 30 يومًا",
+    "EGP collected": "جنيه تم تحصيلها"
 }

@@ -2,12 +2,32 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class WhatsAppService
 {
+    /**
+     * Notify a user over WhatsApp, best effort.
+     *
+     * Skips users without a phone number and never throws: delivery
+     * problems are logged so the calling flow always proceeds.
+     */
+    public function notifyUser(?User $user, string $message): void
+    {
+        if ($user === null || trim((string) $user->phone) === '') {
+            return;
+        }
+
+        try {
+            $this->send($user->phone, $message);
+        } catch (\Throwable $exception) {
+            Log::warning('WhatsApp notification failed.', ['error' => $exception->getMessage()]);
+        }
+    }
+
     /**
      * Send a WhatsApp message through the configured driver.
      *

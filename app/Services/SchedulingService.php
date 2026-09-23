@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class SchedulingService
 {
-    public function __construct(private RequestStatusService $transitions) {}
+    public function __construct(private RequestStatusService $transitions, private WhatsAppService $whatsapp) {}
 
     /**
      * Determine whether the technician has a conflicting appointment (BR-002).
@@ -162,6 +162,10 @@ class SchedulingService
             );
 
             $request->user->notify(new TechnicianOnWay($request->refresh()));
+            $this->whatsapp->notifyUser(
+                $request->user,
+                "{$technicianUser->name} is on the way for your request #{$request->id}."
+            );
 
             return $request->refresh();
         });

@@ -27,6 +27,34 @@
         @endif
     </div>
 
+    @if($maintenanceRequest->status === \App\Enums\RequestStatus::TechnicianOnWay && $maintenanceRequest->technician)
+        <div class="mb-6 flex items-center gap-3 rounded-2xl border border-teal-200 bg-teal-50 p-4 shadow-sm">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-white">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
+            </span>
+            <div>
+                <p class="text-sm font-extrabold text-slate-900">{{ $maintenanceRequest->technician->user->name }} {{ __('is on the way to you') }}</p>
+                @if($maintenanceRequest->appointment && !$maintenanceRequest->appointment->isCancelled())
+                    <p class="text-xs text-slate-600">{{ __('Visit today at :time', ['time' => \Carbon\Carbon::parse($maintenanceRequest->appointment->start_time)->format('h:i A')]) }}</p>
+                @endif
+            </div>
+        </div>
+    @elseif($maintenanceRequest->status === \App\Enums\RequestStatus::Scheduled && $maintenanceRequest->appointment && !$maintenanceRequest->appointment->isCancelled() && $maintenanceRequest->appointment->date->isToday())
+        <div class="mb-6 flex items-center gap-3 rounded-2xl border border-sky-200 bg-sky-50 p-4 shadow-sm">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-600 text-white">
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clip-rule="evenodd" /></svg>
+            </span>
+            <p class="text-sm font-extrabold text-slate-900">{{ __('Visit today at :time', ['time' => \Carbon\Carbon::parse($maintenanceRequest->appointment->start_time)->format('h:i A')]) }}</p>
+        </div>
+    @elseif($maintenanceRequest->status === \App\Enums\RequestStatus::InProgress)
+        <div class="mb-6 flex items-center gap-3 rounded-2xl border border-teal-200 bg-teal-50 p-4 shadow-sm">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-white">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </span>
+            <p class="text-sm font-extrabold text-slate-900">{{ __('Work is in progress on your request.') }}</p>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 class="text-sm font-extrabold text-slate-900">{{ __('Request Details') }}</h3>

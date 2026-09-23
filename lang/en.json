@@ -902,5 +902,10 @@
     "Off duty": "Off duty",
     "Outside working hours": "Outside working hours",
     "At daily limit": "At daily limit",
-    "Time conflict": "Time conflict"
+    "Time conflict": "Time conflict",
+    "is on the way to you": "is on the way to you",
+    "Visit today at :time": "Visit today at :time",
+    "Work is in progress on your request.": "Work is in progress on your request.",
+    "30-Day Revenue": "30-Day Revenue",
+    "EGP collected": "EGP collected"
 }

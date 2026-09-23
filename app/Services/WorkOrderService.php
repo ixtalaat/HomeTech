@@ -23,7 +23,8 @@ class WorkOrderService
     public function __construct(
         private RequestStatusService $transitions,
         private SchedulingService $scheduling,
-        private InventoryService $inventory
+        private InventoryService $inventory,
+        private WhatsAppService $whatsapp
     ) {}
 
     /**
@@ -202,6 +203,10 @@ class WorkOrderService
             );
 
             $workOrder->request->user->notify(new JobCompleted($workOrder->request));
+            $this->whatsapp->notifyUser(
+                $workOrder->request->user,
+                "The work for your request #{$workOrder->request->id} is completed."
+            );
 
             return $workOrder->refresh();
         });

@@ -30,7 +30,8 @@ class TechnicianAssignmentService
 
     public function __construct(
         private RequestStatusService $transitions,
-        private SchedulingService $scheduling
+        private SchedulingService $scheduling,
+        private WhatsAppService $whatsapp
     ) {}
 
     /**
@@ -70,6 +71,10 @@ class TechnicianAssignmentService
 
             $request->user->notify(new TechnicianAssignedToRequest($request->refresh(), $technician->user->name));
             $technician->user->notify(new JobAssigned($request->refresh()));
+            $this->whatsapp->notifyUser(
+                $request->user,
+                "Technician {$technician->user->name} was assigned to your request #{$request->id}."
+            );
 
             return $request->refresh();
         });

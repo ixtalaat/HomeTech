@@ -19,5 +19,6 @@ return [
     'queue_backlog_stuck' => 'تكدس في الطابور: :count مهام معلقة، وأقدمها ينتظر منذ :minutes دقيقة.',
     'stale_assignment_nudge' => 'الطلب #:id تمت الموافقة عليه منذ :days أيام وما زال غير مُسند.',
     'reschedule_needed' => 'لا يوجد فني متاح للطلب #:id. يرجى اختيار موعد آخر.',
+    'job_unassigned' => 'تم إلغاء تعيينك من الطلب #:id.',
     'fallback' => 'تحديث',
 ];

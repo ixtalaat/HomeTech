@@ -12,6 +12,7 @@ use App\Models\MaintenanceRequest;
 use App\Models\Technician;
 use App\Models\User;
 use App\Notifications\JobAssigned;
+use App\Notifications\JobUnassigned;
 use App\Notifications\TechnicianAssignedToRequest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -133,6 +134,9 @@ class TechnicianAssignmentService
         }
 
         return DB::transaction(function () use ($request, $actor): MaintenanceRequest {
+            $technician = $request->technician;
+            $technicianUser = $technician?->user;
+
             $request->update(['technician_id' => null]);
 
             $appointment = $request->appointment;
@@ -148,8 +152,33 @@ class TechnicianAssignmentService
                 'Technician unassigned; appointment cancelled.'
             );
 
+            $technicianUser?->notify(new JobUnassigned($request->refresh()));
+
             return $request->refresh();
         });
+    }
+
+    /**
+     * Eligible technicians annotated for the preferred slot.
+     *
+     * Each model carries `day_load` (blocking bookings that day) and a
+     * nullable `slot_note` flagging off-duty, out-of-hours, capped, or
+     * conflicting technicians — so manual assignment stays a conscious
+     * choice instead of silently overloading anyone.
+     *
+     * @return Collection<int, Technician>
+     */
+    public function eligibleWithSlotStatus(MaintenanceRequest $request, ?Branch $branch = null): Collection
+    {
+        [$date, $start, $end] = $this->resolveSlot($request, []);
+        $dayOfWeek = Carbon::parse($date)->dayOfWeek;
+
+        return $this->eligibleFor($request, $branch)
+            ->loadMissing(['schedules' => fn (HasMany $query) => $query->where('day_of_week', $dayOfWeek)])
+            ->each(function (Technician $technician) use ($date, $start, $end, $dayOfWeek): void {
+                $technician->day_load = $this->dailyLoad($technician->id, $date);
+                $technician->slot_note = $this->slotNote($technician, $date, $start, $end, $dayOfWeek);
+            });
     }
 
     /**
@@ -307,6 +336,32 @@ class TechnicianAssignmentService
     public function dailyLoad(int $technicianId, string $date): int
     {
         return Appointment::forTechnicianOn($technicianId, $date)->blocking()->count();
+    }
+
+    /**
+     * Short availability flag for one technician and slot, if any applies.
+     */
+    private function slotNote(Technician $technician, string $date, string $start, string $end, int $dayOfWeek): ?string
+    {
+        $schedule = $technician->schedules->firstWhere('day_of_week', $dayOfWeek);
+
+        if ($schedule === null || ! $schedule->is_working) {
+            return __('Off duty');
+        }
+
+        if (! $schedule->covers($start, $end)) {
+            return __('Outside working hours');
+        }
+
+        if ($technician->day_load >= self::MAX_DAILY_REQUESTS) {
+            return __('At daily limit');
+        }
+
+        if ($this->scheduling->hasConflict($technician->id, $date, $start, $end)) {
+            return __('Time conflict');
+        }
+
+        return null;
     }
 
     /**

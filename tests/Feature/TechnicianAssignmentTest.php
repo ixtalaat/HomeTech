@@ -8,6 +8,7 @@ use App\Models\MaintenanceRequest;
 use App\Models\Technician;
 use App\Models\User;
 use App\Services\TechnicianAssignmentService;
+use Carbon\Carbon;
 
 it('assigns an eligible technician to an approved request and books the slot', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
@@ -115,4 +116,52 @@ it('lists only eligible technicians for a request', function () {
     expect($ids)->toContain($eligible->id)
         ->and($ids)->not->toContain($unskilled->id)
         ->and($ids)->not->toContain($inactive->id);
+});
+
+it('notifies the removed technician on unassign', function () {
+    $service = app(TechnicianAssignmentService::class);
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $request = MaintenanceRequest::factory()->approved()->create(['preferred_time' => '10:00']);
+    $request->service->update(['estimated_duration_minutes' => 60]);
+    $technician = skilledTechnician($request->service);
+
+    $service->assign($request, $technician, $admin);
+    $service->unassign($request->refresh(), $admin);
+
+    $stored = $technician->user->notifications()->pluck('data')->firstWhere('type', 'job_unassigned');
+
+    expect($stored)->not->toBeNull()
+        ->and($stored['maintenance_request_id'])->toBe($request->id);
+});
+
+it('annotates eligible technicians with day load and slot notes', function () {
+    $service = app(TechnicianAssignmentService::class);
+    $request = mondayRequest(hourlyService(), 'Riyadh');
+    staffedBranch('Riyadh');
+
+    $offDuty = Technician::factory()->create();
+    $offDuty->categories()->sync([$request->service->service_category_id]);
+    $offDuty->schedules()->create([
+        'day_of_week' => Carbon::MONDAY,
+        'is_working' => false,
+        'start_time' => null,
+        'end_time' => null,
+    ]);
+
+    $annotated = $service->eligibleWithSlotStatus($request->refresh())->keyBy('id');
+
+    expect($annotated[$offDuty->id]->slot_note)->toBe('Off duty')
+        ->and($annotated[$offDuty->id]->day_load)->toBe(0);
+});
+
+it('shows day load in the assignment dropdown', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $service = hourlyService();
+    $branch = staffedBranch('Riyadh');
+    workingTechnician($service, $branch);
+    $request = mondayRequest($service, 'Riyadh');
+
+    $this->actingAs($admin)->get(route('admin.requests.show', $request))
+        ->assertOk()
+        ->assertSee('0/2', false);
 });

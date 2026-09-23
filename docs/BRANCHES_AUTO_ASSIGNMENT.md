@@ -192,6 +192,13 @@ immediately: success assigns and books, failure keeps the new slot with the
 reason flashed — the loop closes without staff involvement. Covered in
 `tests/Feature/RescheduleFlowTest.php`.
 
+Unassigning notifies the removed technician (`JobUnassigned`), and the
+manual assignment dropdowns annotate every candidate with day load
+(`1/2`) plus flags (`Off duty`, `Outside working hours`, `At daily
+limit`, `Time conflict`) via
+`TechnicianAssignmentService::eligibleWithSlotStatus()` — so overriding
+the automatic rules stays a conscious choice.
+
 ## 8. Branch Managers
 
 Each branch has at most one active manager (`branches.manager_user_id`,

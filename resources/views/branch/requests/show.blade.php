@@ -85,7 +85,7 @@
                         <select name="technician_id" required class="form-input text-xs" aria-label="{{ __('Select eligible technician') }}">
                             <option value="">{{ __('Select eligible technician') }}</option>
                             @foreach ($eligibleTechnicians as $technician)
-                                <option value="{{ $technician->id }}">{{ $technician->user->name }} ({{ $technician->assigned_requests_count ?? 0 }} {{ __('Assigned') }})</option>
+                                <option value="{{ $technician->id }}">{{ $technician->user->name }} ({{ $technician->assigned_requests_count ?? 0 }} {{ __('Assigned') }} · {{ $technician->day_load ?? 0 }}/{{ \App\Services\TechnicianAssignmentService::MAX_DAILY_REQUESTS }}){{ ! empty($technician->slot_note) ? ' — '.$technician->slot_note : '' }}</option>
                             @endforeach
                         </select>
                         <button type="submit" class="secondary-button w-full text-xs">{{ __('Assign & Book') }}</button>

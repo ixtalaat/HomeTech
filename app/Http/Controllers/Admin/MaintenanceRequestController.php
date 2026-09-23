@@ -61,7 +61,7 @@ class MaintenanceRequestController extends Controller
 
         $maintenanceRequest->load(['user', 'service.category', 'address', 'reviewer', 'technician.user', 'appointment', 'workOrder', 'invoice', 'cancellation', 'review.user', 'statusHistories']);
 
-        $eligibleTechnicians = $this->assignments->eligibleFor($maintenanceRequest);
+        $eligibleTechnicians = $this->assignments->eligibleWithSlotStatus($maintenanceRequest);
 
         return view('admin.requests.show', compact('maintenanceRequest', 'eligibleTechnicians'));
     }

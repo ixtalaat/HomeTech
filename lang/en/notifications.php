@@ -19,5 +19,6 @@ return [
     'queue_backlog_stuck' => 'Queue backlog: :count jobs pending, oldest waiting :minutes minutes.',
     'stale_assignment_nudge' => 'Request #:id approved :days days ago is still unassigned.',
     'reschedule_needed' => 'No technician is available for request #:id. Please choose another appointment time.',
+    'job_unassigned' => 'You were unassigned from request #:id.',
     'fallback' => 'Update',
 ];

@@ -898,5 +898,9 @@
     "Next week": "Next week",
     "This week": "This week",
     "All branches": "All branches",
-    "No technician was available for your slot. Pick another date or time.": "No technician was available for your slot. Pick another date or time."
+    "No technician was available for your slot. Pick another date or time.": "No technician was available for your slot. Pick another date or time.",
+    "Off duty": "Off duty",
+    "Outside working hours": "Outside working hours",
+    "At daily limit": "At daily limit",
+    "Time conflict": "Time conflict"
 }

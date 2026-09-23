@@ -908,5 +908,9 @@
     "Next week": "الأسبوع التالي",
     "This week": "هذا الأسبوع",
     "All branches": "كل الفروع",
-    "No technician was available for your slot. Pick another date or time.": "لا يوجد فني متاح لموعدك. اختر تاريخًا أو وقتًا آخر."
+    "No technician was available for your slot. Pick another date or time.": "لا يوجد فني متاح لموعدك. اختر تاريخًا أو وقتًا آخر.",
+    "Off duty": "خارج الخدمة",
+    "Outside working hours": "خارج ساعات العمل",
+    "At daily limit": "بلغ الحد اليومي",
+    "Time conflict": "تعارض في الموعد"
 }

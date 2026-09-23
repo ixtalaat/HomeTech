@@ -51,7 +51,7 @@ class RequestController extends BaseController
 
         $maintenanceRequest->load(['user', 'service.category', 'address', 'technician.user', 'appointment']);
 
-        $eligibleTechnicians = $this->assignments->eligibleFor($maintenanceRequest, $branch);
+        $eligibleTechnicians = $this->assignments->eligibleWithSlotStatus($maintenanceRequest, $branch);
 
         return view('branch.requests.show', compact('branch', 'maintenanceRequest', 'eligibleTechnicians'));
     }

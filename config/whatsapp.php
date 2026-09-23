@@ -33,4 +33,16 @@ return [
 
     'code_ttl_minutes' => 10,
     'code_max_attempts' => 5,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Demo Code Reveal
+    |--------------------------------------------------------------------------
+    |
+    | Flash the verification code on screen so testers without provider
+    | credentials can complete verification. Triple-guarded: explicit opt-in,
+    | never in production, and never with a real provider configured.
+    |
+    */
+    'reveal_codes' => env('PHONE_VERIFICATION_DEMO', false),
 ];

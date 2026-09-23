@@ -21,12 +21,18 @@ class PhoneVerificationController extends Controller
     public function send(Request $request): RedirectResponse
     {
         try {
-            $this->verifications->sendCode($request->user());
+            $result = $this->verifications->sendCode($request->user());
         } catch (PhoneVerificationException $exception) {
             return back()->with('error', $exception->getMessage());
         }
 
-        return back()->with('success', __('Verification code sent via WhatsApp.'));
+        $redirect = back()->with('success', __('Verification code sent via WhatsApp.'));
+
+        if ($result['revealedCode'] !== null) {
+            $redirect->with('status', __('Demo mode: your verification code is :code.', ['code' => $result['revealedCode']]));
+        }
+
+        return $redirect;
     }
 
     /**

@@ -907,5 +907,6 @@
     "Visit today at :time": "Visit today at :time",
     "Work is in progress on your request.": "Work is in progress on your request.",
     "30-Day Revenue": "30-Day Revenue",
-    "EGP collected": "EGP collected"
+    "EGP collected": "EGP collected",
+    "Demo mode: your verification code is :code.": "Demo mode: your verification code is :code."
 }

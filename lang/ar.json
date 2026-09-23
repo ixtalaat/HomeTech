@@ -917,5 +917,6 @@
     "Visit today at :time": "الزيارة اليوم الساعة :time",
     "Work is in progress on your request.": "العمل جارٍ على طلبك.",
     "30-Day Revenue": "إيرادات 30 يومًا",
-    "EGP collected": "جنيه تم تحصيلها"
+    "EGP collected": "جنيه تم تحصيلها",
+    "Demo mode: your verification code is :code.": "وضع التجربة: رمز التأكيد الخاص بك هو :code."
 }

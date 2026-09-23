@@ -97,3 +97,40 @@ it('refuses codes without a phone or when already verified', function () {
     ]);
     $this->actingAs($verified)->post(route('phone.send-code'))->assertSessionHas('error');
 });
+
+it('reveals the code on screen in demo mode', function () {
+    config(['whatsapp.reveal_codes' => true]);
+
+    $customer = verifiedCustomer();
+
+    $this->actingAs($customer)->post(route('phone.send-code'))
+        ->assertRedirect()
+        ->assertSessionHas('status');
+
+    preg_match('/\b(\d{6})\b/', (string) session('status'), $matches);
+    $code = $matches[1] ?? null;
+
+    expect($code)->not->toBeNull();
+
+    $this->actingAs($customer)->post(route('phone.verify'), ['code' => $code])->assertRedirect();
+
+    expect($customer->refresh()->phone_verified_at)->not->toBeNull();
+});
+
+it('never reveals codes without explicit opt-in or with a real driver', function () {
+    $customer = verifiedCustomer();
+
+    // Default: no reveal.
+    $this->actingAs($customer)->post(route('phone.send-code'))->assertRedirect();
+
+    expect(session()->has('status'))->toBeFalse();
+
+    // Real driver configured: no reveal even when opted in.
+    config(['whatsapp.reveal_codes' => true, 'whatsapp.driver' => 'twilio']);
+
+    $this->actingAs($customer)->post(route('phone.send-code'))
+        ->assertRedirect()
+        ->assertSessionHas('error');
+
+    expect(session()->has('status'))->toBeFalse();
+});

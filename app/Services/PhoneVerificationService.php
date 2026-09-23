@@ -16,11 +16,15 @@ class PhoneVerificationService
      * Issue a verification code to the user's phone via WhatsApp.
      *
      * Any previous pending code is replaced. Returns the verification
-     * record (the plain code is only ever sent, never stored).
+     * record plus the plain code ONLY in demo mode (explicit opt-in,
+     * non-production, log driver) — otherwise null, so the code can
+     * never leak through a real provider or production build.
+     *
+     * @return array{verification: PhoneVerification, revealedCode: ?string}
      *
      * @throws PhoneVerificationException
      */
-    public function sendCode(User $user): PhoneVerification
+    public function sendCode(User $user): array
     {
         if (empty($user->phone)) {
             throw new PhoneVerificationException(__('Add a phone number to your profile first.'));
@@ -53,7 +57,20 @@ class PhoneVerificationService
             throw new PhoneVerificationException($exception->getMessage());
         }
 
-        return $verification;
+        return [
+            'verification' => $verification,
+            'revealedCode' => $this->revealsCodes() ? $code : null,
+        ];
+    }
+
+    /**
+     * Determine whether plain codes may be shown on screen.
+     */
+    public function revealsCodes(): bool
+    {
+        return (bool) config('whatsapp.reveal_codes', false)
+            && ! app()->isProduction()
+            && config('whatsapp.driver', 'log') === 'log';
     }
 
     /**

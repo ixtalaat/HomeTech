@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\FcmToken;
 use App\Models\User;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Illuminate\Http\Client\Response;
@@ -104,6 +105,54 @@ class FcmService
         }
 
         return ['sent' => $sent, 'failed' => $failed];
+    }
+
+    /**
+     * Validate every stored token without delivering anything.
+     *
+     * Uses FCM's validate_only flag: registry-dead tokens are deleted so
+     * future sends skip them. Never throws.
+     *
+     * @return array{checked: int, pruned: int}
+     */
+    public function pruneStaleTokens(): array
+    {
+        if (! $this->isConfigured()) {
+            return ['checked' => 0, 'pruned' => 0];
+        }
+
+        try {
+            $accessToken = $this->accessToken();
+        } catch (\Throwable $exception) {
+            Log::warning('FCM access token failed.', ['error' => $exception->getMessage()]);
+
+            return ['checked' => 0, 'pruned' => 0];
+        }
+
+        $checked = 0;
+        $pruned = 0;
+
+        foreach (FcmToken::query()->orderBy('id')->pluck('token', 'id') as $id => $token) {
+            $checked++;
+
+            try {
+                $response = Http::withToken($accessToken)->post($this->endpoint(), [
+                    'validate_only' => true,
+                    'message' => ['token' => $token],
+                ]);
+            } catch (\Throwable $exception) {
+                Log::warning('FCM validation failed.', ['error' => $exception->getMessage()]);
+
+                continue;
+            }
+
+            if (! $response->successful() && $this->isDeadToken($response)) {
+                FcmToken::whereKey($id)->delete();
+                $pruned++;
+            }
+        }
+
+        return ['checked' => $checked, 'pruned' => $pruned];
     }
 
     protected function endpoint(): string

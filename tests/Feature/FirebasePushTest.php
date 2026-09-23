@@ -114,3 +114,44 @@ it('forwards database notifications to push', function () {
 
     event(new NotificationSent($customer, $notification, 'database', null));
 });
+
+it('prunes dead tokens without delivering anything', function () {
+    $customer = User::factory()->create(['role' => UserRole::Customer]);
+    $customer->fcmTokens()->createMany([['token' => 'live-token'], ['token' => 'dead-token']]);
+
+    Http::fake([
+        'fcm.googleapis.com/*' => Http::sequence()
+            ->push(['name' => 'projects/demo/messages/1'], 200)
+            ->push(['error' => ['status' => 'NOT_FOUND']], 404),
+    ]);
+
+    $service = Mockery::mock(FcmService::class.'[accessToken,isConfigured]', ['/nonexistent/creds.json', 'demo-project']);
+    $service->shouldAllowMockingProtectedMethods();
+    $service->shouldReceive('accessToken')->andReturn('fake-access-token');
+    $service->shouldReceive('isConfigured')->andReturn(true);
+
+    expect($service->pruneStaleTokens())->toBe(['checked' => 2, 'pruned' => 1]);
+    expect($customer->fcmTokens()->pluck('token')->all())->toBe(['live-token']);
+});
+
+it('reports pruned counts from the command', function () {
+    $customer = User::factory()->create(['role' => UserRole::Customer]);
+    $customer->fcmTokens()->create(['token' => 'dead-token']);
+
+    Http::fake([
+        'fcm.googleapis.com/*' => Http::sequence()
+            ->push(['error' => ['status' => 'UNREGISTERED']], 404),
+    ]);
+
+    $service = Mockery::mock(FcmService::class.'[accessToken,isConfigured]', ['/nonexistent/creds.json', 'demo-project']);
+    $service->shouldAllowMockingProtectedMethods();
+    $service->shouldReceive('accessToken')->andReturn('fake-access-token');
+    $service->shouldReceive('isConfigured')->andReturn(true);
+    $this->app->instance(FcmService::class, $service);
+
+    $this->artisan('app:prune-stale-tokens')
+        ->assertSuccessful()
+        ->expectsOutputToContain('pruned 1 stale');
+
+    expect($customer->fcmTokens()->exists())->toBeFalse();
+});

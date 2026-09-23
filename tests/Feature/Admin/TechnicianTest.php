@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Models\Branch;
 use App\Models\ServiceCategory;
 use App\Models\Technician;
 use App\Models\User;
@@ -22,21 +23,35 @@ it('creates a technician with user account and skills', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
     $plumbing = ServiceCategory::factory()->create(['name' => 'Plumbing']);
     $electrical = ServiceCategory::factory()->create(['name' => 'Electrical']);
+    $branch = Branch::factory()->create(['name' => 'Riyadh']);
 
     $this->actingAs($admin)->post(route('admin.technicians.store'), [
         'name' => 'Ahmed Hassan',
         'email' => 'ahmed@hometech.test',
         'password' => 'password123',
         'phone' => '01000000001',
+        'branch_id' => $branch->id,
         'skills' => [$plumbing->id, $electrical->id],
     ])->assertRedirect();
 
     $technician = Technician::first();
+
     expect($technician->user->role)->toBe(UserRole::Technician)
         ->and($technician->user->email)->toBe('ahmed@hometech.test')
+        ->and($technician->branch_id)->toBe($branch->id)
         ->and($technician->categories->pluck('id')->sort()->values()->all())->toBe(
             collect([$plumbing->id, $electrical->id])->sort()->values()->all()
         );
+});
+
+it('requires a branch when hiring technicians', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $this->actingAs($admin)->post(route('admin.technicians.store'), [
+        'name' => 'No Branch',
+        'email' => 'nobranch@hometech.test',
+        'password' => 'password123',
+    ])->assertSessionHasErrors('branch_id');
 });
 
 it('updates technician skills via sync', function () {

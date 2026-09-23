@@ -40,9 +40,10 @@ into another branch's form **moves** it, so a city never has two branches.
 
 ### 1.3 `technicians.branch_id`
 
-Nullable FK → `branches.id` (`nullOnDelete`). Nullable for backward
-compatibility with pre-branch technicians; the admin form offers a branch
-dropdown, and automatic assignment only considers technicians with a branch.
+Nullable FK → `branches.id` (`nullOnDelete`) for legacy rows: every newly
+hired technician must belong to a branch (required on the create form),
+while older branchless profiles stay untouched and invisible to automatic
+assignment.
 
 ### 1.4 `technician_schedules`
 

@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('app:check-queue-backlog')->hourly();
 Schedule::command('app:nudge-stale-assignments')->daily();
+Schedule::command('app:prune-stale-tokens')->weekly();

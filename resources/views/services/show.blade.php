@@ -50,6 +50,14 @@
             <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_0.8fr]">
                 <!-- Main Service Information -->
                 <div>
+                    @if($service->coverPhotoUrl())
+                        <img src="{{ $service->coverPhotoUrl() }}" alt="{{ $service->display_name }}"
+                            class="mb-6 h-64 w-full rounded-3xl border border-slate-200 object-cover shadow-sm">
+                    @else
+                        <div class="mb-6 flex h-64 w-full items-center justify-center rounded-3xl bg-gradient-to-br from-teal-500 to-teal-700 shadow-sm" role="img" aria-label="{{ $service->display_name }}">
+                            <svg class="h-20 w-20 text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                        </div>
+                    @endif
                     <span class="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-teal-700">
                         {{ $service->category->display_name }}
                     </span>

@@ -77,10 +77,17 @@
                     @forelse ($services as $service)
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-6 py-4">
-                                <p class="font-bold text-slate-900">{{ $service->display_name }}</p>
-                                @if($service->translated('description'))
-                                    <p class="mt-0.5 max-w-xs truncate text-xs text-slate-400">{{ $service->translated('description') }}</p>
-                                @endif
+                                <div class="flex items-center gap-3">
+                                    @if($service->coverPhotoUrl())
+                                        <img src="{{ $service->coverPhotoUrl() }}" alt="{{ $service->display_name }}" class="h-10 w-14 shrink-0 rounded-lg border border-slate-200 object-cover">
+                                    @endif
+                                    <div>
+                                        <p class="font-bold text-slate-900">{{ $service->display_name }}</p>
+                                        @if($service->translated('description'))
+                                            <p class="mt-0.5 max-w-xs truncate text-xs text-slate-400">{{ $service->translated('description') }}</p>
+                                        @endif
+                                    </div>
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">

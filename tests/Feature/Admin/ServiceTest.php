@@ -4,6 +4,8 @@ use App\Enums\UserRole;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 it('forbids non-admins from managing services', function (UserRole $role) {
     $user = User::factory()->create(['role' => $role]);
@@ -166,4 +168,81 @@ it('allows admin to delete a service', function () {
     $this->assertDatabaseMissing('services', [
         'id' => $service->id,
     ]);
+});
+
+it('stores a cover photo on create and shows it in the catalog', function () {
+    Storage::fake('public');
+
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $category = ServiceCategory::factory()->create();
+
+    $this->actingAs($admin)->post(route('admin.services.store'), [
+        'service_category_id' => $category->id,
+        'name' => 'AC Deep Cleaning',
+        'base_price' => 350,
+        'estimated_duration_minutes' => 90,
+        'cover_photo' => fakePngPhoto('ac.png'),
+    ])->assertRedirect();
+
+    $service = Service::where('name', 'AC Deep Cleaning')->firstOrFail();
+
+    expect($service->cover_photo)->not->toBeNull();
+    Storage::disk('public')->assertExists($service->cover_photo);
+
+    $this->get(route('services.index'))->assertOk()->assertSee($service->coverPhotoUrl(), false);
+    $this->get(route('services.show', $service->slug))->assertOk()->assertSee($service->coverPhotoUrl(), false);
+});
+
+it('replaces the cover photo on update and deletes the service photo', function () {
+    Storage::fake('public');
+
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $service = Service::factory()->create([
+        'cover_photo' => fakePngPhoto('old.png')->store('services', 'public'),
+    ]);
+    $oldPath = $service->cover_photo;
+
+    $this->actingAs($admin)->put(route('admin.services.update', $service), [
+        'service_category_id' => $service->service_category_id,
+        'name' => $service->name,
+        'base_price' => 350,
+        'estimated_duration_minutes' => 90,
+        'cover_photo' => fakePngPhoto('new.png'),
+    ])->assertRedirect();
+
+    expect($service->refresh()->cover_photo)->not->toBe($oldPath);
+    Storage::disk('public')->assertMissing($oldPath);
+    Storage::disk('public')->assertExists($service->cover_photo);
+
+    $this->actingAs($admin)->delete(route('admin.services.destroy', $service))->assertRedirect();
+
+    Storage::disk('public')->assertMissing($service->cover_photo);
+});
+
+it('rejects non-image cover uploads', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $category = ServiceCategory::factory()->create();
+
+    $this->actingAs($admin)->post(route('admin.services.store'), [
+        'service_category_id' => $category->id,
+        'name' => 'Bad Upload',
+        'base_price' => 100,
+        'estimated_duration_minutes' => 30,
+        'cover_photo' => UploadedFile::fake()->create('notes.txt', 10, 'text/plain'),
+    ])->assertSessionHasErrors('cover_photo');
+});
+
+it('seeds cover photos without overwriting uploads', function () {
+    Storage::fake('public');
+
+    $known = Service::factory()->create(['name' => 'Faucet & Tap Repair', 'cover_photo' => null]);
+    $custom = Service::factory()->create(['name' => 'Faucet & Tap Repair fav', 'cover_photo' => 'services/custom.jpg']);
+    Storage::disk('public')->put('services/custom.jpg', 'custom');
+
+    $this->artisan('db:seed', ['--class' => 'Database\\Seeders\\ServicePhotoSeeder'])
+        ->assertSuccessful();
+
+    expect($known->refresh()->cover_photo)->toBe('services/seed-faucet.jpg');
+    Storage::disk('public')->assertExists('services/seed-faucet.jpg');
+    expect($custom->refresh()->cover_photo)->toBe('services/custom.jpg');
 });

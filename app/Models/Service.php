@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Service extends Model
@@ -33,6 +34,7 @@ class Service extends Model
         'name',
         'slug',
         'description',
+        'cover_photo',
         'base_price',
         'estimated_duration_minutes',
         'is_active',
@@ -62,6 +64,24 @@ class Service extends Model
                 $service->slug = Str::slug($service->name);
             }
         });
+
+        static::deleting(function (self $service): void {
+            if (is_string($service->cover_photo) && $service->cover_photo !== '') {
+                Storage::disk('public')->delete($service->cover_photo);
+            }
+        });
+    }
+
+    /**
+     * Public URL of the cover photo, or null when none is set.
+     */
+    public function coverPhotoUrl(): ?string
+    {
+        if (! is_string($this->cover_photo) || $this->cover_photo === '') {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->cover_photo);
     }
 
     /**

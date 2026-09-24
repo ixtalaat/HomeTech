@@ -43,6 +43,7 @@ class UpdateServiceRequest extends FormRequest
             'is_active' => ['sometimes', 'boolean'],
             'name_ar' => ['nullable', 'string', 'max:255'],
             'description_ar' => ['nullable', 'string', 'max:3000'],
+            'cover_photo' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:2048'],
         ];
     }
 }

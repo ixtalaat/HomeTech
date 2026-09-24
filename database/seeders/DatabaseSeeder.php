@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             ManagerUserSeeder::class,
             ServiceCategorySeeder::class,
             ServiceSeeder::class,
+            ServicePhotoSeeder::class,
             BranchSeeder::class,
             TechnicianSeeder::class,
             DemoSeeder::class,

@@ -6,7 +6,9 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CatalogService
@@ -47,7 +49,13 @@ class CatalogService
      */
     public function createService(array $attributes): Service
     {
+        $photo = $this->extractCoverPhoto($attributes);
         $service = Service::create($this->normalizeServiceAttributes($attributes));
+
+        if ($photo !== null) {
+            $service->update(['cover_photo' => $photo->store('services', 'public')]);
+        }
+
         $service->saveTranslations($this->arabicAttributes($attributes, ['name', 'description']));
 
         return $service->refresh();
@@ -60,6 +68,18 @@ class CatalogService
      */
     public function updateService(Service $service, array $attributes): Service
     {
+        $photo = $this->extractCoverPhoto($attributes);
+
+        if ($photo !== null) {
+            if (is_string($service->cover_photo) && $service->cover_photo !== '') {
+                Storage::disk('public')->delete($service->cover_photo);
+            }
+
+            $attributes['cover_photo'] = $photo->store('services', 'public');
+        } else {
+            unset($attributes['cover_photo']);
+        }
+
         $service->update($this->normalizeServiceAttributes($attributes));
         $service->saveTranslations($this->arabicAttributes($attributes, ['name', 'description']));
 
@@ -198,6 +218,18 @@ class CatalogService
     public function orderedCategories(): Collection
     {
         return ServiceCategory::with('translations')->orderBy('name')->get();
+    }
+
+    /**
+     * Pull an uploaded cover photo out of the attributes, if any.
+     */
+    private function extractCoverPhoto(array &$attributes): ?UploadedFile
+    {
+        $photo = $attributes['cover_photo'] ?? null;
+
+        unset($attributes['cover_photo']);
+
+        return $photo instanceof UploadedFile ? $photo : null;
     }
 
     /**

@@ -14,7 +14,7 @@
     </div>
 
     <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-        <form method="POST" action="{{ route('admin.services.update', $service) }}" class="space-y-6">
+        <form method="POST" action="{{ route('admin.services.update', $service) }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 
@@ -95,6 +95,19 @@
                 <textarea id="description_ar" name="description_ar" rows="4" dir="rtl"
                     class="form-input @error('description_ar') border-rose-300 ring-rose-100 @enderror">{{ old('description_ar', $service->translate('ar')?->description) }}</textarea>
                 @error('description_ar')
+                    <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="cover_photo" class="form-label">{{ __('Cover photo') }}</label>
+                @if($service->coverPhotoUrl())
+                    <img src="{{ $service->coverPhotoUrl() }}" alt="{{ $service->display_name }}" class="mb-2 h-24 w-40 rounded-xl border border-slate-200 object-cover">
+                @endif
+                <input type="file" id="cover_photo" name="cover_photo" accept="image/jpeg,image/png,image/webp"
+                    class="form-input @error('cover_photo') border-rose-300 ring-rose-100 @enderror">
+                <p class="mt-1 text-xs text-slate-400">{{ __('JPEG, PNG or WebP up to 2 MB. Shown to customers in the catalog.') }}</p>
+                @error('cover_photo')
                     <p class="mt-1.5 text-xs font-semibold text-rose-600">{{ $message }}</p>
                 @enderror
             </div>

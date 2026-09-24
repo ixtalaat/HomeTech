@@ -20,6 +20,8 @@
         <a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo /></a>
         <nav class="flex items-center gap-3 text-sm font-bold" aria-label="{{ __('Home navigation') }}">
             <a href="{{ route('locale.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="rounded-xl border border-slate-200 px-3 py-2.5 text-slate-600 transition hover:border-teal-300 hover:text-teal-700" aria-label="{{ __('Switch language') }}">{{ app()->getLocale() === 'ar' ? 'EN' : 'عربي' }}</a>
+            <a href="{{ route('about') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700">{{ __('About Us') }}</a>
+            <a href="{{ route('contact.create') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700">{{ __('Contact Us') }}</a>
             <a href="{{ route('services.index') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700">{{ __('Browse Services') }}</a>
             @auth
                 <a href="{{ route('dashboard') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950">{{ __('Dashboard') }}</a>
@@ -183,7 +185,12 @@
     </main>
     <footer
         class="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
-        <span>© {{ date('Y') }} HomeTech</span><span>{{ __('Built for better everyday living.') }}</span></footer>
+        <span>© {{ date('Y') }} HomeTech</span>
+        <span class="flex items-center gap-4">
+            <a href="{{ route('about') }}" class="transition hover:text-teal-700">{{ __('About Us') }}</a>
+            <a href="{{ route('contact.create') }}" class="transition hover:text-teal-700">{{ __('Contact Us') }}</a>
+        </span>
+        <span>{{ __('Built for better everyday living.') }}</span></footer>
 </body>
 
 </html>

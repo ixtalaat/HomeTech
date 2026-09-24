@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\RequestStatus;
 use App\Http\Controllers\AdditionalWorkController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\BranchController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Branch\DashboardController as BranchDashboardController
 use App\Http\Controllers\Branch\RequestController as BranchRequestController;
 use App\Http\Controllers\Branch\TechnicianController as BranchTechnicianController;
 use App\Http\Controllers\Branch\TechnicianScheduleController as BranchScheduleController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\InvoiceController;
@@ -38,6 +40,9 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceBrowseController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\Technician\WorkOrderController as TechnicianWorkOrderController;
+use App\Models\MaintenanceRequest;
+use App\Models\Service;
+use App\Models\Technician;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -49,6 +54,22 @@ Route::get('/services', [ServiceBrowseController::class, 'index'])->name('servic
 Route::get('/services/{slug}', [ServiceBrowseController::class, 'show'])->name('services.show');
 
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
+
+// Public informational pages.
+Route::get('/about', function () {
+    return view('about', [
+        'servicesCount' => Service::active()->count(),
+        'techniciansCount' => Technician::active()->count(),
+        'completedJobs' => MaintenanceRequest::whereIn('status', [
+            RequestStatus::Completed,
+            RequestStatus::Invoiced,
+            RequestStatus::Paid,
+            RequestStatus::Closed,
+        ])->count(),
+    ]);
+})->name('about');
+Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 
 // Public Firebase web-push configuration (client identifiers only, no secrets).
 Route::get('/firebase-config', [PushTokenController::class, 'config'])->name('firebase.config');

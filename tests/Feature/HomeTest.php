@@ -115,6 +115,12 @@ it('exposes SEO and social meta tags on the home page', function () {
         ->assertSee('واستمتع بمنزلك', false);
 });
 
+it('collapses public nav links on small screens', function () {
+    $this->get(route('home'))->assertOk()->assertSee('hidden rounded-xl px-4 py-2.5', false);
+    $this->get(route('about'))->assertOk()->assertSee('hidden rounded-xl px-4 py-2.5', false);
+    $this->get(route('contact.create'))->assertOk()->assertSee('hidden rounded-xl px-4 py-2.5', false);
+});
+
 it('serves home page aggregates from cache until flushed', function () {
     $category = ServiceCategory::factory()->create();
     Service::factory()->create([

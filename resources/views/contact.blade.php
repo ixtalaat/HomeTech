@@ -17,18 +17,18 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900 antialiased">
-    <header class="relative z-10 border-b border-slate-200/80 bg-white/90 px-5 py-6 backdrop-blur sm:px-8 lg:px-12"><div class="mx-auto flex max-w-7xl items-center justify-between">
+    <header class="relative z-10 border-b border-slate-200/80 bg-white/90 px-5 py-4 backdrop-blur sm:px-8 sm:py-6 lg:px-12"><div class="mx-auto flex max-w-7xl items-center justify-between">
         <a href="{{ url('/') }}" aria-label="HomeTech home"><x-brand-logo /></a>
-        <nav class="flex items-center gap-3 text-sm font-bold" aria-label="{{ __('Home navigation') }}">
+        <nav class="flex items-center gap-2 text-sm font-bold sm:gap-3" aria-label="{{ __('Home navigation') }}">
             <a href="{{ route('locale.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="rounded-xl border border-slate-200 px-3 py-2.5 text-slate-600 transition hover:border-teal-300 hover:text-teal-700" aria-label="{{ __('Switch language') }}">{{ app()->getLocale() === 'ar' ? 'EN' : 'عربي' }}</a>
-            <a href="{{ route('about') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700">{{ __('About Us') }}</a>
-            <a href="{{ route('contact.create') }}" class="rounded-xl px-4 py-2.5 text-teal-700 transition">{{ __('Contact Us') }}</a>
-            <a href="{{ route('services.index') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700">{{ __('Browse Services') }}</a>
+            <a href="{{ route('about') }}" class="hidden rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700 sm:inline">{{ __('About Us') }}</a>
+            <a href="{{ route('contact.create') }}" class="hidden rounded-xl px-4 py-2.5 text-teal-700 transition sm:inline">{{ __('Contact Us') }}</a>
+            <a href="{{ route('services.index') }}" class="hidden rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700 sm:inline">{{ __('Browse Services') }}</a>
             @auth
-                <a href="{{ route('dashboard') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950">{{ __('Dashboard') }}</a>
+                <a href="{{ route('dashboard') }}" class="hidden rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950 sm:inline">{{ __('Dashboard') }}</a>
             @else
-                <a href="{{ route('login') }}" class="rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950">{{ __('Sign in') }}</a>
-                <a href="{{ route('register') }}" class="primary-button">{{ __('Get started') }} <span aria-hidden="true">→</span></a>
+                <a href="{{ route('login') }}" class="hidden rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950 sm:inline">{{ __('Sign in') }}</a>
+                <a href="{{ route('register') }}" class="primary-button whitespace-nowrap">{{ __('Get started') }} <span aria-hidden="true">→</span></a>
             @endauth
         </nav></div>
     </header>

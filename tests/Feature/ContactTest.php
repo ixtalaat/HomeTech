@@ -9,7 +9,9 @@ it('shows the public about page with live stats', function () {
     $this->get(route('about'))
         ->assertOk()
         ->assertSee('A maintenance company built around your home.', false)
-        ->assertSee('Active services', false);
+        ->assertSee('Active services', false)
+        ->assertSee('property="og:description"', false)
+        ->assertSee(route('about'), false);
 });
 
 it('shows the public contact page with a form', function () {

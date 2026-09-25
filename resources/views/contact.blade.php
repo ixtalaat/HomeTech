@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#0f766e">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>{{ __('Contact Us') }} — {{ __('HomeTech') }}</title>
+    <x-meta :title="__('Contact Us').' — '.__('HomeTech')" :description="__('Feedback, questions, or partnership inquiries — our team reads every message.')" :canonical="route('contact.create')" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link

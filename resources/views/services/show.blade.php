@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#0f766e">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>{{ $service->display_name }} — {{ __('HomeTech') }}</title>
+    <x-meta :title="$service->display_name.' — '.__('HomeTech')" :description="\Illuminate\Support\Str::limit((string) $service->translated('description'), 160)" :canonical="route('services.show', $service->slug)" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link

@@ -173,3 +173,26 @@ it('returns 404 when viewing an inactive service', function () {
     $this->get(route('services.show', 'decommissioned-service'))
         ->assertNotFound();
 });
+
+it('exposes SEO tags on catalog and detail pages', function () {
+    $category = ServiceCategory::factory()->create(['is_active' => true]);
+    $service = Service::factory()->create([
+        'service_category_id' => $category->id,
+        'name' => 'Appliance Maintenance',
+        'slug' => 'appliance-maintenance',
+        'description' => 'Keeps every appliance running smoothly.',
+        'is_active' => true,
+    ]);
+
+    $this->get(route('services.index'))
+        ->assertOk()
+        ->assertSee('property="og:title"', false)
+        ->assertSee('rel="canonical"', false)
+        ->assertSee(route('services.index'), false);
+
+    $this->get(route('services.show', 'appliance-maintenance'))
+        ->assertOk()
+        ->assertSee('property="og:title"', false)
+        ->assertSee('Appliance Maintenance', false)
+        ->assertSee(route('services.show', 'appliance-maintenance'), false);
+});

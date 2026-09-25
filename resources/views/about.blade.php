@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#0f766e">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>{{ __('About Us') }} — {{ __('HomeTech') }}</title>
+    <x-meta :title="__('About Us').' — '.__('HomeTech')" :description="__('Certified technicians across plumbing, electrical, AC, painting and appliances — with transparent pricing and guaranteed work.')" :canonical="route('about')" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link

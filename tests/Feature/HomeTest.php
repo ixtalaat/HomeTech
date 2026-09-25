@@ -95,3 +95,17 @@ it('shows the coverage band, stats, and FAQ', function () {
         ->assertSee('Frequently asked questions', false)
         ->assertSee('How do I book a service?', false);
 });
+
+it('exposes SEO and social meta tags on the home page', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('<meta name="description"', false)
+        ->assertSee('property="og:title"', false)
+        ->assertSee('property="og:description"', false)
+        ->assertSee('rel="canonical"', false)
+        ->assertSee(route('home'), false);
+
+    $this->withSession(['locale' => 'ar'])->get(route('home'))
+        ->assertOk()
+        ->assertSee('واستمتع بمنزلك', false);
+});

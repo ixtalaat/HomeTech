@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#0f766e">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>{{ __('HomeTech — Home maintenance made simple') }}</title>
+    <x-meta :title="__('HomeTech — Home maintenance made simple')" :description="__('Book trusted maintenance, keep track of every visit, and get back to enjoying your home — without the hassle.')" :canonical="route('home')" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link

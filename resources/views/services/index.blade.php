@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#0f766e">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <title>{{ __('Available Services — HomeTech') }}</title>
+    <x-meta :title="__('Available Services — HomeTech')" :description="__('Transparent pricing, certified technicians, and hassle-free scheduling across all home maintenance categories.')" :canonical="route('services.index')" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link

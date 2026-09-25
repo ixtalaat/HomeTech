@@ -109,24 +109,21 @@
                     <!-- Metrics Grid -->
                     <div class="mt-6 grid grid-cols-2 gap-3">
                         <div class="rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
-                            <p class="text-xs font-semibold text-slate-500">{{ __('Active Requests') }}</p>
-                            <p class="mt-2 font-display text-2xl font-extrabold text-slate-900">02 <span class="text-xs font-normal text-slate-400">{{ __('Jobs') }}</span></p>
-                            <div class="mt-3 flex gap-1">
-                                <div class="h-1.5 flex-1 rounded-full bg-teal-500"></div>
-                                <div class="h-1.5 flex-1 rounded-full bg-teal-300"></div>
-                                <div class="h-1.5 flex-1 rounded-full bg-slate-200"></div>
-                            </div>
+                            <p class="text-xs font-semibold text-slate-500">{{ __('Active services') }}</p>
+                            <p class="mt-2 font-display text-2xl font-extrabold text-slate-900">{{ $stats['services'] }}</p>
                         </div>
                         <div class="rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
-                            <p class="text-xs font-semibold text-slate-500">{{ __('Next Scheduled Visit') }}</p>
-                            <p class="mt-2 font-display text-2xl font-extrabold text-slate-900">{{ __('Tomorrow') }}</p>
-                            <p class="mt-1 text-xs font-medium text-teal-700">10:30 {{ __('AM') }} · {{ __('Confirmed') }}</p>
+                            <p class="text-xs font-semibold text-slate-500">{{ __('Average rating') }}</p>
+                            <p class="mt-2 font-display text-2xl font-extrabold text-slate-900">{{ $stats['averageRating'] ?? '—' }}<span class="text-xs font-bold text-slate-400"> / 5</span></p>
+                            <p class="mt-1 text-xs font-medium text-teal-700">{{ $stats['reviewsCount'] }} {{ __('Reviews') }}</p>
                         </div>
                     </div>
 
-                    <!-- Live Active Job Card -->
+                    @if($popularServices->isNotEmpty())
+                    @php($topService = $popularServices->first())
+                    <!-- Most Booked Spotlight -->
                     <div class="mt-4 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50/70 to-sky-50/40 p-4">
-                        <div class="flex items-start justify-between">
+                        <div class="flex items-start justify-between gap-3">
                             <div class="flex items-center gap-3">
                                 <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-white font-bold shadow-md shadow-teal-600/20">
                                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -134,34 +131,19 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-sm font-bold text-slate-900">{{ __('AC Full Seasonal Service') }}</p>
-                                    </div>
-                                    <p class="mt-0.5 text-xs text-slate-500">{{ __('Technician Ahmed M. · On the way') }}</p>
+                                    <p class="text-[11px] font-bold uppercase tracking-wider text-teal-700">{{ __('Popular services') }}</p>
+                                    <p class="text-sm font-bold text-slate-900">{{ $topService->display_name }}</p>
                                 </div>
                             </div>
-                            <span class="font-display text-sm font-extrabold text-slate-900">350 {{ __('SAR') }}</span>
+                            <span class="font-display text-sm font-extrabold text-slate-900 shrink-0">{{ number_format($topService->base_price, 2) }} {{ __('SAR') }}</span>
                         </div>
 
-                        <!-- Progress Steps -->
-                        <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-slate-500 pt-2 border-t border-teal-200/40">
-                            <span class="flex items-center gap-1 text-teal-700 font-bold">
-                                <svg class="h-3.5 w-3.5 text-teal-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-                                {{ __('Booked') }}
-                            </span>
-                            <span class="h-0.5 flex-1 mx-2 bg-teal-400"></span>
-                            <span class="flex items-center gap-1 text-teal-700 font-bold">
-                                <svg class="h-3.5 w-3.5 text-teal-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-                                {{ __('Assigned') }}
-                            </span>
-                            <span class="h-0.5 flex-1 mx-2 bg-teal-400"></span>
-                            <span class="flex items-center gap-1 text-teal-700 font-bold animate-pulse">
-                                {{ __('In Route') }}
-                            </span>
-                            <span class="h-0.5 flex-1 mx-2 bg-slate-200"></span>
-                            <span class="text-slate-400">{{ __('Done') }}</span>
+                        <div class="mt-3 flex items-center justify-between border-t border-teal-200/40 pt-3 text-xs">
+                            <span class="font-semibold text-slate-500">{{ $topService->category->display_name }}</span>
+                            <a href="{{ route('services.show', $topService->slug) }}" class="font-bold text-teal-700 transition hover:text-teal-800">{{ __('Explore services') }} <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
+                    @endif
                 </div>
 
                 <!-- Floating Bottom Badge -->
@@ -170,8 +152,8 @@
                         ★
                     </div>
                     <div>
-                        <p class="text-xs font-extrabold text-slate-900">{{ __('4.9 / 5 Rating') }}</p>
-                        <p class="text-[11px] text-slate-500">{{ __('Over 1,200+ completed repairs') }}</p>
+                        <p class="text-xs font-extrabold text-slate-900">{{ $stats['averageRating'] ?? '—' }} / 5 {{ __('Rating') }}</p>
+                        <p class="text-[11px] text-slate-500">{{ $stats['reviewsCount'] }} {{ __('Reviews') }}</p>
                     </div>
                 </div>
             </div>

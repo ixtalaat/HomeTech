@@ -26,6 +26,23 @@ it('shows popular services with photos on the home page', function () {
         ->assertSee('/storage/services/demo.jpg', false);
 });
 
+it('spotlights live platform numbers in the hero card', function () {
+    $category = ServiceCategory::factory()->create(['name' => 'Plumbing', 'is_active' => true]);
+    $service = Service::factory()->create([
+        'service_category_id' => $category->id,
+        'name' => 'Live Hero Service',
+        'base_price' => 199.00,
+        'is_active' => true,
+    ]);
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertDontSee('Tomorrow')
+        ->assertDontSee('Ahmed M.')
+        ->assertSee('Live Hero Service', false)
+        ->assertSee('199.00', false);
+});
+
 it('hides the popular strip when no services exist', function () {
     $this->get(route('home'))
         ->assertOk()

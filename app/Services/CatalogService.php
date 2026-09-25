@@ -320,6 +320,7 @@ class CatalogService
         foreach (ServiceCategory::active()->orderBy('name')->get() as $category) {
             $top = Service::active()
                 ->where('service_category_id', $category->id)
+                ->with(['category', 'translations', 'category.translations'])
                 ->withCount(['maintenanceRequests as completed_jobs_count' => fn ($query): Builder => $query->whereIn('status', $completed)])
                 ->orderByDesc('completed_jobs_count')
                 ->orderBy('id')

@@ -33,17 +33,7 @@ class CatalogService
         }
 
         if (! empty($filters['search'])) {
-            $query->where(function ($inner) use ($filters): void {
-                $inner->where('name', 'like', "%{$filters['search']}%")
-                    ->orWhere('description', 'like', "%{$filters['search']}%")
-                    ->orWhereHas('translations', fn ($translationQuery) => $translationQuery
-                        ->where('name', 'like', "%{$filters['search']}%")
-                        ->orWhere('description', 'like', "%{$filters['search']}%"))
-                    ->orWhereHas('category', fn ($categoryQuery) => $categoryQuery
-                        ->where('name', 'like', "%{$filters['search']}%")
-                        ->orWhereHas('translations', fn ($categoryTranslationQuery) => $categoryTranslationQuery
-                            ->where('name', 'like', "%{$filters['search']}%")));
-            });
+            $this->applySearch($query, $filters['search']);
         }
 
         return $query->paginate(15)->withQueryString();
@@ -180,17 +170,7 @@ class CatalogService
         }
 
         if (! empty($search)) {
-            $servicesQuery->where(function ($query) use ($search): void {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhereHas('translations', fn ($translationQuery): Builder => $translationQuery
-                        ->where('name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%"))
-                    ->orWhereHas('category', fn ($categoryQuery): Builder => $categoryQuery
-                        ->where('name', 'like', "%{$search}%")
-                        ->orWhereHas('translations', fn ($categoryTranslationQuery): Builder => $categoryTranslationQuery
-                            ->where('name', 'like', "%{$search}%")));
-            });
+            $this->applySearch($servicesQuery, $search);
         }
 
         return [
@@ -198,6 +178,104 @@ class CatalogService
             'services' => $servicesQuery->orderBy('name')->paginate(12)->withQueryString(),
             'selectedCategory' => $selectedCategory,
         ];
+    }
+
+    /**
+     * Constrain services to a keyword across names, descriptions, translations, and categories.
+     *
+     * Arabic terms also match on a light stem (definite article, plural and
+     * feminine suffixes, hamza variants) so inflected forms still find results.
+     * Columns are normalized with the same hamza folding on the database side.
+     */
+    private function applySearch(Builder $query, string $search): void
+    {
+        $query->where(function ($group) use ($search): void {
+            foreach ($this->searchTerms($search) as $term) {
+                $like = "%{$term}%";
+                $group->orWhereRaw($this->normalizedLike('name'), [$like])
+                    ->orWhereRaw($this->normalizedLike('description'), [$like])
+                    ->orWhereHas('translations', fn ($translationQuery) => $translationQuery
+                        ->whereRaw($this->normalizedLike('name'), [$like])
+                        ->orWhereRaw($this->normalizedLike('description'), [$like]))
+                    ->orWhereHas('category', fn ($categoryQuery) => $categoryQuery
+                        ->whereRaw($this->normalizedLike('name'), [$like])
+                        ->orWhereHas('translations', fn ($categoryTranslationQuery) => $categoryTranslationQuery
+                            ->whereRaw($this->normalizedLike('name'), [$like])));
+            }
+        });
+    }
+
+    /**
+     * A LIKE expression with Arabic hamza variants folded to a canonical form.
+     */
+    private function normalizedLike(string $column): string
+    {
+        $expression = $column;
+
+        foreach (['أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ؤ' => 'و', 'ئ' => 'ي'] as $from => $to) {
+            $expression = "REPLACE({$expression}, '{$from}', '{$to}')";
+        }
+
+        return "{$expression} LIKE ?";
+    }
+
+    /**
+     * The raw query plus normalized and stemmed variants of each Arabic word.
+     *
+     * @return list<string>
+     */
+    private function searchTerms(string $search): array
+    {
+        $terms = [$search];
+
+        foreach (preg_split('/\s+/u', $search) ?: [] as $word) {
+            if (preg_match('/\p{Arabic}/u', $word) !== 1 || mb_strlen($word) < 3) {
+                continue;
+            }
+
+            $current = $this->normalizeArabic($word);
+
+            if ($current !== $word) {
+                $terms[] = $current;
+            }
+
+            if (mb_strlen($word) < 4) {
+                continue;
+            }
+
+            for ($pass = 0; $pass < 3; $pass++) {
+                $stripped = $this->stripArabicAffix($current);
+
+                if ($stripped === $current || mb_strlen($stripped) < 3) {
+                    break;
+                }
+
+                $current = $stripped;
+                $terms[] = $current;
+            }
+        }
+
+        return array_values(array_unique($terms));
+    }
+
+    /**
+     * Fold hamza variants and strip diacritics to a canonical search form.
+     */
+    private function normalizeArabic(string $word): string
+    {
+        $word = str_replace(['أ', 'إ', 'آ', 'ؤ', 'ئ'], ['ا', 'ا', 'ا', 'و', 'ي'], $word);
+
+        return (string) preg_replace('/[\x{064B}-\x{0652}]/u', '', $word);
+    }
+
+    /**
+     * Strip one leading article or trailing suffix from an Arabic word.
+     */
+    private function stripArabicAffix(string $word): string
+    {
+        $word = (string) preg_replace('/^(وال|بال|كال|فال|لل|ال)/u', '', $word);
+
+        return (string) preg_replace('/(ات|ون|ين|ان|ها|هم|هن|كم|كن|نا|ة|ه|ك|ي)$/u', '', $word);
     }
 
     /**

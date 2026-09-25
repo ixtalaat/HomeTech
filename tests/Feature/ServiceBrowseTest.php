@@ -143,6 +143,48 @@ it('finds services by translated description', function () {
         ->assertSee('Drain Service');
 });
 
+it('matches inflected Arabic search terms via light stemming', function () {
+    $category = ServiceCategory::factory()->create(['is_active' => true]);
+    $faucet = Service::factory()->create([
+        'service_category_id' => $category->id,
+        'name' => 'Tap Repair',
+        'description' => 'Fixes taps.',
+        'is_active' => true,
+    ]);
+    $faucet->saveTranslations(['ar' => ['name' => 'تصليح الحنفيات', 'description' => 'إصلاح الحنفيات والخلاطات.']]);
+    $tech = Service::factory()->create([
+        'service_category_id' => $category->id,
+        'name' => 'Tech Visit',
+        'description' => 'A technician visit.',
+        'is_active' => true,
+    ]);
+    $tech->saveTranslations(['ar' => ['name' => 'زيارة فني الصيانة']]);
+    $other = Service::factory()->create([
+        'service_category_id' => $category->id,
+        'name' => 'Door Painting',
+        'description' => 'Paints doors.',
+        'is_active' => true,
+    ]);
+    $other->saveTranslations(['ar' => ['name' => 'دهان الأبواب']]);
+
+    // Singular ة-form finds the plural ت-form.
+    $this->get(route('services.index', ['search' => 'حنفية']))
+        ->assertOk()
+        ->assertSee('Tap Repair')
+        ->assertDontSee('Door Painting');
+
+    // Prefixed and suffixed form finds the bare form.
+    $this->get(route('services.index', ['search' => 'للفنيين']))
+        ->assertOk()
+        ->assertSee('Tech Visit')
+        ->assertDontSee('Door Painting');
+
+    // Bare alef finds the hamza form.
+    $this->get(route('services.index', ['search' => 'اصلاح']))
+        ->assertOk()
+        ->assertSee('Tap Repair');
+});
+
 it('allows viewing an active service detail page', function () {
     $category = ServiceCategory::factory()->create(['is_active' => true]);
     $service = Service::factory()->create([

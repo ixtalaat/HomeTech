@@ -13,8 +13,8 @@
 
 @layer base {
     body { font-family: var(--font-sans); }
-    html[lang="ar"] body { font-family: 'IBM Plex Sans Arabic', var(--font-sans); }
-    html[lang="ar"] .font-display { font-family: 'IBM Plex Sans Arabic', var(--font-display); }
+    html[lang="ar"] body { font-family: 'Cairo', var(--font-sans); }
+    html[lang="ar"] .font-display { font-family: 'Cairo', var(--font-display); }
     button, a, input, select, textarea { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
     button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgb(45 212 191 / 0.45); outline-offset: 3px; }
 }

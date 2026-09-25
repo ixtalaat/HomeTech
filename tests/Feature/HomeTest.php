@@ -5,6 +5,11 @@ use App\Models\City;
 use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use Illuminate\Support\Facades\Cache;
+
+beforeEach(function (): void {
+    Cache::flush();
+});
 
 it('shows popular services with photos on the home page', function () {
     $category = ServiceCategory::factory()->create();
@@ -108,4 +113,28 @@ it('exposes SEO and social meta tags on the home page', function () {
     $this->withSession(['locale' => 'ar'])->get(route('home'))
         ->assertOk()
         ->assertSee('واستمتع بمنزلك', false);
+});
+
+it('serves home page aggregates from cache until flushed', function () {
+    $category = ServiceCategory::factory()->create();
+    Service::factory()->create([
+        'service_category_id' => $category->id,
+        'name' => 'Cached Service',
+        'is_active' => true,
+    ]);
+
+    $this->get(route('home'))->assertOk()->assertSee('Cached Service', false);
+
+    $extra = ServiceCategory::factory()->create(['name' => 'Extra Trade', 'slug' => 'extra-trade', 'is_active' => true]);
+    Service::factory()->create([
+        'service_category_id' => $extra->id,
+        'name' => 'Fresh Service',
+        'is_active' => true,
+    ]);
+
+    $this->get(route('home'))->assertOk()->assertDontSee('Fresh Service', false);
+
+    Cache::flush();
+
+    $this->get(route('home'))->assertOk()->assertSee('Fresh Service', false);
 });

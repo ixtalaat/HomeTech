@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -107,14 +107,7 @@
                     @forelse ($services as $service)
                         <div class="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-teal-300 hover:shadow-md">
                             <div class="-mx-6 -mt-6 mb-5 aspect-[16/10] w-[calc(100%+3rem)] overflow-hidden rounded-t-3xl border-b border-slate-100 bg-slate-100">
-                                @if($service->coverPhotoUrl())
-                                    <img src="{{ $service->coverPhotoUrl() }}" alt="{{ $service->display_name }}" loading="lazy"
-                                        class="h-full w-full object-cover">
-                                @else
-                                    <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-teal-500 to-teal-700" role="img" aria-label="{{ $service->display_name }}">
-                                        <svg class="h-12 w-12 text-white/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                                    </div>
-                                @endif
+                                <x-service-photo :service="$service" class="h-full w-full" />
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-700">

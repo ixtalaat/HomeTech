@@ -21,7 +21,7 @@
             <p class="mt-2 rounded-xl bg-slate-100 p-3 text-xs font-semibold text-slate-600">
                 {{ __('Cancelled: :reason', ['reason' => $maintenanceRequest->cancellation->reason]) }}
                 @if($maintenanceRequest->cancellation->fee > 0)
-                    · {{ __('Fee: :amount EGP', ['amount' => number_format($maintenanceRequest->cancellation->fee, 2)]) }}
+                    · {{ __('Fee: :amount SAR', ['amount' => number_format($maintenanceRequest->cancellation->fee, 2)]) }}
                 @endif
             </p>
         @endif
@@ -106,12 +106,12 @@
                     @foreach ($pendingExtras as $extra)
                         <div class="mt-3 rounded-xl bg-white/80 p-3 text-sm">
                             <p class="font-bold text-slate-900">{{ $extra->description }}</p>
-                            <p class="mt-0.5 text-xs text-slate-500">{{ __('Additional cost: :amount EGP', ['amount' => number_format($extra->cost, 2)]) }} · {{ __('requested :date', ['date' => $extra->created_at->format('d M Y, h:i A')]) }}</p>
+                            <p class="mt-0.5 text-xs text-slate-500">{{ __('Additional cost: :amount SAR', ['amount' => number_format($extra->cost, 2)]) }} · {{ __('requested :date', ['date' => $extra->created_at->format('d M Y, h:i A')]) }}</p>
                             <div class="mt-2 flex gap-2">
                                 <form method="POST" action="{{ route('additional-work.approve', $extra) }}" class="flex-1">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="primary-button w-full text-xs">{{ __('Approve (:amount EGP)', ['amount' => number_format($extra->cost, 2)]) }}</button>
+                                    <button type="submit" class="primary-button w-full text-xs">{{ __('Approve (:amount SAR)', ['amount' => number_format($extra->cost, 2)]) }}</button>
                                 </form>
                                 <form method="POST" action="{{ route('additional-work.reject', $extra) }}" class="flex-1" data-confirm="{{ __('Reject this additional work? It will not be billed.') }}">
                                     @csrf

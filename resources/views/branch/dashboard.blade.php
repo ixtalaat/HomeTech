@@ -56,7 +56,7 @@
             <span>
                 <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('30-Day Revenue') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold text-emerald-600">{{ number_format($revenue_30d, 2) }}</span>
-                <span class="mt-0.5 block text-xs font-semibold text-slate-500">{{ __('EGP collected') }}</span>
+                <span class="mt-0.5 block text-xs font-semibold text-slate-500">{{ __('SAR collected') }}</span>
             </span>
         </div>
     </div>

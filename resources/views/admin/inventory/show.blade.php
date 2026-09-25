@@ -16,7 +16,7 @@
         </div>
         <p class="mt-1 text-sm text-slate-500">
             {{ __(':stock :unit in stock', ['stock' => $inventoryItem->current_stock, 'unit' => $inventoryItem->unit]) }} ·
-            {{ number_format($inventoryItem->unit_cost, 2) }} {{ __('EGP') }}/{{ $inventoryItem->unit }} ·
+            {{ number_format($inventoryItem->unit_cost, 2) }} {{ __('SAR') }}/{{ $inventoryItem->unit }} ·
             {{ __('threshold :value', ['value' => $inventoryItem->low_stock_threshold]) }}
         </p>
     </div>

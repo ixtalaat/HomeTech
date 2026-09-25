@@ -75,7 +75,7 @@
             <span>
                 <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Unpaid Invoices') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold text-rose-600">{{ $unpaid_invoices }}</span>
-                <span class="mt-0.5 block text-xs font-semibold text-slate-500">{{ number_format($outstanding_total, 2) }} {{ __('EGP outstanding') }}</span>
+                <span class="mt-0.5 block text-xs font-semibold text-slate-500">{{ number_format($outstanding_total, 2) }} {{ __('SAR outstanding') }}</span>
             </span>
         </a>
         <a href="{{ route('admin.inventory.index', ['filter' => 'low-stock']) }}" class="stat-card transition hover:border-amber-200 hover:shadow-md" aria-label="{{ __('View low-stock items') }}">

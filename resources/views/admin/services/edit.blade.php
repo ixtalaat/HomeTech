@@ -63,7 +63,7 @@
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                    <label for="base_price" class="form-label">{{ __('Base Price (EGP)') }} <span class="text-rose-500">*</span></label>
+                    <label for="base_price" class="form-label">{{ __('Base Price (SAR)') }} <span class="text-rose-500">*</span></label>
                     <input type="number" step="0.01" min="0" id="base_price" name="base_price" value="{{ old('base_price', $service->base_price) }}" required
                         class="form-input @error('base_price') border-rose-300 ring-rose-100 @enderror">
                     @error('base_price')

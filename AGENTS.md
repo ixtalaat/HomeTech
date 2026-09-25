@@ -46,7 +46,7 @@ Do not assume a package's API — confirm the installed version first with `comp
 - **Service Categories** (`service_categories`): Name, slug, description, icon, is_active.
   - Initial seed categories: Plumbing, Electrical, Air Conditioning, Painting, Appliance Repair.
   - Safe deletion: Deleting a category with associated services is forbidden.
-- **Services** (`services`): Category relation, name, slug, description, base_price (EGP decimal), estimated_duration_minutes, is_active.
+- **Services** (`services`): Category relation, name, slug, description, base_price (SAR decimal), estimated_duration_minutes, is_active.
   - Admin CRUD: `/admin/categories`, `/admin/services` (Admin/Manager only).
   - Quick toggle status: `PATCH /admin/services/{service}/toggle-status`.
   - Public catalog: `/services` and `/services/{slug}` strictly showing active services in active categories. Filterable by category and keyword search.

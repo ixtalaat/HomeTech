@@ -25,8 +25,8 @@
                     @forelse ($invoices as $invoice)
                         <tr class="hover:bg-slate-50/70 transition">
                             <td class="px-6 py-4 font-bold text-slate-900">{{ $invoice->number }}</td>
-                            <td class="px-6 py-4 font-bold text-slate-900">{{ number_format($invoice->total, 2) }} {{ __('EGP') }}</td>
-                            <td class="px-6 py-4 text-xs">{{ number_format($invoice->remaining(), 2) }} {{ __('EGP') }}</td>
+                            <td class="px-6 py-4 font-bold text-slate-900">{{ number_format($invoice->total, 2) }} {{ __('SAR') }}</td>
+                            <td class="px-6 py-4 text-xs">{{ number_format($invoice->remaining(), 2) }} {{ __('SAR') }}</td>
                             <td class="px-6 py-4">
                                 <x-status-badge :status="$invoice->status" />
                             </td>

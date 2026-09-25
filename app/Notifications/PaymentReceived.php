@@ -37,8 +37,8 @@ class PaymentReceived extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject("Payment received for invoice {$this->invoice->number}")
-            ->line("We received your payment of {$this->amount} EGP for invoice {$this->invoice->number}.")
-            ->line("Remaining balance: {$this->invoice->remaining()} EGP.")
+            ->line("We received your payment of {$this->amount} SAR for invoice {$this->invoice->number}.")
+            ->line("Remaining balance: {$this->invoice->remaining()} SAR.")
             ->action('View Invoice', route('invoices.show', $this->invoice))
             ->line('Thank you for using HomeTech!');
     }
@@ -56,7 +56,7 @@ class PaymentReceived extends Notification implements ShouldQueue
             'maintenance_request_id' => $this->invoice->maintenance_request_id,
             'message_key' => 'notifications.payment_received',
             'message_params' => ['amount' => $this->amount, 'number' => $this->invoice->number, 'remaining' => $this->invoice->remaining()],
-            'message' => "Payment of {$this->amount} EGP received for invoice {$this->invoice->number}. Remaining: {$this->invoice->remaining()} EGP.",
+            'message' => "Payment of {$this->amount} SAR received for invoice {$this->invoice->number}. Remaining: {$this->invoice->remaining()} SAR.",
         ];
     }
 }

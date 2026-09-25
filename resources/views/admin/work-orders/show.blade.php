@@ -37,12 +37,12 @@
             </div>
 
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 class="text-sm font-extrabold text-slate-900">{{ __('Labor (:total EGP)', ['total' => number_format($workOrder->laborTotal(), 2)]) }}</h3>
+                <h3 class="text-sm font-extrabold text-slate-900">{{ __('Labor (:total SAR)', ['total' => number_format($workOrder->laborTotal(), 2)]) }}</h3>
                 <ul class="mt-3 space-y-2 text-sm">
                     @forelse ($workOrder->laborItems as $item)
                         <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
                             <span class="font-medium text-slate-700">{{ $item->description }}</span>
-                            <span class="font-bold text-slate-900">{{ number_format($item->cost, 2) }} EGP</span>
+                            <span class="font-bold text-slate-900">{{ number_format($item->cost, 2) }} SAR</span>
                         </li>
                     @empty
                         <p class="text-sm text-slate-400">{{ __('No labor recorded.') }}</p>

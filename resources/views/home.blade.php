@@ -140,7 +140,7 @@
                                     <p class="mt-0.5 text-xs text-slate-500">{{ __('Technician Ahmed M. · On the way') }}</p>
                                 </div>
                             </div>
-                            <span class="font-display text-sm font-extrabold text-slate-900">350 {{ __('EGP') }}</span>
+                            <span class="font-display text-sm font-extrabold text-slate-900">350 {{ __('SAR') }}</span>
                         </div>
 
                         <!-- Progress Steps -->
@@ -195,7 +195,7 @@
                             </div>
                             <div class="flex flex-1 flex-col p-4">
                                 <p class="text-xs font-bold text-slate-900 line-clamp-2">{{ $service->display_name }}</p>
-                                <p class="mt-2 text-xs font-semibold text-slate-500">{{ __('Starting from') }} <span class="font-extrabold text-slate-900">{{ number_format($service->base_price, 2) }} {{ __('EGP') }}</span></p>
+                                <p class="mt-2 text-xs font-semibold text-slate-500">{{ __('Starting from') }} <span class="font-extrabold text-slate-900">{{ number_format($service->base_price, 2) }} {{ __('SAR') }}</span></p>
                             </div>
                         </a>
                     @endforeach

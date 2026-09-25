@@ -31,7 +31,7 @@
                             <td class="px-6 py-4">{{ $technician->assigned }}</td>
                             <td class="px-6 py-4">{{ $technician->completed }}</td>
                             <td class="px-6 py-4">{{ $technician->cancelled }}</td>
-                            <td class="px-6 py-4 font-bold text-slate-900">{{ number_format($technician->revenue, 2) }} {{ __('EGP') }}</td>
+                            <td class="px-6 py-4 font-bold text-slate-900">{{ number_format($technician->revenue, 2) }} {{ __('SAR') }}</td>
                             <td class="px-6 py-4 text-xs">
                                 @if($technician->reviews_count > 0)
                                     <span class="font-extrabold text-amber-500">★ {{ number_format($technician->avg_rating, 1) }}</span>

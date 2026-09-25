@@ -24,7 +24,7 @@ class ManagerUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => $email],
             [
-                'name' => 'Manager',
+                'name' => 'Lina Al-Harbi',
                 'password' => $password,
                 'role' => UserRole::Manager,
                 'is_active' => true,

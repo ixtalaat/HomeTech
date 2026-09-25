@@ -23,7 +23,7 @@
         </div>
         @if($outstanding_balance > 0)
             <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900" role="status">
-                {{ __('Outstanding balance: :amount EGP', ['amount' => number_format($outstanding_balance, 2)]) }} —
+                {{ __('Outstanding balance: :amount SAR', ['amount' => number_format($outstanding_balance, 2)]) }} —
                 <a href="{{ route('invoices.index') }}" class="font-bold underline">{{ __('view invoices →') }}</a>
             </div>
         @endif

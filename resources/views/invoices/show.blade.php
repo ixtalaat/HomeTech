@@ -14,7 +14,7 @@
         </div>
         @if($invoice->remaining() > 0 && $invoice->acceptsPayments())
             <p class="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900" role="status">
-                {{ __('Balance due: :amount EGP — pay in full or partially below.', ['amount' => number_format($invoice->remaining(), 2)]) }}
+                {{ __('Balance due: :amount SAR — pay in full or partially below.', ['amount' => number_format($invoice->remaining(), 2)]) }}
             </p>
         @elseif($invoice->status === \App\Enums\InvoiceStatus::Paid)
             <p class="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-900" role="status">
@@ -33,32 +33,32 @@
                             <p class="font-medium text-slate-700">{{ $item->description }}</p>
                             <p class="text-xs text-slate-400">{{ $item->item_type->label() }} · {{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</p>
                         </div>
-                        <span class="font-bold text-slate-900">{{ number_format($item->total, 2) }} {{ __('EGP') }}</span>
+                        <span class="font-bold text-slate-900">{{ number_format($item->total, 2) }} {{ __('SAR') }}</span>
                     </li>
                 @endforeach
             </ul>
             <dl class="mt-4 space-y-1 border-t border-slate-100 pt-4 text-sm">
                 <div class="flex justify-between text-slate-600">
                     <dt>{{ __('Subtotal') }}</dt>
-                    <dd class="font-semibold">{{ number_format($invoice->subtotal, 2) }} {{ __('EGP') }}</dd>
+                    <dd class="font-semibold">{{ number_format($invoice->subtotal, 2) }} {{ __('SAR') }}</dd>
                 </div>
                 @if($invoice->discount_amount > 0)
                     <div class="flex justify-between text-emerald-700">
                         <dt>{{ __('Discount') }}</dt>
-                        <dd class="font-semibold">−{{ number_format($invoice->discount_amount, 2) }} {{ __('EGP') }}</dd>
+                        <dd class="font-semibold">−{{ number_format($invoice->discount_amount, 2) }} {{ __('SAR') }}</dd>
                     </div>
                 @endif
                 <div class="flex justify-between text-base font-extrabold text-slate-900">
                     <dt>{{ __('Total') }}</dt>
-                    <dd>{{ number_format($invoice->total, 2) }} {{ __('EGP') }}</dd>
+                    <dd>{{ number_format($invoice->total, 2) }} {{ __('SAR') }}</dd>
                 </div>
                 <div class="flex justify-between text-slate-600">
                     <dt>{{ __('Paid') }}</dt>
-                    <dd class="font-semibold">{{ number_format($invoice->paid_amount, 2) }} {{ __('EGP') }}</dd>
+                    <dd class="font-semibold">{{ number_format($invoice->paid_amount, 2) }} {{ __('SAR') }}</dd>
                 </div>
                 <div class="flex justify-between font-bold text-teal-700">
                     <dt>{{ __('Remaining') }}</dt>
-                    <dd>{{ number_format($invoice->remaining(), 2) }} {{ __('EGP') }}</dd>
+                    <dd>{{ number_format($invoice->remaining(), 2) }} {{ __('SAR') }}</dd>
                 </div>
             </dl>
         </div>
@@ -69,7 +69,7 @@
                 <ul class="mt-3 space-y-2 text-sm">
                     @forelse ($invoice->payments as $payment)
                         <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                            <span class="font-bold text-slate-900">{{ number_format($payment->amount, 2) }} {{ __('EGP') }}</span>
+                            <span class="font-bold text-slate-900">{{ number_format($payment->amount, 2) }} {{ __('SAR') }}</span>
                             <span class="text-xs text-slate-400">
                                 {{ $payment->method->label() }} · {{ $payment->paid_at?->format('d M Y') }}
                                 · {{ $payment->confirmed_at ? __('Confirmed') : __('Awaiting confirmation') }}
@@ -95,7 +95,7 @@
                                 <option value="bank_transfer">{{ __('Bank Transfer') }}</option>
                             </select>
                         </div>
-                        <button type="submit" class="primary-button w-full text-xs">{{ __('Pay :amount EGP', ['amount' => number_format($invoice->remaining(), 2)]) }}</button>
+                        <button type="submit" class="primary-button w-full text-xs">{{ __('Pay :amount SAR', ['amount' => number_format($invoice->remaining(), 2)]) }}</button>
                     </form>
                 </div>
             @endif

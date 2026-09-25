@@ -26,32 +26,32 @@
                                 <p class="font-medium text-slate-700">{{ $item->description }}</p>
                                 <p class="text-xs text-slate-400">{{ $item->item_type->label() }} · {{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</p>
                             </div>
-                            <span class="font-bold text-slate-900">{{ number_format($item->total, 2) }} {{ __('EGP') }}</span>
+                            <span class="font-bold text-slate-900">{{ number_format($item->total, 2) }} {{ __('SAR') }}</span>
                         </li>
                     @endforeach
                 </ul>
                 <dl class="mt-4 space-y-1 border-t border-slate-100 pt-4 text-sm">
                     <div class="flex justify-between text-slate-600">
                         <dt>{{ __('Subtotal') }}</dt>
-                        <dd class="font-semibold">{{ number_format($invoice->subtotal, 2) }} {{ __('EGP') }}</dd>
+                        <dd class="font-semibold">{{ number_format($invoice->subtotal, 2) }} {{ __('SAR') }}</dd>
                     </div>
                     @if($invoice->discount_amount > 0)
                         <div class="flex justify-between text-emerald-700">
                             <dt>{{ __('Discount (:type :value)', ['type' => $invoice->discount_type?->label(), 'value' => $invoice->discount_value]) }}</dt>
-                            <dd class="font-semibold">−{{ number_format($invoice->discount_amount, 2) }} {{ __('EGP') }}</dd>
+                            <dd class="font-semibold">−{{ number_format($invoice->discount_amount, 2) }} {{ __('SAR') }}</dd>
                         </div>
                     @endif
                     <div class="flex justify-between text-base font-extrabold text-slate-900">
                         <dt>{{ __('Total') }}</dt>
-                        <dd>{{ number_format($invoice->total, 2) }} {{ __('EGP') }}</dd>
+                        <dd>{{ number_format($invoice->total, 2) }} {{ __('SAR') }}</dd>
                     </div>
                     <div class="flex justify-between text-slate-600">
                         <dt>{{ __('Paid') }}</dt>
-                        <dd class="font-semibold">{{ number_format($invoice->paid_amount, 2) }} {{ __('EGP') }}</dd>
+                        <dd class="font-semibold">{{ number_format($invoice->paid_amount, 2) }} {{ __('SAR') }}</dd>
                     </div>
                     <div class="flex justify-between font-bold text-teal-700">
                         <dt>{{ __('Remaining') }}</dt>
-                        <dd>{{ number_format($invoice->remaining(), 2) }} {{ __('EGP') }}</dd>
+                        <dd>{{ number_format($invoice->remaining(), 2) }} {{ __('SAR') }}</dd>
                     </div>
                 </dl>
             </div>
@@ -62,7 +62,7 @@
                     @forelse ($invoice->payments as $payment)
                         <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
                             <div>
-                                <p class="font-bold text-slate-900">{{ number_format($payment->amount, 2) }} {{ __('EGP') }}</p>
+                                <p class="font-bold text-slate-900">{{ number_format($payment->amount, 2) }} {{ __('SAR') }}</p>
                                 <p class="text-xs text-slate-400">{{ $payment->method->label() }} · {{ $payment->paid_at?->format('d M Y, h:i A') }} · {{ __('by :name', ['name' => $payment->receiver->name ?? '—']) }}</p>
                             </div>
                             <div class="flex items-center gap-2">
@@ -101,13 +101,13 @@
             @if(! in_array($invoice->status, [\App\Enums\InvoiceStatus::Paid, \App\Enums\InvoiceStatus::Cancelled], true))
                 <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <h3 class="text-sm font-extrabold text-slate-900">{{ __('Apply Discount') }}</h3>
-                    <p class="mt-1 text-xs text-slate-500">{{ __('Discounts above 20% or 500 EGP require a manager — yours will be queued for approval.') }}</p>
+                    <p class="mt-1 text-xs text-slate-500">{{ __('Discounts above 20% or 500 SAR require a manager — yours will be queued for approval.') }}</p>
                     <form method="POST" action="{{ route('admin.invoices.discount', $invoice) }}" class="mt-3 space-y-3">
                         @csrf
                         @method('PATCH')
                         <div class="grid grid-cols-2 gap-2">
                             <select name="discount_type" required class="form-input text-xs" aria-label="{{ __('Discount type') }}">
-                                <option value="fixed">{{ __('Fixed (EGP)') }}</option>
+                                <option value="fixed">{{ __('Fixed (SAR)') }}</option>
                                 <option value="percent">{{ __('Percent (%)') }}</option>
                             </select>
                             <input type="number" name="discount_value" step="0.01" min="0" required placeholder="{{ __('Value') }}" aria-label="{{ __('Discount value') }}" class="form-input text-xs">
@@ -121,7 +121,7 @@
                     <form method="POST" action="{{ route('admin.invoices.payments', $invoice) }}" class="mt-3 space-y-3">
                         @csrf
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="number" name="amount" step="0.01" min="0.01" required placeholder="{{ __('Amount (EGP)') }}" aria-label="{{ __('Amount') }}" class="form-input text-xs">
+                            <input type="number" name="amount" step="0.01" min="0.01" required placeholder="{{ __('Amount (SAR)') }}" aria-label="{{ __('Amount') }}" class="form-input text-xs">
                             <select name="method" required class="form-input text-xs" aria-label="{{ __('Method') }}">
                                 <option value="cash">{{ __('Cash') }}</option>
                                 <option value="card">{{ __('Card') }}</option>

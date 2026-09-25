@@ -95,7 +95,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 font-bold text-slate-900">
-                                {{ number_format($service->base_price, 2) }} <span class="text-xs font-semibold text-slate-500">{{ __('EGP') }}</span>
+                                {{ number_format($service->base_price, 2) }} <span class="text-xs font-semibold text-slate-500">{{ __('SAR') }}</span>
                             </td>
                             <td class="px-6 py-4 text-xs font-medium text-slate-600">
                                 {{ $service->estimated_duration_minutes }} {{ __('mins') }}

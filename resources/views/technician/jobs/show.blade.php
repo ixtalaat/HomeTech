@@ -112,13 +112,13 @@
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-extrabold text-slate-900">{{ __('Labor') }}</h3>
-                    <span class="text-sm font-extrabold text-slate-900">{{ __('Total: :amount EGP', ['amount' => number_format($workOrder->laborTotal(), 2)]) }}</span>
+                    <span class="text-sm font-extrabold text-slate-900">{{ __('Total: :amount SAR', ['amount' => number_format($workOrder->laborTotal(), 2)]) }}</span>
                 </div>
                 <ul class="mt-3 space-y-2 text-sm">
                     @forelse ($workOrder->laborItems as $item)
                         <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
                             <span class="font-medium text-slate-700">{{ $item->description }}</span>
-                            <span class="font-bold text-slate-900">{{ number_format($item->cost, 2) }} {{ __('EGP') }}</span>
+                            <span class="font-bold text-slate-900">{{ number_format($item->cost, 2) }} {{ __('SAR') }}</span>
                         </li>
                     @empty
                         <p class="text-sm text-slate-400">{{ __('No labor recorded yet.') }}</p>
@@ -129,7 +129,7 @@
                         @csrf
                         <div class="grid grid-cols-2 gap-2">
                             <input type="text" name="description" required placeholder="{{ __('Description') }}" aria-label="{{ __('Description') }}" class="form-input text-xs">
-                            <input type="number" name="cost" step="0.01" min="0" required placeholder="{{ __('Cost (EGP)') }}" aria-label="{{ __('Cost (EGP)') }}" class="form-input text-xs">
+                            <input type="number" name="cost" step="0.01" min="0" required placeholder="{{ __('Cost (SAR)') }}" aria-label="{{ __('Cost (SAR)') }}" class="form-input text-xs">
                         </div>
                         <button type="submit" class="secondary-button w-full text-xs">{{ __('Add Labor') }}</button>
                     </form>
@@ -139,13 +139,13 @@
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-extrabold text-slate-900">{{ __('Materials') }}</h3>
-                    <span class="text-sm font-extrabold text-slate-900">{{ __('Total: :amount EGP', ['amount' => number_format($workOrder->materialsTotal(), 2)]) }}</span>
+                    <span class="text-sm font-extrabold text-slate-900">{{ __('Total: :amount SAR', ['amount' => number_format($workOrder->materialsTotal(), 2)]) }}</span>
                 </div>
                 <ul class="mt-3 space-y-2 text-sm">
                     @forelse ($workOrder->materialUsages as $usage)
                         <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
                             <span class="font-medium text-slate-700">{{ $usage->item->display_name ?? '—' }} × {{ $usage->quantity }}</span>
-                            <span class="font-bold text-slate-900">{{ number_format($usage->extendedCost(), 2) }} {{ __('EGP') }}</span>
+                            <span class="font-bold text-slate-900">{{ number_format($usage->extendedCost(), 2) }} {{ __('SAR') }}</span>
                         </li>
                     @empty
                         <p class="text-sm text-slate-400">{{ __('No materials used yet.') }}</p>
@@ -175,7 +175,7 @@
                         <li class="rounded-xl bg-slate-50 px-3 py-2">
                             <div class="flex items-center justify-between">
                                 <span class="font-medium text-slate-700">{{ $extra->description }}</span>
-                                <span class="font-bold text-slate-900">{{ number_format($extra->cost, 2) }} {{ __('EGP') }}</span>
+                                <span class="font-bold text-slate-900">{{ number_format($extra->cost, 2) }} {{ __('SAR') }}</span>
                             </div>
                             <div class="mt-1 flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-500">{{ $extra->status->label() }}</span>
@@ -197,7 +197,7 @@
                         @csrf
                         <input type="text" name="description" required placeholder="{{ __('Describe the extra problem…') }}" aria-label="{{ __('Extra work description') }}" class="form-input text-xs">
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="number" name="cost" step="0.01" min="0" required placeholder="{{ __('Extra cost (EGP)') }}" aria-label="{{ __('Extra cost (EGP)') }}" class="form-input text-xs">
+                            <input type="number" name="cost" step="0.01" min="0" required placeholder="{{ __('Extra cost (SAR)') }}" aria-label="{{ __('Extra cost (SAR)') }}" class="form-input text-xs">
                             <button type="submit" class="secondary-button text-xs">{{ __('Request Approval') }}</button>
                         </div>
                     </form>

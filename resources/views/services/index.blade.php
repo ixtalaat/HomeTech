@@ -132,7 +132,7 @@
                                 <div>
                                     <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">{{ __('Starting from') }}</p>
                                     <p class="font-display text-xl font-extrabold text-slate-950">
-                                        {{ number_format($service->base_price, 2) }} <span class="text-xs font-semibold text-slate-500">{{ __('EGP') }}</span>
+                                        {{ number_format($service->base_price, 2) }} <span class="text-xs font-semibold text-slate-500">{{ __('SAR') }}</span>
                                     </p>
                                 </div>
                                 <a href="{{ route('services.show', $service->slug) }}"

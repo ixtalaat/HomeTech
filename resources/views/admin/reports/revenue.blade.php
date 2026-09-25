@@ -18,7 +18,7 @@
                 @forelse ($daily as $row)
                     <li class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-1.5">
                         <span class="text-slate-600">{{ $row->day }}</span>
-                        <span class="font-bold text-slate-900">{{ number_format($row->total, 2) }} EGP</span>
+                        <span class="font-bold text-slate-900">{{ number_format($row->total, 2) }} SAR</span>
                     </li>
                 @empty
                     <p class="text-sm text-slate-400">{{ __('No revenue recorded yet.') }}</p>
@@ -32,7 +32,7 @@
                 @forelse ($monthly as $row)
                     <li class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-1.5">
                         <span class="text-slate-600">{{ $row->month }}</span>
-                        <span class="font-bold text-slate-900">{{ number_format($row->total, 2) }} EGP</span>
+                        <span class="font-bold text-slate-900">{{ number_format($row->total, 2) }} SAR</span>
                     </li>
                 @empty
                     <p class="text-sm text-slate-400">{{ __('No revenue recorded yet.') }}</p>
@@ -46,7 +46,7 @@
                 @forelse ($byService as $row)
                     <li class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-1.5">
                         <span class="text-slate-600">{{ $row->name }}</span>
-                        <span class="font-bold text-slate-900">{{ number_format($row->total, 2) }} EGP</span>
+                        <span class="font-bold text-slate-900">{{ number_format($row->total, 2) }} SAR</span>
                     </li>
                 @empty
                     <p class="text-sm text-slate-400">{{ __('No invoiced work yet.') }}</p>
@@ -60,7 +60,7 @@
                 @forelse ($byTechnician as $row)
                     <li class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-1.5">
                         <span class="text-slate-600">{{ $row->name }}</span>
-                        <span class="font-bold text-slate-900">{{ number_format($row->total, 2) }} EGP</span>
+                        <span class="font-bold text-slate-900">{{ number_format($row->total, 2) }} SAR</span>
                     </li>
                 @empty
                     <p class="text-sm text-slate-400">{{ __('No paid work yet.') }}</p>
@@ -75,7 +75,7 @@
             @forelse ($outstanding as $invoice)
                 <li class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-1.5">
                     <a href="{{ route('admin.invoices.show', $invoice) }}" class="font-bold text-teal-700 hover:underline">{{ $invoice->number }} · {{ $invoice->user->name ?? '' }}</a>
-                    <span class="font-bold text-rose-600">{{ number_format($invoice->total - $invoice->paid_amount, 2) }} {{ __('EGP due') }}</span>
+                    <span class="font-bold text-rose-600">{{ number_format($invoice->total - $invoice->paid_amount, 2) }} {{ __('SAR due') }}</span>
                 </li>
             @empty
                     <p class="text-sm text-slate-400">{{ __('No outstanding invoices.') }}</p>

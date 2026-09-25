@@ -75,7 +75,7 @@
                                 <p class="mt-0.5 text-xs text-slate-400">{{ $item->sku ?? $item->unit }}</p>
                             </td>
                             <td class="px-6 py-4 font-bold text-slate-900">{{ $item->current_stock }} <span class="text-xs font-medium text-slate-400">{{ $item->unit }}</span></td>
-                            <td class="px-6 py-4 text-xs">{{ number_format($item->unit_cost, 2) }} {{ __('EGP') }}</td>
+                            <td class="px-6 py-4 text-xs">{{ number_format($item->unit_cost, 2) }} {{ __('SAR') }}</td>
                             <td class="px-6 py-4">
                                 @if($item->isLowOnStock())
                                     <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">{{ __('Low Stock') }}</span>

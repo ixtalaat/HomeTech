@@ -43,7 +43,7 @@ class AdditionalWorkRequiresApproval extends Notification implements ShouldQueue
             'cost' => (float) $this->additionalWork->cost,
             'message_key' => 'notifications.additional_work_approval',
             'message_params' => ['description' => $this->additionalWork->description, 'cost' => (float) $this->additionalWork->cost, 'id' => $request->id],
-            'message' => "Approval needed: {$this->additionalWork->description} ({$this->additionalWork->cost} EGP) for request #{$request->id}.",
+            'message' => "Approval needed: {$this->additionalWork->description} ({$this->additionalWork->cost} SAR) for request #{$request->id}.",
         ];
     }
 }

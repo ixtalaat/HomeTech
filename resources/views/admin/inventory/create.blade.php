@@ -72,7 +72,7 @@
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                    <label for="unit_cost" class="form-label">{{ __('Unit Cost (EGP)') }} <span class="text-rose-500">*</span></label>
+                    <label for="unit_cost" class="form-label">{{ __('Unit Cost (SAR)') }} <span class="text-rose-500">*</span></label>
                     <input type="number" id="unit_cost" name="unit_cost" step="0.01" min="0" value="{{ old('unit_cost', 0) }}" required
                         class="form-input @error('unit_cost') border-rose-300 @enderror">
                     @error('unit_cost')

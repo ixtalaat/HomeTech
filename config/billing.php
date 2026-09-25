@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Discounts above these thresholds require a manager (admins are refused).
-    | Percent applies to the invoice subtotal; fixed is a flat EGP amount.
+    | Percent applies to the invoice subtotal; fixed is a flat SAR amount.
     |
     */
 

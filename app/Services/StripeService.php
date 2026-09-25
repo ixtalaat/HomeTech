@@ -26,7 +26,7 @@ class StripeService
     /**
      * Create a hosted Checkout Session for full or partial payment.
      *
-     * Amounts go to Stripe in piasters (EGP × 100).
+     * Amounts go to Stripe in halalas (SAR × 100).
      *
      * @throws StripeException
      */
@@ -43,21 +43,21 @@ class StripeService
         $amount = $amount === null ? $invoice->remaining() : round($amount, 2);
 
         if ($amount <= 0 || $amount > $invoice->remaining()) {
-            throw new StripeException("Online payment must be between 1 piaster and {$invoice->remaining()} EGP.");
+            throw new StripeException("Online payment must be between 1 halala and {$invoice->remaining()} SAR.");
         }
 
-        $piaster = (int) round($amount * 100);
+        $halala = (int) round($amount * 100);
 
         try {
             return $this->client()->checkout->sessions->create([
                 'mode' => 'payment',
-                'currency' => 'egp',
+                'currency' => 'sar',
                 'customer_email' => $customer->email,
                 'line_items' => [[
                     'price_data' => [
-                        'currency' => 'egp',
+                        'currency' => 'sar',
                         'product_data' => ['name' => "HomeTech invoice {$invoice->number}"],
-                        'unit_amount' => $piaster,
+                        'unit_amount' => $halala,
                     ],
                     'quantity' => 1,
                 ]],

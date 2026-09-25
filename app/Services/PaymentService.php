@@ -40,13 +40,13 @@ class PaymentService
         }
 
         if ($amount > $invoice->remaining()) {
-            throw new BillingException("Payment of {$amount} EGP exceeds the remaining balance of {$invoice->remaining()} EGP.");
+            throw new BillingException("Payment of {$amount} SAR exceeds the remaining balance of {$invoice->remaining()} SAR.");
         }
 
         $recorded = round((float) $invoice->payments()->sum('amount'), 2);
 
         if (round($amount + $recorded, 2) > (float) $invoice->total) {
-            throw new BillingException("This invoice already has payments recorded covering {$recorded} EGP of {$invoice->total} EGP.");
+            throw new BillingException("This invoice already has payments recorded covering {$recorded} SAR of {$invoice->total} SAR.");
         }
 
         $confirmed = $confirmed || $this->isStaff($actor);

@@ -98,7 +98,7 @@
                                         class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-teal-300 hover:shadow-sm">
                                         <p class="font-bold text-slate-900 text-sm">{{ $related->display_name }}</p>
                                         <div class="mt-3 flex items-center justify-between text-xs">
-                                            <span class="font-bold text-slate-900">{{ number_format($related->base_price, 2) }} {{ __('EGP') }}</span>
+                                            <span class="font-bold text-slate-900">{{ number_format($related->base_price, 2) }} {{ __('SAR') }}</span>
                                             <span class="text-teal-700 font-semibold">{{ __('View →') }}</span>
                                         </div>
                                     </a>
@@ -115,7 +115,7 @@
                         
                         <div class="mt-4 flex items-baseline gap-2">
                             <span class="font-display text-4xl font-extrabold text-slate-950">{{ number_format($service->base_price, 2) }}</span>
-                            <span class="text-sm font-bold text-slate-500">{{ __('EGP') }}</span>
+                            <span class="text-sm font-bold text-slate-500">{{ __('SAR') }}</span>
                             <span class="text-xs text-slate-400">({{ __('base diagnostic & labor estimate') }})</span>
                         </div>
 

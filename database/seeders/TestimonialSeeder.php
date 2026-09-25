@@ -8,7 +8,6 @@ use App\Models\MaintenanceRequest;
 use App\Models\Service;
 use App\Models\User;
 use App\Services\ReviewService;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class TestimonialSeeder extends Seeder
@@ -34,7 +33,7 @@ class TestimonialSeeder extends Seeder
                 'name' => 'Omar Farouk',
                 'email' => 'omar.demo@hometech.com',
                 'rating' => 5,
-                'comment' => 'الفني كان محترم وشغله نضيف، والسعر زي ما اتفقنا بالظبط.',
+                'comment' => 'الفني كان محترم وشغله نظيف، والسعر مثل ما اتفقنا بالضبط.',
             ],
             [
                 'name' => 'Mariam Samir',
@@ -58,7 +57,7 @@ class TestimonialSeeder extends Seeder
                 [
                     'name' => $entry['name'],
                     'password' => 'password',
-                    'phone' => '0100000001'.$index,
+                    'phone' => '055000001'.$index,
                     'role' => UserRole::Customer,
                     'is_active' => true,
                     'email_verified_at' => now(),
@@ -68,8 +67,8 @@ class TestimonialSeeder extends Seeder
             $address = $customer->addresses()->firstOrCreate(
                 ['title' => 'Home'],
                 [
-                    'street' => 'Demo Street '.($index + 1),
-                    'city' => 'Cairo',
+                    'street' => ['12 King Fahd Road, Apt 4', '7 Tahlia Street, Villa 3', '3 Corniche Road, Apt 9'][$index] ?? '12 King Fahd Road, Apt 4',
+                    'city' => ['Riyadh', 'Jeddah', 'Dammam'][$index] ?? 'Riyadh',
                     'is_default' => true,
                 ]
             );

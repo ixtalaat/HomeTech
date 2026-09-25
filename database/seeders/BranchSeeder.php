@@ -22,7 +22,7 @@ class BranchSeeder extends Seeder
         ['name' => 'Jeddah', 'priority' => 40, 'cities' => ['Jeddah']],
         ['name' => 'Dammam', 'priority' => 30, 'cities' => ['Dammam']],
         ['name' => 'Mecca', 'priority' => 20, 'cities' => ['Mecca']],
-        ['name' => 'Cairo', 'priority' => 10, 'cities' => ['Cairo']],
+        ['name' => 'Medina', 'priority' => 10, 'cities' => ['Medina']],
     ];
 
     /**
@@ -45,28 +45,30 @@ class BranchSeeder extends Seeder
     }
 
     /**
-     * Seed one demo branch manager for Riyadh (credential documented in
+     * Seed one demo branch manager per branch (credentials documented in
      * README; override per deploy via env, like technician passwords).
      */
     private function seedDemoManager(): void
     {
-        $branch = Branch::where('name', 'Riyadh')->first();
+        foreach (self::BRANCHES as $data) {
+            $branch = Branch::where('name', $data['name'])->first();
 
-        if ($branch === null || $branch->manager_user_id !== null) {
-            return;
+            if ($branch === null || $branch->manager_user_id !== null) {
+                continue;
+            }
+
+            $manager = User::firstOrCreate(
+                ['email' => strtolower($data['name']).'.manager@hometech.test'],
+                [
+                    'name' => $data['name'].' Manager',
+                    'password' => env('BRANCH_MANAGER_PASSWORD', 'password'),
+                    'role' => UserRole::Manager,
+                    'is_active' => true,
+                    'email_verified_at' => now(),
+                ]
+            );
+
+            $branch->update(['manager_user_id' => $manager->id]);
         }
-
-        $manager = User::firstOrCreate(
-            ['email' => 'riyadh.manager@hometech.test'],
-            [
-                'name' => 'Riyadh Manager',
-                'password' => env('BRANCH_MANAGER_PASSWORD', 'password'),
-                'role' => UserRole::Manager,
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        $branch->update(['manager_user_id' => $manager->id]);
     }
 }

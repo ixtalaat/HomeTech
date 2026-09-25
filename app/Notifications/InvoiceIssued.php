@@ -34,7 +34,7 @@ class InvoiceIssued extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject("Invoice {$this->invoice->number} issued")
-            ->line("Invoice {$this->invoice->number} for {$this->invoice->total} EGP has been issued for your maintenance request #{$this->invoice->maintenance_request_id}.")
+            ->line("Invoice {$this->invoice->number} for {$this->invoice->total} SAR has been issued for your maintenance request #{$this->invoice->maintenance_request_id}.")
             ->action('View Invoice', route('invoices.show', $this->invoice))
             ->line('Thank you for using HomeTech!');
     }
@@ -52,7 +52,7 @@ class InvoiceIssued extends Notification implements ShouldQueue
             'maintenance_request_id' => $this->invoice->maintenance_request_id,
             'message_key' => 'notifications.invoice_issued',
             'message_params' => ['number' => $this->invoice->number, 'total' => $this->invoice->total, 'id' => $this->invoice->maintenance_request_id],
-            'message' => "Invoice {$this->invoice->number} ({$this->invoice->total} EGP) was issued for your request #{$this->invoice->maintenance_request_id}.",
+            'message' => "Invoice {$this->invoice->number} ({$this->invoice->total} SAR) was issued for your request #{$this->invoice->maintenance_request_id}.",
         ];
     }
 }

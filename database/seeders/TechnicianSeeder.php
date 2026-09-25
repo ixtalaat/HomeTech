@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\UserRole;
+use App\Models\Branch;
 use App\Models\ServiceCategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -12,26 +13,43 @@ class TechnicianSeeder extends Seeder
     /**
      * Demo technicians with their skills (category slugs).
      *
-     * @var array<int, array{name: string, email: string, phone: string, skills: array<int, string>}>
+     * @var array<int, array{name: string, email: string, phone: string, branch: string, skills: array<int, string>}>
      */
     private const TECHNICIANS = [
         [
             'name' => 'Ahmed Hassan',
             'email' => 'ahmed@hometech.com',
-            'phone' => '01000000001',
+            'phone' => '0550000001',
+            'branch' => 'Riyadh',
             'skills' => ['plumbing'],
         ],
         [
             'name' => 'Sara Mahmoud',
             'email' => 'sara@hometech.com',
-            'phone' => '01000000002',
+            'phone' => '0550000002',
+            'branch' => 'Riyadh',
             'skills' => ['electrical', 'air-conditioning'],
         ],
         [
             'name' => 'Omar Khaled',
             'email' => 'omar@hometech.com',
-            'phone' => '01000000003',
+            'phone' => '0550000003',
+            'branch' => 'Jeddah',
             'skills' => ['painting', 'appliance-repair'],
+        ],
+        [
+            'name' => 'Khalid Al-Otaibi',
+            'email' => 'khalid@hometech.com',
+            'phone' => '0550000004',
+            'branch' => 'Jeddah',
+            'skills' => ['air-conditioning', 'appliance-repair'],
+        ],
+        [
+            'name' => 'Reem Al-Qahtani',
+            'email' => 'reem@hometech.com',
+            'phone' => '0550000005',
+            'branch' => 'Dammam',
+            'skills' => ['plumbing', 'electrical'],
         ],
     ];
 
@@ -66,6 +84,7 @@ class TechnicianSeeder extends Seeder
                 ['user_id' => $user->id],
                 [
                     'phone' => $data['phone'],
+                    'branch_id' => Branch::where('name', $data['branch'])->first()?->id,
                     'is_active' => true,
                     'hired_at' => now(),
                 ]

@@ -2,7 +2,7 @@
 
 HomeTech manages the complete lifecycle of a home maintenance job: customer request → admin review → technician assignment → scheduling → work order (diagnosis/labor/materials) → additional-work approval → invoicing → payment → closure → review.
 
-**Stack:** PHP 8.2 · Laravel 12 · MySQL · Blade + Tailwind · Pest (147 tests, 583 assertions)
+**Stack:** PHP 8.2 · Laravel 12 · MySQL · Blade + Tailwind · Pest (265 tests, 1065 assertions)
 
 ## Quickstart
 
@@ -17,24 +17,32 @@ composer run dev   # app + queue worker + vite
 
 Open http://localhost:8000.
 
-## Demo Accounts (after seeding)
+## Demo Accounts (after seeding — all passwords `password` unless noted)
 
-| Role | Email | Password |
-|---|---|---|
-| Admin | `admin@hometech.com` | `ADMIN_PASSWORD` from `.env` |
-| Manager | `manager@hometech.com` | `MANAGER_PASSWORD` from `.env` |
-| Technician (Plumbing) | `ahmed@hometech.com` | `password` (or `TECHNICIAN_PASSWORD`) |
-| Technician (Electrical/AC) | `sara@hometech.com` | `password` |
-| Technician (Painting/Appliance) | `omar@hometech.com` | `password` |
-| Customer | `demo@hometech.com` / `test@example.com` | `password` |
+| Role | Name | Email | Phone |
+|---|---|---|---|
+| Admin | Saleh Al-Ghamdi | `admin@hometech.com` | — |
+| Manager (all branches) | Lina Al-Harbi | `manager@hometech.com` | — |
+| Branch Manager | Riyadh / Jeddah / Dammam / Mecca / Medina Manager | `<city>.manager@hometech.test` | — |
+| Technician (Plumbing, Riyadh) | Ahmed Hassan | `ahmed@hometech.com` | 0550000001 |
+| Technician (Electrical/AC, Riyadh) | Sara Mahmoud | `sara@hometech.com` | 0550000002 |
+| Technician (Painting/Appliance, Jeddah) | Omar Khaled | `omar@hometech.com` | 0550000003 |
+| Technician (AC/Appliance, Jeddah) | Khalid Al-Otaibi | `khalid@hometech.com` | 0550000004 |
+| Technician (Plumbing/Electrical, Dammam) | Reem Al-Qahtani | `reem@hometech.com` | 0550000005 |
+| Customer | Abdullah Al-Rashid (Riyadh) | `demo@hometech.com` | 0550000009 |
+| Customer | Layla Hassan (Riyadh) | `layla.demo@hometech.com` | 0550000010 |
+| Customer | Omar Farouk (Jeddah) | `omar.demo@hometech.com` | 0550000011 |
+| Customer | Mariam Samir (Dammam) | `mariam.demo@hometech.com` | 0550000012 |
 
-The demo customer ships with a Cairo address and a pending AC request, and inventory comes stocked (including one low-stock item to see the alert).
+Admin/Manager passwords come from `ADMIN_PASSWORD` / `MANAGER_PASSWORD` in `.env`; everything else uses `password` (or `TECHNICIAN_PASSWORD` / `BRANCH_MANAGER_PASSWORD`).
+
+The demo customer ships with a Riyadh address and a pending AC request, and inventory comes stocked (including one low-stock item to see the alert).
 
 ## 5-Minute Tour (the PRD §38 scenario)
 
 1. **Customer** (`demo@…`): open the pending request → Services → request an AC repair with a photo.
 2. **Admin**: Requests → approve → assign Ahmed (slot auto-books from the preferred time).
-3. **Ahmed**: My Jobs → Start Visit → diagnosis + labor + use 1× Capacitor → request extra work (100 EGP connector).
+3. **Ahmed**: My Jobs → Start Visit → diagnosis + labor + use 1× Capacitor → request extra work (100 SAR connector).
 4. **Customer**: approve the extra from the request banner.
 5. **Ahmed**: mark it performed → Complete Job.
 6. **Admin**: generate + issue the invoice → record a partial cash payment.

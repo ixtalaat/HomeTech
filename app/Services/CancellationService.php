@@ -57,7 +57,7 @@ class CancellationService
                 $request->refresh(),
                 RequestStatus::Cancelled,
                 $actor,
-                $fee > 0 ? "Cancelled with a fee of {$fee} EGP: {$reason}" : "Cancelled without fee: {$reason}"
+                $fee > 0 ? "Cancelled with a fee of {$fee} SAR: {$reason}" : "Cancelled without fee: {$reason}"
             );
 
             AuditLog::record($actor, 'request.cancelled', $request->refresh(), [

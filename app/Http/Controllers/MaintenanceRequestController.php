@@ -137,7 +137,7 @@ class MaintenanceRequestController extends Controller
         }
 
         $message = $cancellation->fee > 0
-            ? "Request cancelled with a fee of {$cancellation->fee} EGP per the cancellation policy."
+            ? "Request cancelled with a fee of {$cancellation->fee} SAR per the cancellation policy."
             : 'Request cancelled without a fee.';
 
         return redirect()

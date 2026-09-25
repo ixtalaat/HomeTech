@@ -57,9 +57,9 @@ class DemoSeeder extends Seeder
         $customer = User::firstOrCreate(
             ['email' => 'demo@hometech.com'],
             [
-                'name' => 'Demo Customer',
+                'name' => 'Abdullah Al-Rashid',
                 'password' => env('DEMO_CUSTOMER_PASSWORD', 'password'),
-                'phone' => '01000000009',
+                'phone' => '0550000009',
                 'role' => UserRole::Customer,
                 'is_active' => true,
                 'email_verified_at' => now(),
@@ -69,8 +69,8 @@ class DemoSeeder extends Seeder
         $address = $customer->addresses()->firstOrCreate(
             ['title' => 'Home'],
             [
-                'street' => '12 Nile Street, Apt 4',
-                'city' => 'Cairo',
+                'street' => '12 King Fahd Road, Apt 4',
+                'city' => 'Riyadh',
                 'notes' => 'Near the metro station.',
                 'is_default' => true,
             ]
@@ -99,15 +99,15 @@ class DemoSeeder extends Seeder
     }
 
     /**
-     * Link legacy demo technicians to the Cairo branch and give every
+     * Link legacy demo technicians to the Riyadh branch and give every
      * technician without one the default weekly schedule, so automatic
      * assignment has coverage on reseeded environments.
      */
     private function backfillBranchesAndSchedules(): void
     {
         $branch = Branch::firstOrCreate(
-            ['name' => 'Cairo'],
-            ['priority' => 10, 'is_active' => true]
+            ['name' => 'Riyadh'],
+            ['priority' => 50, 'is_active' => true]
         );
 
         foreach (Technician::whereNull('branch_id')->get() as $technician) {
@@ -236,11 +236,11 @@ class DemoSeeder extends Seeder
     private function materials(): array
     {
         return [
-            ['name' => 'Capacitor', 'name_ar' => 'مكثف', 'sku' => 'SKU-CAP', 'cost' => 150.00, 'stock' => 25],
-            ['name' => 'Copper Connector', 'name_ar' => 'وصلة نحاس', 'sku' => 'SKU-COP', 'cost' => 25.00, 'stock' => 100],
-            ['name' => 'Water Pipe (1m)', 'name_ar' => 'ماسورة مياه (1م)', 'sku' => 'SKU-PIP', 'cost' => 80.00, 'stock' => 40],
-            ['name' => 'Faucet Cartridge', 'name_ar' => 'قلب خلاط', 'sku' => 'SKU-FAU', 'cost' => 120.00, 'stock' => 3],
-            ['name' => 'LED Panel', 'name_ar' => 'لوح ليد', 'sku' => 'SKU-LED', 'cost' => 200.00, 'stock' => 15],
+            ['name' => 'Capacitor', 'name_ar' => 'مكثف', 'sku' => 'SKU-CAP', 'cost' => 45.00, 'stock' => 25],
+            ['name' => 'Copper Connector', 'name_ar' => 'وصلة نحاس', 'sku' => 'SKU-COP', 'cost' => 15.00, 'stock' => 100],
+            ['name' => 'Water Pipe (1m)', 'name_ar' => 'ماسورة مياه (1م)', 'sku' => 'SKU-PIP', 'cost' => 35.00, 'stock' => 40],
+            ['name' => 'Faucet Cartridge', 'name_ar' => 'قلب خلاط', 'sku' => 'SKU-FAU', 'cost' => 60.00, 'stock' => 3],
+            ['name' => 'LED Panel', 'name_ar' => 'لوح ليد', 'sku' => 'SKU-LED', 'cost' => 85.00, 'stock' => 15],
         ];
     }
 }

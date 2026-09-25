@@ -39,6 +39,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PushTokenController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceBrowseController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\Technician\WorkOrderController as TechnicianWorkOrderController;
 use App\Models\MaintenanceRequest;
@@ -69,6 +70,8 @@ Route::get('/about', function () {
 })->name('about');
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
+
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 // Public Firebase web-push configuration (client identifiers only, no secrets).
 Route::get('/firebase-config', [PushTokenController::class, 'config'])->name('firebase.config');

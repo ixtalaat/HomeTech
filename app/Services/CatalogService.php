@@ -279,6 +279,19 @@ class CatalogService
     }
 
     /**
+     * Active services in active categories for the XML sitemap.
+     *
+     * @return Collection<int, Service>
+     */
+    public function sitemapServices(): Collection
+    {
+        return Service::active()
+            ->whereHas('category', fn ($query): Builder => $query->active())
+            ->orderBy('updated_at', 'desc')
+            ->get(['id', 'slug', 'updated_at']);
+    }
+
+    /**
      * Find an active service in an active category by slug, with related services.
      *
      * @return array{service: Service, relatedServices: Collection<int, Service>}

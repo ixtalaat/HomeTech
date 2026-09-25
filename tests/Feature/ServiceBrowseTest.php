@@ -109,6 +109,40 @@ it('allows searching services by keywords', function () {
         ->assertDontSee('Door Painting');
 });
 
+it('finds services by category name in either language', function () {
+    $category = ServiceCategory::factory()->create(['name' => 'Plumbing', 'slug' => 'plumbing', 'is_active' => true]);
+    $category->saveTranslations(['ar' => ['name' => 'سباكة']]);
+    Service::factory()->create([
+        'service_category_id' => $category->id,
+        'name' => 'Faucet Leak Fix',
+        'description' => 'Fixes leaks fast.',
+        'is_active' => true,
+    ]);
+
+    $this->get(route('services.index', ['search' => 'Plumbing']))
+        ->assertOk()
+        ->assertSee('Faucet Leak Fix');
+
+    $this->get(route('services.index', ['search' => 'سباكة']))
+        ->assertOk()
+        ->assertSee('Faucet Leak Fix');
+});
+
+it('finds services by translated description', function () {
+    $category = ServiceCategory::factory()->create(['is_active' => true]);
+    $service = Service::factory()->create([
+        'service_category_id' => $category->id,
+        'name' => 'Drain Service',
+        'description' => 'Clears blockages.',
+        'is_active' => true,
+    ]);
+    $service->saveTranslations(['ar' => ['name' => 'خدمة المجاري', 'description' => 'تسليك المجاري المسدودة بسرعة.']]);
+
+    $this->get(route('services.index', ['search' => 'المسدودة']))
+        ->assertOk()
+        ->assertSee('Drain Service');
+});
+
 it('allows viewing an active service detail page', function () {
     $category = ServiceCategory::factory()->create(['is_active' => true]);
     $service = Service::factory()->create([

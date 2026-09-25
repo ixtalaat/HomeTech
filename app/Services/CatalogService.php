@@ -36,7 +36,13 @@ class CatalogService
             $query->where(function ($inner) use ($filters): void {
                 $inner->where('name', 'like', "%{$filters['search']}%")
                     ->orWhere('description', 'like', "%{$filters['search']}%")
-                    ->orWhereHas('translations', fn ($translationQuery) => $translationQuery->where('name', 'like', "%{$filters['search']}%"));
+                    ->orWhereHas('translations', fn ($translationQuery) => $translationQuery
+                        ->where('name', 'like', "%{$filters['search']}%")
+                        ->orWhere('description', 'like', "%{$filters['search']}%"))
+                    ->orWhereHas('category', fn ($categoryQuery) => $categoryQuery
+                        ->where('name', 'like', "%{$filters['search']}%")
+                        ->orWhereHas('translations', fn ($categoryTranslationQuery) => $categoryTranslationQuery
+                            ->where('name', 'like', "%{$filters['search']}%")));
             });
         }
 
@@ -177,7 +183,13 @@ class CatalogService
             $servicesQuery->where(function ($query) use ($search): void {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhereHas('translations', fn ($translationQuery): Builder => $translationQuery->where('name', 'like', "%{$search}%"));
+                    ->orWhereHas('translations', fn ($translationQuery): Builder => $translationQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%"))
+                    ->orWhereHas('category', fn ($categoryQuery): Builder => $categoryQuery
+                        ->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('translations', fn ($categoryTranslationQuery): Builder => $categoryTranslationQuery
+                            ->where('name', 'like', "%{$search}%")));
             });
         }
 

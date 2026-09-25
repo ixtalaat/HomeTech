@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             TechnicianSeeder::class,
             DemoSeeder::class,
+            TestimonialSeeder::class,
         ]);
     }
 }

@@ -29,8 +29,9 @@
                     <a href="{{ route('dashboard') }}" class="hidden rounded-xl border border-slate-200 px-4 py-2 text-slate-700 hover:border-teal-200 hover:bg-teal-50 transition sm:inline">{{ __('Dashboard') }}</a>
                 @else
                     <a href="{{ route('login') }}" class="hidden rounded-xl px-4 py-2 text-slate-600 transition hover:text-slate-950 sm:inline">{{ __('Sign in') }}</a>
-                    <a href="{{ route('register') }}" class="primary-button py-2 px-4 text-xs whitespace-nowrap">{{ __('Get started') }} <span aria-hidden="true">→</span></a>
+                    <a href="{{ route('register') }}" class="primary-button hidden py-2 px-4 text-xs whitespace-nowrap sm:inline-flex">{{ __('Get started') }} <span aria-hidden="true">→</span></a>
                 @endauth
+                <x-mobile-nav active="services" />
             </nav>
         </div>
     </header>

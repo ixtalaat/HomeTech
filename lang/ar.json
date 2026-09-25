@@ -946,5 +946,6 @@
     "We currently serve :cities.": "نخدم حاليًا: :cities.",
     "What if I need to reschedule or cancel?": "ماذا لو احتجت إلى إعادة الجدولة أو الإلغاء؟",
     "Approved requests can pick a new slot from your dashboard, and cancellations follow our cancellation policy.": "يمكن إعادة جدولة الطلبات المعتمدة باختيار موعد جديد من لوحة التحكم، ويخضع الإلغاء لسياسة الإلغاء.",
-    "Popular right now": "رائج الآن"
+    "Popular right now": "رائج الآن",
+    "Menu": "القائمة"
 }

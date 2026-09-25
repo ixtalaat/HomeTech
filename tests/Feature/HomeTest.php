@@ -138,6 +138,18 @@ it('collapses public nav links on small screens', function () {
     $this->get(route('contact.create'))->assertOk()->assertSee('hidden rounded-xl px-4 py-2.5', false);
 });
 
+it('offers a mobile menu with the hidden nav links', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('<details', false)
+        ->assertSee(route('about'), false)
+        ->assertSee(route('contact.create'), false);
+
+    $this->withSession(['locale' => 'ar'])->get(route('home'))
+        ->assertOk()
+        ->assertSee('القائمة', false);
+});
+
 it('serves home page aggregates from cache until flushed', function () {
     $category = ServiceCategory::factory()->create();
     Service::factory()->create([

@@ -26,14 +26,15 @@
             <a href="{{ route('services.index') }}" class="hidden rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-teal-700 sm:inline">{{ __('Browse Services') }}</a>
             @auth
                 <a href="{{ route('dashboard') }}" class="hidden rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950 sm:inline">{{ __('Dashboard') }}</a>
-                <form method="POST" action="{{ route('logout') }}" class="inline">
+                <form method="POST" action="{{ route('logout') }}" class="hidden sm:inline">
                     @csrf
                     <button type="submit" class="primary-button">{{ __('Log out') }} <span aria-hidden="true">→</span></button>
                 </form>
             @else
                 <a href="{{ route('login') }}" class="hidden rounded-xl px-4 py-2.5 text-slate-600 transition hover:text-slate-950 sm:inline">{{ __('Sign in') }}</a>
-                <a href="{{ route('register') }}" class="primary-button whitespace-nowrap">{{ __('Get started') }} <span aria-hidden="true">→</span></a>
+                <a href="{{ route('register') }}" class="primary-button hidden whitespace-nowrap sm:inline-flex">{{ __('Get started') }} <span aria-hidden="true">→</span></a>
             @endauth
+            <x-mobile-nav />
         </nav></div>
     </header>
     <main class="relative overflow-hidden bg-slate-50">

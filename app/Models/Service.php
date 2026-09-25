@@ -123,4 +123,14 @@ class Service extends Model
     {
         return $this->hasMany(ServiceTranslation::class);
     }
+
+    /**
+     * Get the maintenance requests for this service.
+     *
+     * @return HasMany<MaintenanceRequest, $this>
+     */
+    public function maintenanceRequests(): HasMany
+    {
+        return $this->hasMany(MaintenanceRequest::class);
+    }
 }

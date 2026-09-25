@@ -14,6 +14,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\MaintenanceRequest;
 use App\Models\Payment;
+use App\Models\Review;
 use App\Models\Service;
 use App\Models\Technician;
 use App\Models\User;
@@ -389,6 +390,27 @@ class ReportingService
             'branches' => Branch::where('is_active', true)->orderByDesc('priority')->orderBy('name')->get(),
             'branchId' => $branchId,
             'weekOffset' => $offset,
+        ];
+    }
+
+    /**
+     * Public home-page stats: catalog size, team size, finished jobs, rating.
+     *
+     * @return array{services: int, technicians: int, completedJobs: int, averageRating: ?float, reviewsCount: int}
+     */
+    public function homeStats(): array
+    {
+        return [
+            'services' => Service::active()->count(),
+            'technicians' => Technician::active()->count(),
+            'completedJobs' => MaintenanceRequest::whereIn('status', [
+                RequestStatus::Completed,
+                RequestStatus::Invoiced,
+                RequestStatus::Paid,
+                RequestStatus::Closed,
+            ])->count(),
+            'averageRating' => ($average = Review::avg('rating')) !== null ? round((float) $average, 1) : null,
+            'reviewsCount' => Review::count(),
         ];
     }
 

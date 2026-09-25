@@ -8,6 +8,7 @@ use App\Exceptions\ReviewException;
 use App\Models\MaintenanceRequest;
 use App\Models\Review;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ReviewService
@@ -47,6 +48,21 @@ class ReviewService
                 'comment' => $comment,
             ]);
         });
+    }
+
+    /**
+     * Latest top-rated reviews with a comment, for public testimonials.
+     *
+     * @return Collection<int, Review>
+     */
+    public function spotlight(int $limit = 3): Collection
+    {
+        return Review::highlyRated()
+            ->whereNotNull('comment')
+            ->with('user')
+            ->latest()
+            ->limit($limit)
+            ->get();
     }
 
     /**

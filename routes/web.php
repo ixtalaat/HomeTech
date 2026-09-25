@@ -29,6 +29,7 @@ use App\Http\Controllers\Branch\TechnicianScheduleController as BranchScheduleCo
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MaintenanceRequestController;
@@ -45,9 +46,7 @@ use App\Models\Service;
 use App\Models\Technician;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('home');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Public service catalogue
 Route::get('/services', [ServiceBrowseController::class, 'index'])->name('services.index');

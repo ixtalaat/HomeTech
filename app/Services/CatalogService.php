@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\RequestStatus;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -208,6 +209,53 @@ class CatalogService
             ->get();
 
         return compact('service', 'relatedServices');
+    }
+
+    /**
+     * The most-booked active service per active category for the home page.
+     *
+     * @return Collection<int, Service>
+     */
+    public function popularByCategory(): Collection
+    {
+        $completed = [
+            RequestStatus::Completed,
+            RequestStatus::Invoiced,
+            RequestStatus::Paid,
+            RequestStatus::Closed,
+        ];
+
+        $popular = collect();
+
+        foreach (ServiceCategory::active()->orderBy('name')->get() as $category) {
+            $top = Service::active()
+                ->where('service_category_id', $category->id)
+                ->withCount(['maintenanceRequests as completed_jobs_count' => fn ($query): Builder => $query->whereIn('status', $completed)])
+                ->orderByDesc('completed_jobs_count')
+                ->orderBy('id')
+                ->first();
+
+            if ($top !== null) {
+                $popular->push($top);
+            }
+        }
+
+        return $popular;
+    }
+
+    /**
+     * Active categories with bookable services, for home-page shortcuts.
+     *
+     * @return Collection<int, ServiceCategory>
+     */
+    public function spotlightCategories(int $limit = 4): Collection
+    {
+        return ServiceCategory::active()
+            ->whereHas('services', fn ($query) => $query->where('is_active', true))
+            ->with('translations')
+            ->orderBy('name')
+            ->limit($limit)
+            ->get();
     }
 
     /**

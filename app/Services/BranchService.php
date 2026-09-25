@@ -19,6 +19,19 @@ use Illuminate\Support\Facades\DB;
 class BranchService
 {
     /**
+     * City names served by active branches, ordered by branch priority.
+     *
+     * @return list<string>
+     */
+    public function servedCities(): array
+    {
+        return City::whereHas('branch', fn ($query) => $query->where('is_active', true))
+            ->orderBy('name')
+            ->pluck('name')
+            ->all();
+    }
+
+    /**
      * Paginate branches with technician and city counts.
      *
      * @return LengthAwarePaginator<int, Branch>

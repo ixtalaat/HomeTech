@@ -23,13 +23,13 @@
             <a href="{{ url('/') }}" aria-label="HomeTech home">
                 <x-brand-logo />
             </a>
-            <nav class="flex items-center gap-4 text-sm font-bold">
-                <a href="{{ route('services.index') }}" class="text-teal-700 transition">{{ __('Services') }}</a>
+            <nav class="flex items-center gap-2 text-sm font-bold sm:gap-4">
+                <a href="{{ route('services.index') }}" class="hidden text-teal-700 transition sm:inline">{{ __('Services') }}</a>
                 @auth
-                    <a href="{{ route('dashboard') }}" class="rounded-xl border border-slate-200 px-4 py-2 text-slate-700 hover:border-teal-200 hover:bg-teal-50 transition">{{ __('Dashboard') }}</a>
+                    <a href="{{ route('dashboard') }}" class="hidden rounded-xl border border-slate-200 px-4 py-2 text-slate-700 hover:border-teal-200 hover:bg-teal-50 transition sm:inline">{{ __('Dashboard') }}</a>
                 @else
-                    <a href="{{ route('login') }}" class="rounded-xl px-4 py-2 text-slate-600 transition hover:text-slate-950">{{ __('Sign in') }}</a>
-                    <a href="{{ route('register') }}" class="primary-button py-2 px-4 text-xs">{{ __('Get started') }} <span aria-hidden="true">→</span></a>
+                    <a href="{{ route('login') }}" class="hidden rounded-xl px-4 py-2 text-slate-600 transition hover:text-slate-950 sm:inline">{{ __('Sign in') }}</a>
+                    <a href="{{ route('register') }}" class="primary-button py-2 px-4 text-xs whitespace-nowrap">{{ __('Get started') }} <span aria-hidden="true">→</span></a>
                 @endauth
             </nav>
         </div>

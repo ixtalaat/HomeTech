@@ -216,6 +216,12 @@ it('returns 404 when viewing an inactive service', function () {
         ->assertNotFound();
 });
 
+it('collapses catalog nav links on small screens', function () {
+    $this->get(route('services.index'))
+        ->assertOk()
+        ->assertSee('hidden rounded-xl px-4 py-2', false);
+});
+
 it('exposes SEO tags on catalog and detail pages', function () {
     $category = ServiceCategory::factory()->create(['is_active' => true]);
     $service = Service::factory()->create([

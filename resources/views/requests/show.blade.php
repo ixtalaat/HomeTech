@@ -60,15 +60,15 @@
             <h3 class="text-sm font-extrabold text-slate-900">{{ __('Request Details') }}</h3>
             <dl class="mt-4 space-y-3 text-sm">
                 <div>
-                    <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Service') }}</dt>
+                    <dt class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Service') }}</dt>
                     <dd class="mt-0.5 font-semibold text-slate-900">{{ $maintenanceRequest->service->display_name ?? '—' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Address') }}</dt>
+                    <dt class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Address') }}</dt>
                     <dd class="mt-0.5 font-semibold text-slate-900">{{ $maintenanceRequest->address->title ?? '—' }} — {{ $maintenanceRequest->address->street ?? '' }}, {{ $maintenanceRequest->address->city ?? '' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Preferred Appointment') }}</dt>
+                    <dt class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Preferred Appointment') }}</dt>
                     <dd class="mt-0.5 font-semibold text-slate-900">{{ $maintenanceRequest->preferred_date->format('d M Y') }} at {{ \Carbon\Carbon::parse($maintenanceRequest->preferred_time)->format('h:i A') }}</dd>
                 </div>
                 @if($maintenanceRequest->appointment && !$maintenanceRequest->appointment->isCancelled())
@@ -82,7 +82,7 @@
                     </div>
                 @endif
                 <div>
-                    <dt class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Description') }}</dt>
+                    <dt class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Description') }}</dt>
                     <dd class="mt-0.5 text-slate-700">{{ $maintenanceRequest->description }}</dd>
                 </div>
                 @if($maintenanceRequest->rejection_reason)
@@ -196,15 +196,18 @@
             <ol class="timeline mt-4">
                 @forelse ($maintenanceRequest->statusHistories as $history)
                     <li class="timeline-item">
-                        <span class="timeline-dot" aria-hidden="true"></span>
+                        <span class="timeline-dot{{ $loop->last ? '' : ' timeline-dot-muted' }}" aria-hidden="true"></span>
                         <div class="text-sm">
                             <p class="font-bold text-slate-900">
                                 @if($history->from_status)
                                     {{ \App\Enums\RequestStatus::from($history->from_status)->label() }} →
                                 @endif
                                 {{ \App\Enums\RequestStatus::from($history->status)->label() }}
+                                @if($loop->last)
+                                    <span class="ms-1 rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-teal-700">{{ __('Current') }}</span>
+                                @endif
                             </p>
-                            <p class="text-xs text-slate-400">{{ $history->created_at->format('d M Y, h:i A') }}</p>
+                            <p class="text-xs text-slate-500">{{ $history->created_at->format('d M Y, h:i A') }}</p>
                             @if($history->reason)
                                 <p class="mt-0.5 text-xs text-slate-600">{{ $history->reason }}</p>
                             @endif

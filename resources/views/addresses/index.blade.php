@@ -26,24 +26,24 @@
                 <p class="mt-2 text-sm text-slate-600">{{ $address->street }}</p>
                 <p class="text-sm text-slate-600">{{ $address->city }}</p>
                 @if($address->notes)
-                    <p class="mt-2 text-xs text-slate-400">{{ $address->notes }}</p>
+                    <p class="mt-2 text-xs text-slate-500">{{ $address->notes }}</p>
                 @endif
                 <div class="mt-4 flex flex-wrap items-center gap-2">
                     <a href="{{ route('addresses.edit', $address) }}"
-                        class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">{{ __('Edit') }}</a>
+                        class="btn-row">{{ __('Edit') }}</a>
                     @unless($address->is_default)
                         <form method="POST" action="{{ route('addresses.set-default', $address) }}" class="inline">
                             @csrf
                             @method('PATCH')
                             <button type="submit"
-                                class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-teal-700 hover:border-teal-300 hover:bg-teal-50 transition">{{ __('Set Default') }}</button>
+                                class="btn-row">{{ __('Set Default') }}</button>
                         </form>
                     @endunless
                     <form method="POST" action="{{ route('addresses.destroy', $address) }}" data-confirm="{{ __('Delete this address?') }}" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
-                            class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition">{{ __('Delete') }}</button>
+                            class="btn-row-danger">{{ __('Delete') }}</button>
                     </form>
                 </div>
             </div>

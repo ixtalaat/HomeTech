@@ -86,9 +86,9 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.inventory.show', $item) }}"
-                                        class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">{{ __('View') }}</a>
+                                        class="btn-row">{{ __('View') }}</a>
                                     <a href="{{ route('admin.inventory.edit', $item) }}"
-                                        class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">{{ __('Edit') }}</a>
+                                        class="btn-row">{{ __('Edit') }}</a>
                                 </div>
                             </td>
                         </tr>

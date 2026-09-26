@@ -46,14 +46,14 @@
                             <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.managers.edit', $manager) }}"
-                                        class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">
+                                        class="btn-row">
                                         {{ __('Edit') }}
                                     </a>
                                     <form method="POST" action="{{ route('admin.managers.toggle-status', $manager) }}" class="inline">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit"
-                                            class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">
+                                            class="btn-row">
                                             {{ $manager->is_active ? __('Deactivate') : __('Activate') }}
                                         </button>
                                     </form>
@@ -62,7 +62,7 @@
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit"
-                                                class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition">
+                                                class="btn-row-danger">
                                                 {{ __('Unassign manager') }}
                                             </button>
                                         </form>

@@ -90,6 +90,37 @@
     .empty-state { border-radius: 1rem; border: 1px dashed rgb(203 213 225); background: white; padding: 3rem 1.5rem; text-align: center; font-size: .875rem; color: rgb(100 116 139); }
 
     /* Definition rows */
-    .detail-label { font-size: .6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgb(148 163 184); }
+    .detail-label { font-size: .6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgb(100 116 139); }
     .detail-value { margin-top: .125rem; font-weight: 600; color: rgb(15 23 42); }
+
+    /* Compact row actions — the standard table/card button. */
+    .btn-row { display: inline-flex; align-items: center; justify-content: center; gap: .375rem; border-radius: .625rem; border: 1px solid rgb(203 213 225); background: linear-gradient(180deg, white, rgb(248 250 252)); padding: .45rem .8rem; font-size: .75rem; font-weight: 700; line-height: 1.25; color: rgb(51 65 85); min-height: 36px; white-space: nowrap; }
+    .btn-row:hover { border-color: rgb(94 234 212); background: rgb(240 253 250); color: rgb(15 118 110); }
+    .btn-row-danger { display: inline-flex; align-items: center; justify-content: center; gap: .375rem; border-radius: .625rem; border: 1px solid rgb(253 164 175); background: linear-gradient(180deg, white, rgb(255 241 242)); padding: .45rem .8rem; font-size: .75rem; font-weight: 700; line-height: 1.25; color: rgb(190 18 60); min-height: 36px; white-space: nowrap; }
+    .btn-row-danger:hover { background: rgb(255 241 242); border-color: rgb(251 113 133); }
+}
+
+/* Unlayered overrides — these beat utilities by cascade order, not specificity. */
+aside nav a.bg-teal-50 {
+    background: linear-gradient(135deg, rgb(13 148 136), rgb(15 118 110));
+    color: #fff;
+    box-shadow: 0 6px 14px rgb(13 148 136 / 0.30), inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+
+button, summary { cursor: pointer; }
+
+/* Pagination — pill look matching btn-row, overriding default Tailwind markup. */
+nav[role="navigation"] span.shadow-sm { box-shadow: none; gap: .375rem; }
+nav[role="navigation"] span.shadow-sm > a,
+nav[role="navigation"] span.shadow-sm > span > span { border-radius: .625rem; margin-left: 0; border-color: rgb(203 213 225); }
+nav[role="navigation"] span[aria-current="page"] > span { background: linear-gradient(135deg, rgb(13 148 136), rgb(15 118 110)); border-color: rgb(15 118 110); color: #fff; font-weight: 800; }
+nav[role="navigation"] a:hover { border-color: rgb(94 234 212); background: rgb(240 253 250); color: rgb(15 118 110); }
+nav[role="navigation"] > div:first-child a,
+nav[role="navigation"] > div:first-child span { border-radius: .75rem; }
+
+@media print {
+    aside, header, nav, form, button, .primary-button, .secondary-button, .btn-row, .btn-row-danger { display: none !important; }
+    body { background: #fff; }
+    main { padding: 0 !important; }
+    .card, .dark-panel { border: 1px solid #e2e8f0; background: #fff; color: #0f172a; box-shadow: none; }
 }

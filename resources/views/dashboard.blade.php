@@ -28,7 +28,7 @@
             </div>
         @endif
         <div class="mt-8 grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
-            <section class="rounded-3xl border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-label="{{ __('Your activity') }}">
+            <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-label="{{ __('Your activity') }}">
                 <div class="flex items-start justify-between"><div><p class="text-sm font-bold uppercase tracking-[0.14em] text-teal-600">{{ __('Your activity') }}</p><h3 class="mt-2 font-display text-xl font-extrabold">{{ $recent_requests->isEmpty() ? __('No services yet') : __('Recent requests') }}</h3></div><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">{{ __('Overview') }}</span></div>
                 @if($recent_requests->isEmpty())
                     <div class="mt-8 rounded-2xl border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center"><div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-100 text-2xl text-teal-700">⌂</div><p class="mt-4 font-bold text-slate-900">{{ __('Your home deserves a great start') }}</p><p class="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500">{{ __('Book your first service and our team will take care of the rest.') }}</p><a href="{{ route('services.index') }}" class="mt-5 inline-flex font-bold text-teal-700 hover:text-teal-800">{{ __('Explore services') }} <span class="ml-2">→</span></a></div>

@@ -6,7 +6,8 @@
 <div class="mx-auto max-w-7xl">
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ __('Operations Dashboard') }}</h2>
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-teal-600">{{ __('Operations') }}</p>
+            <h2 class="mt-1 font-display text-2xl font-extrabold text-slate-900">{{ __('Operations Dashboard') }}</h2>
             <p class="mt-1 text-sm text-slate-500">{{ __('Live overview of jobs, invoices, and inventory.') }}</p>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -37,7 +38,7 @@
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
             </span>
             <span>
-                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __("Today's Jobs") }}</span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-500">{{ __("Today's Jobs") }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold text-slate-900">{{ $todays_jobs }}</span>
             </span>
         </a>
@@ -46,7 +47,7 @@
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
             </span>
             <span>
-                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Pending Requests') }}</span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Pending Requests') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold text-amber-600">{{ $pending_requests }}</span>
             </span>
         </a>
@@ -55,7 +56,7 @@
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
             </span>
             <span>
-                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Active Jobs') }}</span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Active Jobs') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold text-teal-600">{{ $active_jobs }}</span>
             </span>
         </a>
@@ -64,7 +65,7 @@
                 <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
             </span>
             <span>
-                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Completed Today') }}</span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Completed Today') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold text-emerald-600">{{ $completed_today }}</span>
             </span>
         </a>
@@ -73,7 +74,7 @@
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6V3Zm8 0v5h5"/></svg>
             </span>
             <span>
-                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Unpaid Invoices') }}</span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Unpaid Invoices') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold text-rose-600">{{ $unpaid_invoices }}</span>
                 <span class="mt-0.5 block text-xs font-semibold text-slate-500">{{ number_format($outstanding_total, 2) }} {{ __('SAR outstanding') }}</span>
             </span>
@@ -83,7 +84,7 @@
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1ZM7 10h2v2H7v-2Zm0 4h2v2H7v-2Zm4-4h6v2h-6v-2Zm0 4h6v2h-6v-2Z"/></svg>
             </span>
             <span>
-                <span class="block text-xs font-bold uppercase tracking-wider text-slate-400">{{ __('Low-Stock Items') }}</span>
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-500">{{ __('Low-Stock Items') }}</span>
                 <span class="mt-0.5 block font-display text-3xl font-extrabold {{ $low_stock_count > 0 ? 'text-amber-600' : 'text-slate-900' }}">{{ $low_stock_count }}</span>
                 @if($low_stock_items->isNotEmpty())
                     <span class="mt-0.5 block text-xs text-slate-500">{{ $low_stock_items->map(fn ($lowItem) => $lowItem->display_name)->join(', ') }}</span>
@@ -102,7 +103,7 @@
                         <span class="text-xs text-slate-500">{{ $appointment->date->format('d M') }}, {{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }}</span>
                     </li>
                 @empty
-                    <p class="text-sm text-slate-400">{{ __('No upcoming appointments.') }}</p>
+                    <p class="text-sm text-slate-500">{{ __('No upcoming appointments.') }}</p>
                 @endforelse
             </ul>
         </div>
@@ -116,7 +117,7 @@
                         <span class="text-xs text-slate-500">{{ $job->user->name ?? '' }}</span>
                     </li>
                 @empty
-                    <p class="text-sm text-slate-400">{{ __('No unassigned jobs. All clear!') }}</p>
+                    <p class="text-sm text-slate-500">{{ __('No unassigned jobs. All clear!') }}</p>
                 @endforelse
             </ul>
         </div>
@@ -130,7 +131,7 @@
                         <span class="text-xs text-slate-500">{{ $job->user->name ?? '' }}</span>
                     </li>
                 @empty
-                    <p class="text-sm text-slate-400">{{ __('Nothing awaiting approval.') }}</p>
+                    <p class="text-sm text-slate-500">{{ __('Nothing awaiting approval.') }}</p>
                 @endforelse
             </ul>
         </div>
@@ -144,7 +145,7 @@
                         <span class="text-xs text-slate-500">{{ $job->status->label() }}</span>
                     </li>
                 @empty
-                    <p class="text-sm text-slate-400">{{ __('No requests yet.') }}</p>
+                    <p class="text-sm text-slate-500">{{ __('No requests yet.') }}</p>
                 @endforelse
             </ul>
         </div>

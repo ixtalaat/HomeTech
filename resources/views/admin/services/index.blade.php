@@ -115,14 +115,14 @@
                             <td class="px-6 py-4 text-end">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('admin.services.edit', $service) }}"
-                                        class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition">
+                                        class="btn-row">
                                         {{ __('Edit') }}
                                     </a>
                                     <form method="POST" action="{{ route('admin.services.destroy', $service) }}" data-confirm="{{ __('Are you sure you want to delete this service?') }}" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                            class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition">
+                                            class="btn-row-danger">
                                             {{ __('Delete') }}
                                         </button>
                                     </form>

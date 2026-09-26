@@ -71,7 +71,7 @@
                     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div class="stat-card">
                             <div class="stat-icon bg-teal-50 text-teal-700">
-                                ⏱️
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 7v5l3 2"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-slate-400">{{ __('Estimated Duration') }}</p>
@@ -81,13 +81,19 @@
 
                         <div class="stat-card">
                             <div class="stat-icon bg-sky-50 text-sky-700">
-                                🛡️
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 12l2 2 3.5-4"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-slate-400">{{ __('Quality Guarantee') }}</p>
                                 <p class="font-display text-lg font-bold text-slate-900">{{ __('Verified Pros & Warranty') }}</p>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5">{{ __('Transparent pricing') }}</span>
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5">{{ __('Certified technicians') }}</span>
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5">{{ __('On-time arrival') }}</span>
                     </div>
 
                     @if($relatedServices->isNotEmpty())
@@ -154,6 +160,14 @@
             </div>
         </div>
     </main>
+
+    @auth
+        <div class="sticky bottom-0 z-20 border-t border-slate-200 bg-white/95 px-5 py-3 backdrop-blur lg:hidden">
+            <a href="{{ route('requests.create', ['service_id' => $service->id]) }}" class="primary-button w-full py-3.5 text-sm font-bold">
+                {{ __('Request This Service') }} · {{ number_format($service->base_price, 2) }} {{ __('SAR') }}
+            </a>
+        </div>
+    @endauth
 
     <!-- Footer -->
     <footer class="border-t border-slate-200 bg-white">

@@ -13,7 +13,7 @@
             <div class="stat-card"><span class="stat-icon bg-sky-100 text-sky-700">▣</span><div><p class="text-sm font-semibold text-slate-500">{{ __('Completed jobs') }}</p><p class="mt-1 font-display text-3xl font-extrabold">{{ $completed_jobs }}</p></div></div>
         </div>
         <div class="mt-8 grid gap-6 lg:grid-cols-2">
-            <section class="rounded-3xl border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-label="{{ __('Upcoming visits') }}">
+            <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-label="{{ __('Upcoming visits') }}">
                 <p class="text-sm font-bold uppercase tracking-[0.14em] text-teal-600">{{ __('Up next') }}</p>
                 <ul class="mt-4 space-y-2">
                     @forelse ($upcoming as $appointment)
@@ -28,7 +28,7 @@
                     @endforelse
                 </ul>
             </section>
-            <section class="rounded-3xl border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-label="{{ __('Jobs awaiting start') }}">
+            <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-label="{{ __('Jobs awaiting start') }}">
                 <p class="text-sm font-bold uppercase tracking-[0.14em] text-teal-600">{{ __('Awaiting start') }}</p>
                 <ul class="mt-4 space-y-2">
                     @forelse ($assigned as $job)

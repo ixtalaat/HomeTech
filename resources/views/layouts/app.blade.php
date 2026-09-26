@@ -21,7 +21,7 @@
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-teal-600 focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white">{{ __('Skip to content') }}</a>
     <div class="min-h-screen lg:flex">
-        <aside class="hidden w-72 shrink-0 flex-col border-r border-slate-200 bg-white px-6 py-7 lg:flex">
+        <aside class="hidden w-72 shrink-0 flex-col border-r border-slate-200 bg-gradient-to-b from-white via-white to-teal-50/60 px-6 py-7 lg:flex">
             <a href="{{ route('dashboard') }}" aria-label="HomeTech dashboard">
                 <x-brand-logo />
             </a>
@@ -200,8 +200,9 @@
                     <span>{{ __('My profile') }}</span>
                 </a>
             </nav>
-            <div class="relative mt-auto overflow-hidden rounded-2xl bg-slate-900 p-5 text-white">
-                <div class="pointer-events-none absolute -top-12 left-1/2 h-28 w-44 -translate-x-1/2 rounded-full bg-teal-500/25 blur-2xl" aria-hidden="true"></div>
+            <div class="dark-panel mt-auto p-5 text-white">
+                <div class="pointer-events-none absolute -top-12 left-1/2 h-28 w-44 -translate-x-1/2 rounded-full bg-teal-400/30 blur-2xl" aria-hidden="true"></div>
+                <div class="pointer-events-none absolute -bottom-10 -right-10 h-24 w-24 rounded-full bg-sky-400/20 blur-2xl" aria-hidden="true"></div>
                 <div class="relative flex items-center gap-3">
                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-teal-300">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="2.8" y="13.5" width="4" height="6.5" rx="2"/><rect x="17.2" y="13.5" width="4" height="6.5" rx="2"/><path d="M19.5 20a4.5 4.5 0 0 1-4.5 3H13"/></svg>
@@ -219,7 +220,7 @@
         </aside>
         <main id="main-content" class="min-w-0 flex-1" tabindex="-1">
             <header
-                class="flex items-center justify-between border-b border-slate-200 bg-white/90 px-5 py-4 backdrop-blur sm:px-8">
+                class="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white/90 px-5 py-4 shadow-[inset_0_-3px_0_0_rgb(20_184_166/0.15)] backdrop-blur sm:px-8">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-600">{{ __('Home maintenance, simplified') }}</p>
                     <h1 class="mt-1 font-display text-lg font-extrabold text-slate-900">

@@ -38,8 +38,10 @@
 
     <main class="flex-1">
         <!-- Hero Header -->
-        <section class="border-b border-slate-200 bg-white py-12 sm:py-16">
-            <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+        <section class="hero-band relative overflow-hidden py-12 sm:py-16">
+            <div aria-hidden="true" class="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-teal-200/50 blur-3xl"></div>
+            <div aria-hidden="true" class="pointer-events-none absolute -bottom-24 left-1/4 h-56 w-56 rounded-full bg-sky-200/40 blur-3xl"></div>
+            <div class="relative mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
                 <div class="max-w-2xl">
                     <p class="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-teal-700">
                         <span class="h-2 w-2 rounded-full bg-teal-400"></span>

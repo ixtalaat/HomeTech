@@ -243,35 +243,38 @@
         </section>
 
         @if(! empty($servedCities))
-        <section class="relative overflow-hidden bg-slate-900 text-white">
-            <div aria-hidden="true" class="pointer-events-none absolute -top-32 start-1/4 h-72 w-72 rounded-full bg-teal-500/20 blur-3xl"></div>
-            <div aria-hidden="true" class="pointer-events-none absolute -bottom-32 end-1/4 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl"></div>
+        <section class="relative overflow-hidden bg-gradient-to-br from-slate-950 via-teal-950 to-slate-900 text-white">
+            <div aria-hidden="true" class="pointer-events-none absolute -top-32 start-1/4 h-72 w-72 rounded-full bg-teal-400/25 blur-3xl"></div>
+            <div aria-hidden="true" class="pointer-events-none absolute -bottom-32 end-1/4 h-72 w-72 rounded-full bg-sky-400/20 blur-3xl"></div>
+            <div aria-hidden="true" class="pointer-events-none absolute top-1/2 start-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/10 blur-3xl"></div>
             <div class="relative mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-12">
-                <p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-300"><span aria-hidden="true" class="me-2 inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>{{ __('Now serving') }}</p>
+                <p class="text-sm font-bold uppercase tracking-[0.18em] text-teal-200"><span aria-hidden="true" class="me-2 inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>{{ __('Now serving') }}</p>
+                <p class="mt-2 max-w-xl text-sm leading-6 text-teal-100/70">{{ __('Every branch backed by certified technicians, genuine parts, and upfront pricing.') }}</p>
                 <div class="mt-4 flex flex-wrap gap-2">
-                    @foreach ($servedCities as $city)
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-1.5 text-sm font-bold text-white ring-1 ring-white/15">
-                            <svg class="h-4 w-4 text-teal-300" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                    @foreach ($servedCities as $index => $city)
+                        @php($pinColor = ['text-teal-300', 'text-sky-300', 'text-emerald-300', 'text-amber-300'][$index % 4])
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-1.5 text-sm font-bold text-white ring-1 ring-white/15 backdrop-blur-sm transition hover:-translate-y-px hover:bg-white/15 hover:ring-white/25">
+                            <svg class="h-4 w-4 {{ $pinColor }}" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
                             {{ $city }}
                         </span>
                     @endforeach
                 </div>
                 <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div class="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur-sm">
-                        <p class="font-display text-3xl font-extrabold">{{ $stats['services'] }}</p>
-                        <p class="mt-1 text-xs font-semibold text-slate-400">{{ __('Active services') }}</p>
+                    <div class="rounded-2xl border-t-2 border-teal-400 bg-white/[0.06] p-4 ring-1 ring-white/10 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/[0.09]">
+                        <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal-200"><span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-teal-400"></span>{{ __('Active services') }}</p>
+                        <p class="mt-2 font-display text-3xl font-extrabold text-white">{{ $stats['services'] }}</p>
                     </div>
-                    <div class="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur-sm">
-                        <p class="font-display text-3xl font-extrabold">{{ $stats['technicians'] }}</p>
-                        <p class="mt-1 text-xs font-semibold text-slate-400">{{ __('Technicians') }}</p>
+                    <div class="rounded-2xl border-t-2 border-sky-400 bg-white/[0.06] p-4 ring-1 ring-white/10 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/[0.09]">
+                        <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-200"><span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-sky-400"></span>{{ __('Technicians') }}</p>
+                        <p class="mt-2 font-display text-3xl font-extrabold text-white">{{ $stats['technicians'] }}</p>
                     </div>
-                    <div class="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur-sm">
-                        <p class="font-display text-3xl font-extrabold">{{ $stats['completedJobs'] }}</p>
-                        <p class="mt-1 text-xs font-semibold text-slate-400">{{ __('Completed jobs') }}</p>
+                    <div class="rounded-2xl border-t-2 border-emerald-400 bg-white/[0.06] p-4 ring-1 ring-white/10 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/[0.09]">
+                        <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-200"><span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>{{ __('Completed jobs') }}</p>
+                        <p class="mt-2 font-display text-3xl font-extrabold text-white">{{ $stats['completedJobs'] }}</p>
                     </div>
-                    <div class="rounded-2xl bg-white/5 p-4 ring-1 ring-white/10 backdrop-blur-sm">
-                        <p class="font-display text-3xl font-extrabold">{{ $stats['averageRating'] ?? '—' }}<span class="text-base text-slate-400"> / 5</span></p>
-                        <p class="mt-1 text-xs font-semibold text-slate-400">{{ __('Average rating') }}</p>
+                    <div class="rounded-2xl border-t-2 border-amber-400 bg-white/[0.06] p-4 ring-1 ring-white/10 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/[0.09]">
+                        <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-200"><span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>{{ __('Average rating') }}</p>
+                        <p class="mt-2 font-display text-3xl font-extrabold text-white">{{ $stats['averageRating'] ?? '—' }}<span class="text-base text-slate-400"> / 5</span></p>
                     </div>
                 </div>
             </div>

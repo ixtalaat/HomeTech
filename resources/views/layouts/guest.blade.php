@@ -17,24 +17,25 @@
 
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
     <div class="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
-        <section class="relative hidden overflow-hidden bg-teal-50 p-12 text-slate-900 lg:flex lg:flex-col lg:justify-between">
-            <div class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-teal-200/60 blur-3xl"></div>
+        <section class="relative hidden overflow-hidden bg-gradient-to-br from-slate-950 via-teal-950 to-teal-900 p-12 text-white lg:flex lg:flex-col lg:justify-between">
+            <div class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-teal-400/25 blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-sky-400/15 blur-3xl"></div>
             <div class="relative">
                 <div class="flex items-center justify-between">
                     <a href="{{ url('/') }}" aria-label="HomeTech home">
-                        <x-brand-logo />
+                        <x-brand-logo variant="dark" />
                     </a>
                     <a href="{{ route('locale.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
-                        class="rounded-xl border border-teal-200 bg-white/70 px-3 py-2 text-xs font-bold text-teal-700 transition hover:bg-white"
+                        class="rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-xs font-bold text-teal-100 transition hover:bg-white/20"
                         aria-label="{{ __('Switch language') }}">{{ app()->getLocale() === 'ar' ? 'EN' : 'عربي' }}</a>
                 </div>
                 <div class="mt-28 max-w-lg">
-                    <p class="text-sm font-bold uppercase tracking-[0.2em] text-teal-700">{{ __('Care for your home') }}</p>
-                    <h1 class="mt-5 font-display text-5xl font-extrabold leading-tight tracking-tight">{{ __('Reliable help for every corner of home.') }}</h1>
-                    <p class="mt-6 max-w-md text-lg leading-8 text-slate-600">{{ __('Book trusted maintenance, follow your service, and keep your home running smoothly.') }}</p>
+                    <p class="text-sm font-bold uppercase tracking-[0.2em] text-teal-300">{{ __('Care for your home') }}</p>
+                    <h1 class="mt-5 font-display text-5xl font-extrabold leading-tight tracking-tight text-white">{{ __('Reliable help for every corner of home.') }}</h1>
+                    <p class="mt-6 max-w-md text-lg leading-8 text-teal-100/80">{{ __('Book trusted maintenance, follow your service, and keep your home running smoothly.') }}</p>
                 </div>
             </div>
-            <p class="relative text-sm text-slate-500">{{ __('Trusted service coordination for modern households.') }}</p>
+            <p class="relative text-sm text-teal-100/60">{{ __('Trusted service coordination for modern households.') }}</p>
         </section>
         <main class="flex items-center justify-center bg-slate-50 px-5 py-12 sm:px-10">
             <div class="w-full max-w-md">

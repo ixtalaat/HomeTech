@@ -54,7 +54,7 @@
                     </ul>
                 @endif
             </section>
-            <section class="rounded-3xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-900/10 sm:p-8"><p class="text-sm font-bold uppercase tracking-[0.14em] text-teal-300">{{ __('Quick tip') }}</p><h3 class="mt-4 font-display text-2xl font-extrabold leading-tight">{{ __('Small fixes today prevent big repairs tomorrow.') }}</h3><p class="mt-4 text-sm leading-6 text-slate-300">{{ __('Keep a regular maintenance routine and your home will thank you.') }}</p><div class="mt-8 h-1 w-16 rounded-full bg-teal-400"></div></section>
+            <section class="dark-panel p-6 shadow-xl shadow-slate-900/10 sm:p-8"><div aria-hidden="true" class="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-teal-400/25 blur-3xl"></div><div aria-hidden="true" class="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-amber-400/15 blur-3xl"></div><div class="relative"><p class="text-sm font-bold uppercase tracking-[0.14em] text-teal-300">{{ __('Quick tip') }}</p><h3 class="mt-4 font-display text-2xl font-extrabold leading-tight">{{ __('Small fixes today prevent big repairs tomorrow.') }}</h3><p class="mt-4 text-sm leading-6 text-slate-300">{{ __('Keep a regular maintenance routine and your home will thank you.') }}</p><div class="mt-8 h-1 w-16 rounded-full bg-gradient-to-r from-teal-400 to-amber-300"></div></div></section>
         </div>
     </div>
 @endsection

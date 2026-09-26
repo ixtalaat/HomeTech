@@ -9,6 +9,7 @@
             <span>← {{ __('Back to invoices') }}</span>
         </a>
         <div class="mt-2 flex flex-wrap items-center gap-3">
+            <p class="w-full text-xs font-bold uppercase tracking-[0.18em] text-teal-600">{{ __('Billing') }}</p>
             <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ $invoice->number }}</h2>
             <x-status-badge :status="$invoice->status" />
         </div>
@@ -31,7 +32,7 @@
                     <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
                         <div>
                             <p class="font-medium text-slate-700">{{ $item->description }}</p>
-                            <p class="text-xs text-slate-400">{{ $item->item_type->label() }} · {{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</p>
+                            <p class="text-xs text-slate-500">{{ $item->item_type->label() }} · {{ $item->quantity }} × {{ number_format($item->unit_price, 2) }}</p>
                         </div>
                         <span class="font-bold text-slate-900">{{ number_format($item->total, 2) }} {{ __('SAR') }}</span>
                     </li>
@@ -70,13 +71,13 @@
                     @forelse ($invoice->payments as $payment)
                         <li class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
                             <span class="font-bold text-slate-900">{{ number_format($payment->amount, 2) }} {{ __('SAR') }}</span>
-                            <span class="text-xs text-slate-400">
+                            <span class="text-xs text-slate-500">
                                 {{ $payment->method->label() }} · {{ $payment->paid_at?->format('d M Y') }}
                                 · {{ $payment->confirmed_at ? __('Confirmed') : __('Awaiting confirmation') }}
                             </span>
                         </li>
                     @empty
-                        <p class="text-sm text-slate-400">{{ __('No payments yet.') }}</p>
+                        <p class="text-sm text-slate-500">{{ __('No payments yet.') }}</p>
                     @endforelse
                 </ul>
             </div>

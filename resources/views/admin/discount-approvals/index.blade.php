@@ -47,7 +47,7 @@
                                         <form method="POST" action="{{ route('admin.discount-approvals.reject', $approval) }}" class="inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:border-rose-300 hover:text-rose-600 transition">{{ __('Reject') }}</button>
+                                            <button type="submit" class="btn-row-danger">{{ __('Reject') }}</button>
                                         </form>
                                     </div>
                                 @else

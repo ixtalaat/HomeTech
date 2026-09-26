@@ -6,7 +6,8 @@
 <div class="mx-auto max-w-3xl">
     <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h2 class="font-display text-2xl font-extrabold text-slate-900">{{ __('Notifications') }}</h2>
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-teal-600">{{ __('Stay updated') }}</p>
+            <h2 class="mt-1 font-display text-2xl font-extrabold text-slate-900">{{ __('Notifications') }}</h2>
             <p class="mt-1 text-sm text-slate-500">{{ __('Updates about your requests, jobs, invoices, and approvals.') }}</p>
         </div>
         <button type="button" id="enable-push" class="secondary-button shrink-0 text-xs">
@@ -23,14 +24,15 @@
     <div class="space-y-3">
         @forelse ($notifications as $notification)
             <a href="{{ route('notifications.show', $notification) }}"
-                class="block rounded-2xl border p-4 shadow-sm transition hover:border-teal-300 {{ $notification->read_at ? 'border-slate-200 bg-white' : 'border-teal-200 bg-teal-50/60' }}">
-                <p class="text-sm font-medium text-slate-900">{{ __($notification->data['message_key'] ?? 'notifications.fallback', $notification->data['message_params'] ?? []) }}</p>
-                <p class="mt-1 text-xs text-slate-400">{{ $notification->created_at->diffForHumans() }}</p>
+                class="flex items-start gap-3 rounded-2xl border p-4 shadow-sm transition hover:-translate-y-px hover:border-teal-300 hover:shadow-md {{ $notification->read_at ? 'border-slate-200 bg-white' : 'border-teal-200 bg-teal-50/60' }}">
+                <span aria-hidden="true" class="mt-1.5 h-2 w-2 shrink-0 rounded-full {{ $notification->read_at ? 'bg-slate-300' : 'bg-teal-500 animate-pulse' }}"></span>
+                <span class="min-w-0">
+                    <span class="block text-sm font-medium text-slate-900">{{ __($notification->data['message_key'] ?? 'notifications.fallback', $notification->data['message_params'] ?? []) }}</span>
+                    <span class="mt-1 block text-xs text-slate-500">{{ $notification->created_at->diffForHumans() }}</span>
+                </span>
             </a>
         @empty
-            <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center text-sm text-slate-500">
-                {{ __('No notifications yet.') }}
-            </div>
+            <div class="empty-state">{{ __('No notifications yet.') }}</div>
         @endforelse
     </div>
 

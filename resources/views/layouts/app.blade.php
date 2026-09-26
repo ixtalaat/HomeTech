@@ -256,7 +256,7 @@
                 @yield('content')
             </div>
 
-            <nav class="sticky bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-2 backdrop-blur lg:hidden" aria-label="Mobile navigation">
+            <nav class="sticky bottom-0 z-40 border-t border-slate-200 bg-white/95 px-4 pt-2 backdrop-blur lg:hidden pb-[max(0.5rem,env(safe-area-inset-bottom))]" aria-label="Mobile navigation">
                 <div class="flex items-center gap-1 overflow-x-auto">
                     <a href="{{ route('dashboard') }}" @class(['flex shrink-0 flex-col items-center gap-1 rounded-xl px-4 py-2 text-[11px] font-bold', 'text-teal-700' => request()->routeIs('dashboard'), 'text-slate-500' => ! request()->routeIs('dashboard')])>
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1-1v-9Z"/><path d="M9 21v-6h6v6"/></svg>

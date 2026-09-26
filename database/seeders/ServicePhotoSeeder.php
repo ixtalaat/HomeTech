@@ -12,13 +12,24 @@ class ServicePhotoSeeder extends Seeder
     /**
      * Service names mapped to seed photo fixtures.
      *
+     * Fixture credits (CC BY / BY-SA, commercial use allowed — keep the
+     * creator name with the file if you redistribute it):
+     * faucet.jpg — “Bathroom Remodel” © Jeremy Levine Design (CC BY 2.0)
+     * pipes.jpg — “Plumbing” © cobaltfish (CC BY-SA 2.0)
+     * heater.jpg — “Plumber uses two wrenches to tighten a fitting” © Tomwsulcer (CC0 1.0)
+     * drain.jpg — “A Stainless Steel Kitchen Sink Drain” © aqua.mech (CC BY 2.0)
+     * socket.jpg — “Abstracts - a light switch” © R/DV/RS (CC BY 2.0)
+     * ac-freon.jpg — “AC Manifold Gauges checking refrigerant charge” © Phyxter Home Services (CC BY 2.0)
+     * ac-compressor.jpg — “Aging Condenser Unit of a Split Air Conditioning System” © Chris Hunkeler (CC BY-SA 2.0)
+     * paint-room.jpg — “House painter at work” © Richard Sutcliffe (CC BY-SA 2.0)
+     *
      * @var array<string, string>
      */
     private const PHOTOS = [
         'Faucet & Tap Repair' => 'faucet.jpg',
         'Pipe Leakage Detection & Fix' => 'pipes.jpg',
         'Water Heater Maintenance' => 'heater.jpg',
-        'Drain Unclogging & Cleaning' => 'drain.png',
+        'Drain Unclogging & Cleaning' => 'drain.jpg',
         'Circuit Breaker & Short Circuit Repair' => 'breaker.jpg',
         'Lighting & Chandelier Installation' => 'chandelier.jpg',
         'Wall Socket & Switch Replacement' => 'socket.jpg',

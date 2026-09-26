@@ -118,6 +118,9 @@ it('reveals the code on screen in demo mode', function () {
 });
 
 it('never reveals codes without explicit opt-in or with a real driver', function () {
+    // Pin the default: local .env enables demo mode, tests must not depend on it.
+    config(['whatsapp.reveal_codes' => false]);
+
     $customer = verifiedCustomer();
 
     // Default: no reveal.

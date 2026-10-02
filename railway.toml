@@ -1,0 +1,25 @@
+# Railway deployment for HomeTech (Laravel 12 + MySQL + Vite).
+#
+# Services to create in Railway (same repo, different start commands):
+#   web     -> this file's startCommand (migrate + serve)
+#   worker  -> override startCommand:  php artisan queue:work --tries=3 --sleep=3 --timeout=120
+#   cron    -> override startCommand:  php artisan schedule:work
+#   mysql   -> Railway MySQL plugin, then map MYSQL* vars to DB_* below.
+#
+# Required service variables (set in Railway dashboard):
+#   APP_KEY, APP_URL=https://<domain>, DB_HOST/PORT/DATABASE/USERNAME/PASSWORD,
+#   STRIPE_KEY/STRIPE_SECRET, WHATSAPP_DRIVER + Twilio/Meta creds,
+#   Firebase push config, PHONE_VERIFICATION_DEMO=false
+#
+# Attach a Volume at storage/app/public — Railway's filesystem is ephemeral
+# and uploaded service/request photos vanish on redeploy without one.
+
+[build]
+builder = "nixpacks"
+buildCommand = "composer install --no-dev --optimize-autoloader && npm ci && npm run build"
+
+[deploy]
+startCommand = "php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force && php artisan storage:link || true && php artisan serve --host=0.0.0.0 --port=$PORT"
+healthcheckPath = "/up"
+healthcheckTimeout = 300
+restartPolicyType = "on-failure"

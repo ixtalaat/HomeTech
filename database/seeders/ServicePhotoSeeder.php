@@ -14,7 +14,8 @@ class ServicePhotoSeeder extends Seeder
      *
      * Fixture credits (CC BY / BY-SA, commercial use allowed — keep the
      * creator name with the file if you redistribute it):
-     * faucet.jpg — “Bathroom Remodel” © Jeremy Levine Design (CC BY 2.0)
+     * faucet.jpg — “Chrome Faucet with Running Water” (CC0 1.0, public domain)
+     * ac-clean.jpg — “HYUNDAI Air conditioner mini split” © AbchyZa22 (CC0 1.0, public domain)
      * pipes.jpg — “Plumbing” © cobaltfish (CC BY-SA 2.0)
      * heater.jpg — “Plumber uses two wrenches to tighten a fitting” © Tomwsulcer (CC0 1.0)
      * drain.jpg — “A Stainless Steel Kitchen Sink Drain” © aqua.mech (CC BY 2.0)

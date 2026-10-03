@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');   // add this line
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'branch.scope' => EnsureBranchScope::class,
